@@ -1,0 +1,31 @@
+/**
+ * study.js — Chapter loading & navigation
+ */
+
+const chapters = [
+  { title: 'Chapter 1: Speed Reading Basics',
+    body: '<p>Speed reading is the practice of reading text at a faster rate than average without losing comprehension. The key is to reduce subvocalization and expand your visual span...</p>' },
+  { title: 'Chapter 2: Rhythm & Pacing',
+    body: '<p>Every language has its own natural rhythm. English follows a stress-timed rhythm, meaning stressed syllables occur at roughly equal intervals...</p>' },
+  { title: 'Chapter 3: Intonation Patterns',
+    body: '<p>Intonation refers to the rise and fall of pitch in speech. Falling intonation signals finality, while rising intonation often indicates a question...</p>' },
+  { title: 'Chapter 4: Stress & Emphasis',
+    body: '<p>When we speak, we naturally place <strong>stress</strong> on certain words and syllables. This stress pattern helps listeners understand the <em>most important</em> information in a sentence.</p><br/><h4>Key Concepts:</h4><ul><li><strong>Word Stress</strong> – Emphasizing the correct syllable in a word</li><li><strong>Sentence Stress</strong> – Highlighting the most important word</li><li><strong>Contrastive Stress</strong> – Using stress to show contrast</li></ul>' },
+  { title: 'Chapter 5: Advanced Pronunciation',
+    body: '<p>Advanced pronunciation focuses on connected speech features: elision, assimilation, linking, and weak forms. These make fluent speech sound natural...</p>' },
+  { title: 'Chapter 6: Practice Assessment',
+    body: '<p>This chapter contains your unit assessment. Practice all reading passages, record yourself, and compare your performance metrics over time...</p>' },
+];
+
+export function loadChapter(idx) {
+  document.querySelectorAll('.chapter-item').forEach((c, i) => {
+    c.className = 'chapter-item' + (i < idx ? ' done' : i === idx ? ' active-ch' : '');
+  });
+  document.getElementById('chapterTitle').textContent = chapters[idx].title;
+  document.getElementById('chapterBody').innerHTML    = chapters[idx].body;
+  document.querySelector('.mini-fill').style.width     = `${Math.round(((idx + 1) / 6) * 100)}%`;
+  document.querySelector('.content-progress span').textContent = `${idx + 1} of 6`;
+
+  localStorage.setItem('last_chapter_index', idx);
+  localStorage.setItem('last_chapter_title', chapters[idx].title);
+}

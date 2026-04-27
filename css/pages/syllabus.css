@@ -1,0 +1,67 @@
+/* ══════════════════════════════════════════════════════════════
+   SYLLABUS — Glass unit cards (Light Mode)
+   ══════════════════════════════════════════════════════════════ */
+.syllabus-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.unit-card {
+  background: var(--card);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  position: relative;
+  transition: all .3s cubic-bezier(.25,.46,.45,.94);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.unit-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent);
+}
+.unit-card:hover {
+  transform: translateY(-2px);
+  background: var(--glass-hover);
+  box-shadow: var(--shadow);
+}
+.unit-card.active-unit {
+  border-color: rgba(14, 165, 233, 0.4);
+  box-shadow: 0 0 25px rgba(14, 165, 233, 0.15);
+}
+.unit-card.locked { opacity: .55; }
+
+.unit-badge {
+  position: absolute; top: 1rem; right: 1rem;
+  font-size: 1.2rem;
+}
+.unit-num {
+  font-size: .72rem; color: var(--accent);
+  font-weight: 600; text-transform: uppercase;
+  margin-bottom: .5rem; letter-spacing: 0.05em;
+}
+.unit-card h3 { font-size: .95rem; margin-bottom: .5rem; letter-spacing: -0.01em; }
+.unit-card p  { font-size: .8rem; color: var(--text2); margin-bottom: 1rem; line-height: 1.5; }
+
+.unit-progress {
+  height: 3px;
+  background: var(--ui-bg);
+  border-radius: 2px; overflow: hidden;
+  margin-bottom: .5rem;
+}
+.unit-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(14, 165, 233, 0.3);
+}
+
+.unit-status { font-size: .72rem; font-weight: 600; }
+.unit-status.done     { color: var(--success); }
+.unit-status.progress { color: var(--accent); }
+.unit-status.locked-s { color: var(--text3); }

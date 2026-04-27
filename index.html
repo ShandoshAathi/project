@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>VaaniAI – AI Learning Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<!-- Design System -->
+<link rel="stylesheet" href="css/variables.css"/>
+<link rel="stylesheet" href="css/base.css"/>
+<link rel="stylesheet" href="css/layout.css"/>
+<link rel="stylesheet" href="css/components.css"/>
+<!-- Page-Specific -->
+<link rel="stylesheet" href="css/pages/dashboard.css"/>
+<link rel="stylesheet" href="css/pages/syllabus.css"/>
+<link rel="stylesheet" href="css/pages/study.css"/>
+<link rel="stylesheet" href="css/pages/practice.css"/>
+<link rel="stylesheet" href="css/pages/results.css"/>
+<link rel="stylesheet" href="css/pages/quiz.css"/>
+<link rel="stylesheet" href="css/pages/profile.css"/>
+<link rel="stylesheet" href="css/pages/auth.css"/>
+<link rel="stylesheet" href="css/responsive.css"/>
+</head>
+<body>
+<div class="app">
+  <!-- Onboarding Overlay -->
+  <div id="onboarding-overlay" class="auth-page hidden">
+    <div class="auth-card animate-in">
+      <div class="auth-header">
+        <div class="auth-logo">V</div>
+        <h2>Complete Your Profile</h2>
+        <p>Help us personalize your learning journey</p>
+      </div>
+
+      <div id="onboarding-step-1">
+        <div class="social-auth-grid" id="extract-section" style="display: none; margin-bottom: 1.5rem;">
+          <button class="btn-primary" onclick="extractProviderDetails()" id="btn-extract">
+            ✨ Extract details from <span id="provider-name">Provider</span>
+          </button>
+        </div>
+
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" id="onboard-name" placeholder="John Doe" />
+        </div>
+        <div class="input-group">
+          <label>Native Language</label>
+          <select id="onboard-language">
+            <option value="Tamil">Tamil</option>
+            <option value="Hindi">Hindi</option>
+            <option value="Spanish">Spanish</option>
+            <option value="French">French</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Learning Goal</label>
+          <textarea id="onboard-goal" placeholder="e.g. Improve my pronunciation for business meetings" rows="3"></textarea>
+        </div>
+
+        <button class="btn-primary auth-btn" onclick="saveOnboarding()">Finish Setup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Main Content -->
+  <nav class="topnav">
+    <div class="brand">
+      <div class="brand-icon">V</div>
+      <span class="brand-name">VaaniAI</span>
+    </div>
+    <div class="nav">
+      <div class="nav-glider" id="nav-glider"></div>
+      <a class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+        <span class="nav-icon">🏠</span><span>Dashboard</span>
+      </a>
+      <a class="nav-item" data-page="syllabus" onclick="navigate('syllabus')">
+        <span class="nav-icon">📚</span><span>Syllabus</span>
+      </a>
+      <a class="nav-item" data-page="study" onclick="navigate('study')">
+        <span class="nav-icon">📖</span><span>Study</span>
+      </a>
+      <a class="nav-item" data-page="practice" onclick="navigate('practice')">
+        <span class="nav-icon">🎙️</span><span>Practice</span>
+      </a>
+      <a class="nav-item" data-page="results" onclick="navigate('results')">
+        <span class="nav-icon">📊</span><span>Results</span>
+      </a>
+      <a class="nav-item" data-page="quiz" onclick="navigate('quiz')">
+        <span class="nav-icon">🧠</span><span>Quiz</span>
+      </a>
+      <a class="nav-item" data-page="profile" onclick="navigate('profile')">
+        <span class="nav-icon">👤</span><span>Profile</span>
+      </a>
+    </div>
+    <div class="topnav-right">
+      <div class="streak-badge" id="streak-badge">🔥 0 Day Streak</div>
+      <div class="avatar" onclick="navigate('profile')">A</div>
+      <button class="btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="page-header">
+      <h2 class="page-title" id="pageTitle">Dashboard</h2>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg,#6C3DE8,#8B5CF6)">📖</div>
+          <div class="stat-info">
+            <p class="stat-label">Lessons Done</p>
+            <h3 class="stat-value" id="stat-lessons">0</h3>
+            <p class="stat-change positive">Updated now</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg,#0EA5E9,#00D4FF)">🎯</div>
+          <div class="stat-info">
+            <p class="stat-label">Accuracy</p>
+            <h3 class="stat-value" id="stat-accuracy">0%</h3>
+            <p class="stat-change positive">Updated now</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg,#F59E0B,#FCD34D)">⏱️</div>
+          <div class="stat-info">
+            <p class="stat-label">Time Spent</p>
+            <h3 class="stat-value" id="stat-time">0h</h3>
+            <p class="stat-change positive">Updated now</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg,#10B981,#34D399)">🏆</div>
+          <div class="stat-info">
+            <p class="stat-label">Quiz Score</p>
+            <h3 class="stat-value" id="stat-quiz">0%</h3>
+            <p class="stat-change positive">+8% improvement</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3 class="card-title">Weekly Progress</h3>
+          <div class="bar-chart">
+            <div class="bar-group"><div class="bar" style="height:60%"></div><span>Mon</span></div>
+            <div class="bar-group"><div class="bar" style="height:80%"></div><span>Tue</span></div>
+            <div class="bar-group"><div class="bar" style="height:45%"></div><span>Wed</span></div>
+            <div class="bar-group"><div class="bar" style="height:90%"></div><span>Thu</span></div>
+            <div class="bar-group"><div class="bar" style="height:70%"></div><span>Fri</span></div>
+            <div class="bar-group"><div class="bar" style="height:55%"></div><span>Sat</span></div>
+            <div class="bar-group"><div class="bar active-bar" style="height:85%"></div><span>Sun</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Skill Levels</h3>
+          <div class="skill-list" id="skill-list">
+            <div class="skill-item">
+              <div class="skill-header"><span>Reading</span><span id="skill-val-reading">0%</span></div>
+              <div class="skill-bar"><div class="skill-fill" id="skill-bar-reading" style="width:0%;background:linear-gradient(90deg,#6C3DE8,#8B5CF6)"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-header"><span>Pronunciation</span><span id="skill-val-pronunciation">0%</span></div>
+              <div class="skill-bar"><div class="skill-fill" id="skill-bar-pronunciation" style="width:0%;background:linear-gradient(90deg,#0EA5E9,#00D4FF)"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-header"><span>Comprehension</span><span id="skill-val-comprehension">0%</span></div>
+              <div class="skill-bar"><div class="skill-fill" id="skill-bar-comprehension" style="width:0%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-header"><span>Fluency</span><span id="skill-val-fluency">0%</span></div>
+              <div class="skill-bar"><div class="skill-fill" id="skill-bar-fluency" style="width:0%;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Recent Activity</h3>
+          <div class="activity-list" id="activity-list">
+            <!-- Dynamic items will go here -->
+            <p style="color:var(--text2); font-size:0.85rem; padding:1rem 0;">No recent activity yet.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Continue Learning</h3>
+          <div class="continue-card">
+            <div class="continue-icon">📖</div>
+            <div class="continue-info">
+              <p class="continue-lesson">Chapter 5: Advanced Pronunciation</p>
+              <p class="continue-sub">Study Material • 12 min read</p>
+              <div class="progress-bar"><div class="progress-fill" style="width:45%"></div></div>
+              <small>45% complete</small>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="navigate('study')" style="width:100%;margin-top:1rem">Resume →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Syllabus Page -->
+    <div class="page" id="page-syllabus">
+      <div class="syllabus-header">
+        <p class="subtitle">Your personalized learning roadmap</p>
+      </div>
+      <div class="syllabus-grid">
+        <div class="unit-card completed"><div class="unit-badge">✓</div><div class="unit-num">Unit 1</div><h3>Foundations of Reading</h3><p>Basic phonics, letter sounds, and simple words</p><div class="unit-progress"><div class="unit-bar" style="width:100%"></div></div><span class="unit-status done">Completed</span></div>
+        <div class="unit-card completed"><div class="unit-badge">✓</div><div class="unit-num">Unit 2</div><h3>Sentence Formation</h3><p>Building simple and compound sentences</p><div class="unit-progress"><div class="unit-bar" style="width:100%"></div></div><span class="unit-status done">Completed</span></div>
+        <div class="unit-card active-unit"><div class="unit-badge current">●</div><div class="unit-num">Unit 3</div><h3>Reading Fluency</h3><p>Speed reading, rhythm and intonation patterns</p><div class="unit-progress"><div class="unit-bar" style="width:65%"></div></div><span class="unit-status progress">65% Done</span></div>
+        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Unit 4</div><h3>Advanced Comprehension</h3><p>Deep reading, inference and critical thinking</p><div class="unit-progress"><div class="unit-bar" style="width:0%"></div></div><span class="unit-status locked-s">Locked</span></div>
+        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Unit 5</div><h3>Vernacular Integration</h3><p>Tamil-English bilingual reading exercises</p><div class="unit-progress"><div class="unit-bar" style="width:0%"></div></div><span class="unit-status locked-s">Locked</span></div>
+        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Unit 6</div><h3>Mastery Assessment</h3><p>Final evaluation and certification</p><div class="unit-progress"><div class="unit-bar" style="width:0%"></div></div><span class="unit-status locked-s">Locked</span></div>
+      </div>
+    </div>
+
+    <!-- Study Material Page -->
+    <div class="page" id="page-study">
+      <div class="study-layout">
+        <div class="chapters-panel">
+          <h3>Unit 3 – Reading Fluency</h3>
+          <div class="chapter-list">
+            <div class="chapter-item done" onclick="loadChapter(1)"><span>✓</span> Ch 1: Speed Reading Basics</div>
+            <div class="chapter-item done" onclick="loadChapter(2)"><span>✓</span> Ch 2: Rhythm & Pacing</div>
+            <div class="chapter-item done" onclick="loadChapter(3)"><span>✓</span> Ch 3: Intonation Patterns</div>
+            <div class="chapter-item active-ch" onclick="loadChapter(4)"><span>▶</span> Ch 4: Stress & Emphasis</div>
+            <div class="chapter-item" onclick="loadChapter(5)"><span>○</span> Ch 5: Advanced Pronunciation</div>
+            <div class="chapter-item" onclick="loadChapter(6)"><span>○</span> Ch 6: Practice Assessment</div>
+          </div>
+        </div>
+        <div class="content-panel card">
+          <div class="content-header">
+            <h3 id="chapterTitle">Chapter 4: Stress & Emphasis</h3>
+            <div class="content-progress"><span>4 of 6</span><div class="mini-bar"><div class="mini-fill" style="width:67%"></div></div></div>
+          </div>
+          <div class="content-body" id="chapterBody">
+            <p>When we speak, we naturally place <strong>stress</strong> on certain words and syllables. This stress pattern helps listeners understand the <em>most important</em> information in a sentence.</p>
+            <br/>
+            <h4>Key Concepts:</h4>
+            <ul>
+              <li><strong>Word Stress</strong> – Emphasizing the correct syllable in a word (e.g., RE-cord vs re-CORD)</li>
+              <li><strong>Sentence Stress</strong> – Highlighting the most important word in a sentence</li>
+              <li><strong>Contrastive Stress</strong> – Using stress to show contrast between ideas</li>
+            </ul>
+            <br/>
+            <div class="example-box">
+              <p><strong>Example:</strong> "I never said <em>she</em> stole the money" vs "I <em>never</em> said she stole the money"</p>
+              <p>Notice how stressing different words changes the entire meaning!</p>
+            </div>
+            <br/>
+            <p>Practice reading aloud, paying close attention to which words feel naturally emphasized. Record yourself and compare with native speakers to improve your stress patterns.</p>
+          </div>
+          <div class="content-actions">
+            <button class="btn-outline">← Previous</button>
+            <button class="btn-primary" onclick="navigate('practice')">Practice This →</button>
+            <button class="btn-outline">Next Chapter →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Practice Page -->
+    <div class="page" id="page-practice">
+      <div class="practice-layout">
+        <div class="practice-text-card card">
+          <div class="practice-header">
+            <h3>Read Aloud</h3>
+            <span class="difficulty-badge">Medium</span>
+          </div>
+          <div class="practice-passage" id="practicePassage">
+            <p id="passageText">The <span class="word" id="w0">sun</span> <span class="word" id="w1">rises</span> <span class="word" id="w2">in</span> <span class="word" id="w3">the</span> <span class="word" id="w4">east</span> <span class="word" id="w5">and</span> <span class="word" id="w6">sets</span> <span class="word" id="w7">in</span> <span class="word" id="w8">the</span> <span class="word" id="w9">west.</span> <span class="word" id="w10">Every</span> <span class="word" id="w11">morning</span> <span class="word" id="w12">brings</span> <span class="word" id="w13">a</span> <span class="word" id="w14">new</span> <span class="word" id="w15">beginning,</span> <span class="word" id="w16">full</span> <span class="word" id="w17">of</span> <span class="word" id="w18">possibilities</span> <span class="word" id="w19">and</span> <span class="word" id="w20">opportunities</span> <span class="word" id="w21">waiting</span> <span class="word" id="w22">to</span> <span class="word" id="w23">be</span> <span class="word" id="w24">discovered.</span></p>
+          </div>
+          <div class="mic-section">
+            <button class="mic-btn" id="micBtn" onclick="toggleMic()">
+              <span class="mic-icon">🎙️</span>
+              <div class="mic-pulse" id="micPulse"></div>
+            </button>
+            <p id="micStatus">Click to Start Recording</p>
+          </div>
+          <div class="practice-actions">
+            <button class="btn-outline" onclick="newPassage()">New Passage</button>
+            <button class="btn-primary" onclick="submitPractice()">Submit →</button>
+          </div>
+        </div>
+        <div class="feedback-panel">
+          <div class="card" id="feedbackCard">
+            <h3>Feedback</h3>
+            <div class="score-ring">
+              <svg viewBox="0 0 100 100" class="ring-svg">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#1A1A3E" stroke-width="8"/>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="url(#grad)" stroke-width="8" stroke-dasharray="188 251" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#6C3DE8"/><stop offset="100%" style="stop-color:#00D4FF"/></linearGradient></defs>
+              </svg>
+              <div class="ring-score">75%</div>
+            </div>
+            <div class="feedback-metrics">
+              <div class="metric"><span>Accuracy</span><span class="metric-val good">88%</span></div>
+              <div class="metric"><span>Fluency</span><span class="metric-val ok">72%</span></div>
+              <div class="metric"><span>Pronunciation</span><span class="metric-val good">85%</span></div>
+              <div class="metric"><span>Speed</span><span class="metric-val warn">65%</span></div>
+            </div>
+            <div class="feedback-tip">
+              <p>💡 <strong>Tip:</strong> Work on your pacing – try reading slightly slower for better clarity.</p>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Session History</h3>
+            <div class="session-list">
+              <div class="session-item"><span>Session 1</span><span class="good">82%</span></div>
+              <div class="session-item"><span>Session 2</span><span class="ok">74%</span></div>
+              <div class="session-item"><span>Session 3</span><span class="good">88%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Page -->
+    <div class="page" id="page-results">
+      <div class="results-overview">
+        <div class="result-score-card card">
+          <h3>Overall Performance</h3>
+          <div class="big-score">87<span>%</span></div>
+          <p>Above Average 🏆</p>
+          <div class="result-badges">
+            <span class="badge">🎯 Consistent</span>
+            <span class="badge">📈 Improving</span>
+            <span class="badge">⭐ Top 10%</span>
+          </div>
+        </div>
+        <div class="card results-chart-card">
+          <h3>Performance Over Time</h3>
+          <div class="line-chart">
+            <svg viewBox="0 0 300 150" class="line-svg">
+              <polyline points="10,120 50,95 90,105 130,70 170,80 210,55 250,40 290,35" fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs><linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" style="stop-color:#6C3DE8"/><stop offset="100%" style="stop-color:#00D4FF"/></linearGradient></defs>
+              <polyline points="10,120 50,95 90,105 130,70 170,80 210,55 250,40 290,35 290,150 10,150" fill="url(#areaGrad)" opacity="0.15"/>
+              <defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" style="stop-color:#6C3DE8"/><stop offset="100%" style="stop-color:transparent"/></linearGradient></defs>
+            </svg>
+            <div class="chart-labels">
+              <span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="results-detail-grid">
+        <div class="card"><h3>Category Breakdown</h3>
+          <div class="breakdown-list">
+            <div class="breakdown-item"><span>📖 Reading</span><div class="bd-bar"><div style="width:78%;background:linear-gradient(90deg,#6C3DE8,#8B5CF6)"></div></div><span>78%</span></div>
+            <div class="breakdown-item"><span>🎙️ Speaking</span><div class="bd-bar"><div style="width:85%;background:linear-gradient(90deg,#0EA5E9,#00D4FF)"></div></div><span>85%</span></div>
+            <div class="breakdown-item"><span>🧠 Quiz</span><div class="bd-bar"><div style="width:92%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div><span>92%</span></div>
+            <div class="breakdown-item"><span>⚡ Fluency</span><div class="bd-bar"><div style="width:65%;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div></div><span>65%</span></div>
+          </div>
+        </div>
+        <div class="card"><h3>Best Sessions</h3>
+          <div class="best-list">
+            <div class="best-item"><div><p>Unit 2 Practice</p><small>Apr 20, 2026</small></div><span class="score-pill good">95%</span></div>
+            <div class="best-item"><div><p>Quiz – Unit 3</p><small>Apr 22, 2026</small></div><span class="score-pill good">92%</span></div>
+            <div class="best-item"><div><p>Reading – Ch 3</p><small>Apr 23, 2026</small></div><span class="score-pill ok">88%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz Page -->
+    <div class="page" id="page-quiz">
+      <div class="quiz-layout">
+        <div class="quiz-main card">
+          <div class="quiz-header">
+            <span class="quiz-num" id="quizNum">Question 1 of 5</span>
+            <div class="quiz-timer" id="quizTimer">⏱️ 30s</div>
+          </div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quizProgressFill" style="width:20%"></div></div>
+          <div class="question-area">
+            <h3 id="questionText">Which of the following best describes "word stress" in English?</h3>
+            <div class="options-grid" id="optionsGrid">
+              <button class="option-btn" onclick="selectOption(this,false)">A. Speaking very loudly</button>
+              <button class="option-btn" onclick="selectOption(this,true)">B. Emphasizing a particular syllable in a word</button>
+              <button class="option-btn" onclick="selectOption(this,false)">C. Writing in capital letters</button>
+              <button class="option-btn" onclick="selectOption(this,false)">D. Pausing between sentences</button>
+            </div>
+          </div>
+          <div class="quiz-actions">
+            <button class="btn-outline" id="prevBtn" onclick="prevQuestion()" disabled>← Prev</button>
+            <button class="btn-primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+          </div>
+        </div>
+        <div class="quiz-sidebar">
+          <div class="card"><h3>Quiz Info</h3>
+            <div class="quiz-meta">
+              <div class="qm-item"><span>📚 Topic</span><span>Reading Fluency</span></div>
+              <div class="qm-item"><span>❓ Questions</span><span>5</span></div>
+              <div class="qm-item"><span>⏱️ Time</span><span>30s each</span></div>
+              <div class="qm-item"><span>🏆 Pass Mark</span><span>70%</span></div>
+            </div>
+          </div>
+          <div class="card"><h3>Questions</h3>
+            <div class="q-navigator" id="qNav">
+              <div class="q-dot active-q" onclick="goToQ(0)">1</div>
+              <div class="q-dot" onclick="goToQ(1)">2</div>
+              <div class="q-dot" onclick="goToQ(2)">3</div>
+              <div class="q-dot" onclick="goToQ(3)">4</div>
+              <div class="q-dot" onclick="goToQ(4)">5</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Page -->
+    <div class="page" id="page-profile">
+      <div class="profile-layout">
+        <div class="profile-card card">
+          <div class="profile-avatar-big">A</div>
+          <h2 id="profileName">Arjun Kumar</h2>
+          <p class="profile-tag">Level 3 Learner 🎓</p>
+          <div class="profile-stats">
+            <div class="ps"><h4 id="profile-lessons">0</h4><p>Lessons</p></div>
+            <div class="ps"><h4 id="profile-avg">0%</h4><p>Avg Score</p></div>
+            <div class="ps"><h4 id="profile-streak">0</h4><p>Day Streak</p></div>
+          </div>
+          <button class="btn-primary" onclick="editProfile()">Edit Profile</button>
+        </div>
+        <div class="profile-details">
+          <div class="card">
+            <h3>Personal Info</h3>
+            <div class="info-grid" id="infoGrid">
+              <div class="info-item"><label>Full Name</label><p id="infoName">User</p></div>
+              <div class="info-item"><label>Email</label><p id="infoEmail">user@example.com</p></div>
+              <div class="info-item"><label>Language</label><p id="infoLang">English</p></div>
+              <div class="info-item"><label>Level</label><p>Beginner</p></div>
+              <div class="info-item"><label>Joined</label><p id="infoJoined">Today</p></div>
+              <div class="info-item"><label>Goal</label><p id="infoGoal">General Learning</p></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Achievements</h3>
+            <div class="achievements-grid">
+              <div class="achievement earned"><div>🎯</div><p>First Perfect</p></div>
+              <div class="achievement earned"><div>🔥</div><p>7-Day Streak</p></div>
+              <div class="achievement earned"><div>📚</div><p>10 Lessons</p></div>
+              <div class="achievement"><div>🏆</div><p>Unit Master</p></div>
+              <div class="achievement"><div>⭐</div><p>Top Scorer</p></div>
+              <div class="achievement"><div>🎓</div><p>Graduate</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ── Splash Screen ────────────────────────────────────────────── -->
+<div id="splash" class="splash-screen active">
+  <div class="splash-content">
+    <div class="splash-logo">V</div>
+    <h1 class="splash-title">VaaniAI</h1>
+    <p class="splash-subtitle">Your AI Language Tutor</p>
+    <div class="splash-loader"></div>
+  </div>
+</div>
+
+<!-- ── Login Page ───────────────────────────────────────────────── -->
+<div id="page-login" class="page auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">V</div>
+      <h2>Welcome Back</h2>
+      <p>Log in to continue your learning journey</p>
+    </div>
+
+    <div class="auth-options">
+      <div class="social-auth-grid">
+        <button class="btn-google" id="btn-google" onclick="loginWithGoogle()">
+          <svg class="google-icon" viewBox="0 0 48 48" width="20" height="20">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          <span id="text-google">Google</span>
+        </button>
+        <button class="btn-github" id="btn-github" onclick="loginWithGithub()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          <span id="text-github">GitHub</span>
+        </button>
+      </div>
+
+      <div class="auth-divider"><span>OR</span></div>
+
+      <!-- Toggle Nav -->
+      <div class="auth-type-toggle">
+        <button class="toggle-btn active" id="btn-email-toggle" onclick="switchAuthType('email')">Email</button>
+        <button class="toggle-btn" id="btn-phone-toggle" onclick="switchAuthType('phone')">Mobile</button>
+      </div>
+
+      <!-- Email Auth Section -->
+      <div id="email-auth-section">
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" id="emailInput" placeholder="you@example.com" />
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="passwordInput" placeholder="••••••••" />
+        </div>
+        <button class="btn-primary auth-btn" id="email-action-btn" onclick="loginWithEmail()">Log In</button>
+        <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--ui-border); text-align: center;">
+          <span id="email-auth-hint" style="color: var(--text2); font-size: 0.85rem; display: block; margin-bottom: 0.75rem;">Don't have an account?</span> 
+          <button type="button" class="btn-outline" style="width: 100%;" id="email-auth-toggle" onclick="toggleEmailMode()">Create an Account</button>
+        </div>
+      </div>
+
+      <!-- Phone Auth Section -->
+      <div id="phone-auth-section" style="display: none;">
+        <div class="input-group">
+          <label>Mobile Number</label>
+          <input type="tel" id="phoneInput" placeholder="+1 (555) 000-0000" />
+        </div>
+        <button class="btn-primary auth-btn" onclick="sendOTP()">Send Verification Code</button>
+      </div>
+
+      <!-- OTP Verification Section -->
+      <div id="otp-auth-section" style="display: none;">
+        <label>Enter Verification Code</label>
+        <p class="auth-hint">We sent a 6-digit code to your phone.</p>
+        <div class="otp-group">
+          <input type="text" id="otpInput" placeholder="123456" maxlength="6" />
+        </div>
+        <button class="btn-primary auth-btn" onclick="verifyOTP()">Verify & Login</button>
+        <button class="btn-text" onclick="switchAuthType('phone')">Change Phone Number</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- App Modules -->
+<script type="module" src="js/storage.js?v=1.1"></script>
+<script type="module" src="js/supabase.js?v=1.1"></script>
+<script type="module" src="js/auth.js?v=1.1"></script>
+<script type="module" src="js/navigation.js?v=1.1"></script>
+<script type="module" src="js/quiz.js?v=1.1"></script>
+<script type="module" src="js/practice.js?v=1.1"></script>
+<script type="module" src="js/study.js?v=1.1"></script>
+<script type="module" src="js/profile.js?v=1.1"></script>
+<script type="module" src="js/main.js?v=1.1"></script>
+</body>
+</html>

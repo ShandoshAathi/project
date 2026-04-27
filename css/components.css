@@ -1,0 +1,91 @@
+/* ══════════════════════════════════════════════════════════════
+   GLASS CARDS — Core component
+   ══════════════════════════════════════════════════════════════ */
+.card {
+  background: var(--card);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: all .3s cubic-bezier(.25,.46,.45,.94);
+}
+.card:hover {
+  background: var(--glass-hover);
+  border-color: var(--ui-border);
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 1rem; font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.subtitle {
+  color: var(--text2);
+  margin-bottom: 1.5rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BUTTONS — Apple-style
+   ══════════════════════════════════════════════════════════════ */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff; border: none;
+  padding: .65rem 1.5rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600; font-size: .88rem;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(.25,.46,.45,.94);
+  box-shadow: 0 4px 15px rgba(14, 165, 233, 0.25);
+  letter-spacing: -0.01em;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(14, 165, 233, 0.35);
+}
+.btn-primary:active { transform: translateY(0) scale(.98); }
+
+.btn-outline {
+  background: var(--glass);
+  color: var(--text);
+  border: 1px solid var(--ui-border);
+  padding: .65rem 1.5rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500; font-size: .88rem;
+  cursor: pointer;
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+  transition: all .25s cubic-bezier(.25,.46,.45,.94);
+}
+.btn-outline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--glass-hover);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PROGRESS BARS
+   ══════════════════════════════════════════════════════════════ */
+.progress-bar {
+  height: 4px;
+  background: var(--ui-bg);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: .25rem;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(14, 165, 233, 0.2);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   COLOR UTILITY CLASSES
+   ══════════════════════════════════════════════════════════════ */
+.positive { color: var(--success); }
+.good     { color: var(--success); font-weight: 600; }
+.ok       { color: var(--primary);  font-weight: 600; }
+.warn     { color: var(--warn); }

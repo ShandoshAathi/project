@@ -1,0 +1,54 @@
+/* ── Apple-Inspired Design Tokens (Light Mode - Arctic Frost) ── */
+:root {
+  /* Background — clean light gray/white */
+  --bg:         #f8fafc;
+  --bg2:        rgba(255, 255, 255, 0.8);
+  --bg3:        rgba(255, 255, 255, 0.6);
+
+  /* Glass surfaces - light mode */
+  --glass:      rgba(255, 255, 255, 0.7);
+  --glass-hover:rgba(255, 255, 255, 0.9);
+  --glass-solid:rgba(255, 255, 255, 1);
+  --glass-border:rgba(255, 255, 255, 0.8);
+  --glass-glow: rgba(255, 255, 255, 0.6);
+
+  /* Primary — soft sky blue */
+  --primary:    #0ea5e9;
+  --primary2:   #38bdf8;
+  --primary-glow: rgba(14, 165, 233, 0.2);
+
+  /* Accent — elegant indigo */
+  --accent:     #6366f1;
+  --accent2:    #818cf8;
+
+  /* Semantic */
+  --success:    #10b981;
+  --warn:       #f59e0b;
+  --danger:     #ef4444;
+
+  /* Text - Dark slate for light mode */
+  --text:       #0f172a;
+  --text2:      #475569;
+  --text3:      #94a3b8;
+
+  /* Surface and UI elements */
+  --card:       rgba(255, 255, 255, 0.7);
+  --border:     rgba(0, 0, 0, 0.06);
+  --ui-bg:      rgba(0, 0, 0, 0.04);
+  --ui-bg-hover:rgba(0, 0, 0, 0.06);
+  --ui-border:  rgba(0, 0, 0, 0.08);
+
+  /* Radius — Apple-like generous rounding */
+  --radius:     20px;
+  --radius-sm:  14px;
+  --radius-xs:  10px;
+
+  /* Blur */
+  --blur:       blur(40px);
+  --blur-sm:    blur(20px);
+
+  /* Shadows - subtle dark shadows for light mode */
+  --shadow:     0 8px 32px rgba(15, 23, 42, 0.08);
+  --shadow-sm:  0 4px 16px rgba(15, 23, 42, 0.04);
+  --shadow-glow:0 0 40px rgba(14, 165, 233, 0.15);
+}

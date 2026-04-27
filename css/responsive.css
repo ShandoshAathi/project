@@ -1,0 +1,27 @@
+/* ── Tablet ────────────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .stats-grid         { grid-template-columns: repeat(2, 1fr); }
+  .dashboard-grid     { grid-template-columns: 1fr 1fr; }
+  .dashboard-grid .card:nth-child(1),
+  .dashboard-grid .card:nth-child(3) { grid-column: span 1; }
+  .syllabus-grid      { grid-template-columns: repeat(2, 1fr); }
+  .achievements-grid  { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── Mobile ────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .topnav { padding: 0 1rem; gap: .5rem; }
+  .nav { gap: 0; overflow-x: auto; }
+  .nav-item span:not(.nav-icon) { display: none; }
+  .nav-item { padding: .5rem .6rem; }
+  .brand-name { display: none; }
+  .topnav-right { margin-left: auto; }
+
+  .page { padding: 1.25rem; }
+  .practice-layout,
+  .study-layout,
+  .results-overview,
+  .quiz-layout,
+  .profile-layout { grid-template-columns: 1fr; }
+  .results-detail-grid { grid-template-columns: 1fr; }
+}

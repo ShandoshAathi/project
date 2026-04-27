@@ -1,0 +1,79 @@
+/* ══════════════════════════════════════════════════════════════
+   STUDY MATERIAL — Glass chapter nav & content (Light Mode)
+   ══════════════════════════════════════════════════════════════ */
+.study-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 1.5rem;
+}
+
+/* ── Chapters Panel ───────────────────────────────────────────── */
+.chapters-panel {
+  background: var(--card);
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+.chapters-panel h3 {
+  font-size: .9rem; font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: .75rem;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.chapter-list { display: flex; flex-direction: column; gap: .2rem; }
+.chapter-item {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .6rem .7rem;
+  border-radius: var(--radius-xs);
+  font-size: .82rem; cursor: pointer;
+  color: var(--text2);
+  transition: all .2s;
+}
+.chapter-item:hover {
+  background: var(--ui-bg);
+  color: var(--text);
+}
+.chapter-item.done { color: var(--success); }
+.chapter-item.active-ch {
+  background: rgba(14, 165, 233, 0.1);
+  color: var(--primary); font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(14, 165, 233, 0.2);
+}
+
+/* ── Content Panel ────────────────────────────────────────────── */
+.content-header {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 1.25rem;
+}
+.content-progress {
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .78rem; color: var(--text2);
+}
+.mini-bar {
+  width: 80px; height: 3px;
+  background: var(--ui-bg);
+  border-radius: 2px; overflow: hidden;
+}
+.mini-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  box-shadow: 0 0 6px rgba(14, 165, 233, 0.3);
+}
+
+.content-body         { line-height: 1.85; color: var(--text2); font-size: .88rem; }
+.content-body strong  { color: var(--text); }
+.content-body h4      { color: var(--text); margin-bottom: .5rem; }
+.content-body ul      { padding-left: 1.25rem; }
+.content-body ul li   { margin-bottom: .4rem; }
+.example-box {
+  background: rgba(99, 102, 241, 0.05);
+  border-left: 2px solid rgba(99, 102, 241, 0.4);
+  padding: 1rem 1.25rem;
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  backdrop-filter: var(--blur-sm);
+  -webkit-backdrop-filter: var(--blur-sm);
+}
+.content-actions { display: flex; gap: .75rem; margin-top: 1.5rem; }
