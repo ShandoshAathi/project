@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="css/pages/profile.css"/>
 <link rel="stylesheet" href="css/pages/auth.css"/>
 <link rel="stylesheet" href="css/responsive.css"/>
+<link rel="stylesheet" href="css/utils.css"/>
 </head>
 <body>
 <div class="app">
@@ -34,7 +35,7 @@
       </div>
 
       <div id="onboarding-step-1">
-        <div class="social-auth-grid" id="extract-section" style="display: none; margin-bottom: 1.5rem;">
+        <div class="social-auth-grid hidden mb-6" id="extract-section">
           <button class="btn-primary" onclick="extractProviderDetails()" id="btn-extract">
             ✨ Extract details from <span id="provider-name">Provider</span>
           </button>
@@ -45,8 +46,8 @@
           <input type="text" id="onboard-name" placeholder="John Doe" />
         </div>
         <div class="input-group">
-          <label>Native Language</label>
-          <select id="onboard-language">
+          <label for="onboard-language">Native Language</label>
+          <select id="onboard-language" title="Select your native language">
             <option value="Tamil">Tamil</option>
             <option value="Hindi">Hindi</option>
             <option value="Spanish">Spanish</option>
@@ -97,7 +98,7 @@
     <div class="topnav-right">
       <div class="streak-badge" id="streak-badge">🔥 0 Day Streak</div>
       <div class="avatar" onclick="navigate('profile')">A</div>
-      <button class="btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="logout()">Logout</button>
+      <button class="btn-outline btn-sm" onclick="logout()">Logout</button>
     </div>
   </nav>
 
@@ -111,7 +112,7 @@
     <div class="page active" id="page-dashboard">
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-icon" style="background:linear-gradient(135deg,#6C3DE8,#8B5CF6)">📖</div>
+          <div class="stat-icon grad-purple">📖</div>
           <div class="stat-info">
             <p class="stat-label">Lessons Done</p>
             <h3 class="stat-value" id="stat-lessons">0</h3>
@@ -119,7 +120,7 @@
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon" style="background:linear-gradient(135deg,#0EA5E9,#00D4FF)">🎯</div>
+          <div class="stat-icon grad-blue">🎯</div>
           <div class="stat-info">
             <p class="stat-label">Accuracy</p>
             <h3 class="stat-value" id="stat-accuracy">0%</h3>
@@ -127,7 +128,7 @@
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon" style="background:linear-gradient(135deg,#F59E0B,#FCD34D)">⏱️</div>
+          <div class="stat-icon grad-amber">⏱️</div>
           <div class="stat-info">
             <p class="stat-label">Time Spent</p>
             <h3 class="stat-value" id="stat-time">0h</h3>
@@ -135,7 +136,7 @@
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon" style="background:linear-gradient(135deg,#10B981,#34D399)">🏆</div>
+          <div class="stat-icon grad-green">🏆</div>
           <div class="stat-info">
             <p class="stat-label">Quiz Score</p>
             <h3 class="stat-value" id="stat-quiz">0%</h3>
@@ -148,13 +149,13 @@
         <div class="card">
           <h3 class="card-title">Weekly Progress</h3>
           <div class="bar-chart">
-            <div class="bar-group"><div class="bar" style="height:60%"></div><span>Mon</span></div>
-            <div class="bar-group"><div class="bar" style="height:80%"></div><span>Tue</span></div>
-            <div class="bar-group"><div class="bar" style="height:45%"></div><span>Wed</span></div>
-            <div class="bar-group"><div class="bar" style="height:90%"></div><span>Thu</span></div>
-            <div class="bar-group"><div class="bar" style="height:70%"></div><span>Fri</span></div>
-            <div class="bar-group"><div class="bar" style="height:55%"></div><span>Sat</span></div>
-            <div class="bar-group"><div class="bar active-bar" style="height:85%"></div><span>Sun</span></div>
+            <div class="bar-group"><div class="bar h-60"></div><span>Mon</span></div>
+            <div class="bar-group"><div class="bar h-80"></div><span>Tue</span></div>
+            <div class="bar-group"><div class="bar h-45"></div><span>Wed</span></div>
+            <div class="bar-group"><div class="bar h-90"></div><span>Thu</span></div>
+            <div class="bar-group"><div class="bar h-70"></div><span>Fri</span></div>
+            <div class="bar-group"><div class="bar h-55"></div><span>Sat</span></div>
+            <div class="bar-group"><div class="bar active-bar h-85"></div><span>Sun</span></div>
           </div>
         </div>
 
@@ -163,19 +164,19 @@
           <div class="skill-list" id="skill-list">
             <div class="skill-item">
               <div class="skill-header"><span>Reading</span><span id="skill-val-reading">0%</span></div>
-              <div class="skill-bar"><div class="skill-fill" id="skill-bar-reading" style="width:0%;background:linear-gradient(90deg,#6C3DE8,#8B5CF6)"></div></div>
+              <div class="skill-bar"><div class="skill-fill grad-purple-90 w-0" id="skill-bar-reading"></div></div>
             </div>
             <div class="skill-item">
               <div class="skill-header"><span>Pronunciation</span><span id="skill-val-pronunciation">0%</span></div>
-              <div class="skill-bar"><div class="skill-fill" id="skill-bar-pronunciation" style="width:0%;background:linear-gradient(90deg,#0EA5E9,#00D4FF)"></div></div>
+              <div class="skill-bar"><div class="skill-fill grad-blue-90 w-0" id="skill-bar-pronunciation"></div></div>
             </div>
             <div class="skill-item">
               <div class="skill-header"><span>Comprehension</span><span id="skill-val-comprehension">0%</span></div>
-              <div class="skill-bar"><div class="skill-fill" id="skill-bar-comprehension" style="width:0%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div>
+              <div class="skill-bar"><div class="skill-fill grad-green-90 w-0" id="skill-bar-comprehension"></div></div>
             </div>
             <div class="skill-item">
               <div class="skill-header"><span>Fluency</span><span id="skill-val-fluency">0%</span></div>
-              <div class="skill-bar"><div class="skill-fill" id="skill-bar-fluency" style="width:0%;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div></div>
+              <div class="skill-bar"><div class="skill-fill grad-amber-90 w-0" id="skill-bar-fluency"></div></div>
             </div>
           </div>
         </div>
@@ -184,7 +185,7 @@
           <h3 class="card-title">Recent Activity</h3>
           <div class="activity-list" id="activity-list">
             <!-- Dynamic items will go here -->
-            <p style="color:var(--text2); font-size:0.85rem; padding:1rem 0;">No recent activity yet.</p>
+            <p class="empty-state">No recent activity yet.</p>
           </div>
         </div>
 
@@ -195,11 +196,11 @@
             <div class="continue-info">
               <p class="continue-lesson">Chapter 5: Advanced Pronunciation</p>
               <p class="continue-sub">Study Material • 12 min read</p>
-              <div class="progress-bar"><div class="progress-fill" style="width:45%"></div></div>
+              <div class="progress-bar"><div class="progress-fill w-45"></div></div>
               <small>45% complete</small>
             </div>
           </div>
-          <button class="btn-primary" onclick="navigate('study')" style="width:100%;margin-top:1rem">Resume →</button>
+          <button class="btn-primary w-full mt-4" onclick="navigate('study')">Resume →</button>
         </div>
       </div>
     </div>
@@ -210,12 +211,12 @@
         <p class="subtitle">Your personalized learning roadmap</p>
       </div>
       <div class="syllabus-grid">
-        <div class="unit-card completed"><div class="unit-badge">✓</div><div class="unit-num">Unit 1</div><h3>Foundations of Reading</h3><p>Basic phonics, letter sounds, and simple words</p><div class="unit-progress"><div class="unit-bar" style="width:100%"></div></div><span class="unit-status done">Completed</span></div>
-        <div class="unit-card completed"><div class="unit-badge">✓</div><div class="unit-num">Unit 2</div><h3>Sentence Formation</h3><p>Building simple and compound sentences</p><div class="unit-progress"><div class="unit-bar" style="width:100%"></div></div><span class="unit-status done">Completed</span></div>
-        <div class="unit-card active-unit"><div class="unit-badge current">●</div><div class="unit-num">Unit 3</div><h3>Reading Fluency</h3><p>Speed reading, rhythm and intonation patterns</p><div class="unit-progress"><div class="unit-bar" style="width:65%"></div></div><span class="unit-status progress">65% Done</span></div>
-        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Unit 4</div><h3>Advanced Comprehension</h3><p>Deep reading, inference and critical thinking</p><div class="unit-progress"><div class="unit-bar" style="width:0%"></div></div><span class="unit-status locked-s">Locked</span></div>
-        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Unit 5</div><h3>Vernacular Integration</h3><p>Tamil-English bilingual reading exercises</p><div class="unit-progress"><div class="unit-bar" style="width:0%"></div></div><span class="unit-status locked-s">Locked</span></div>
-        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Unit 6</div><h3>Mastery Assessment</h3><p>Final evaluation and certification</p><div class="unit-progress"><div class="unit-bar" style="width:0%"></div></div><span class="unit-status locked-s">Locked</span></div>
+        <div class="unit-card completed"><div class="unit-badge">✓</div><div class="unit-num">Unit 1</div><h3>Foundations of Reading</h3><p>Basic phonics, letter sounds, and simple words</p><div class="unit-progress"><div class="unit-bar w-100"></div></div><span class="unit-status done">Completed</span></div>
+        <div class="unit-card completed"><div class="unit-badge">✓</div><div class="unit-num">Unit 2</div><h3>Sentence Formation</h3><p>Building simple and compound sentences</p><div class="unit-progress"><div class="unit-bar w-100"></div></div><span class="unit-status done">Completed</span></div>
+        <div class="unit-card active-unit"><div class="unit-badge current">●</div><div class="unit-num">Unit 3</div><h3>Reading Fluency</h3><p>Speed reading, rhythm and intonation patterns</p><div class="unit-progress"><div class="unit-bar w-65"></div></div><span class="unit-status progress">65% Done</span></div>
+        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Unit 4</div><h3>Advanced Comprehension</h3><p>Deep reading, inference and critical thinking</p><div class="unit-progress"><div class="unit-bar w-0"></div></div><span class="unit-status locked-s">Locked</span></div>
+        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Unit 5</div><h3>Vernacular Integration</h3><p>Tamil-English bilingual reading exercises</p><div class="unit-progress"><div class="unit-bar w-0"></div></div><span class="unit-status locked-s">Locked</span></div>
+        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Unit 6</div><h3>Mastery Assessment</h3><p>Final evaluation and certification</p><div class="unit-progress"><div class="unit-bar w-0"></div></div><span class="unit-status locked-s">Locked</span></div>
       </div>
     </div>
 
@@ -236,7 +237,7 @@
         <div class="content-panel card">
           <div class="content-header">
             <h3 id="chapterTitle">Chapter 4: Stress & Emphasis</h3>
-            <div class="content-progress"><span>4 of 6</span><div class="mini-bar"><div class="mini-fill" style="width:67%"></div></div></div>
+            <div class="content-progress"><span>4 of 6</span><div class="mini-bar"><div class="mini-fill w-67"></div></div></div>
           </div>
           <div class="content-body" id="chapterBody">
             <p>When we speak, we naturally place <strong>stress</strong> on certain words and syllables. This stress pattern helps listeners understand the <em>most important</em> information in a sentence.</p>
@@ -294,7 +295,7 @@
               <svg viewBox="0 0 100 100" class="ring-svg">
                 <circle cx="50" cy="50" r="40" fill="none" stroke="#1A1A3E" stroke-width="8"/>
                 <circle cx="50" cy="50" r="40" fill="none" stroke="url(#grad)" stroke-width="8" stroke-dasharray="188 251" stroke-linecap="round" transform="rotate(-90 50 50)"/>
-                <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#6C3DE8"/><stop offset="100%" style="stop-color:#00D4FF"/></linearGradient></defs>
+                <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" class="stop-purple"/><stop offset="100%" class="stop-blue"/></linearGradient></defs>
               </svg>
               <div class="ring-score">75%</div>
             </div>
@@ -338,9 +339,9 @@
           <div class="line-chart">
             <svg viewBox="0 0 300 150" class="line-svg">
               <polyline points="10,120 50,95 90,105 130,70 170,80 210,55 250,40 290,35" fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              <defs><linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" style="stop-color:#6C3DE8"/><stop offset="100%" style="stop-color:#00D4FF"/></linearGradient></defs>
+              <defs><linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" class="stop-purple"/><stop offset="100%" class="stop-blue"/></linearGradient></defs>
               <polyline points="10,120 50,95 90,105 130,70 170,80 210,55 250,40 290,35 290,150 10,150" fill="url(#areaGrad)" opacity="0.15"/>
-              <defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" style="stop-color:#6C3DE8"/><stop offset="100%" style="stop-color:transparent"/></linearGradient></defs>
+              <defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" class="stop-purple"/><stop offset="100%" class="stop-transparent"/></linearGradient></defs>
             </svg>
             <div class="chart-labels">
               <span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span>
@@ -351,10 +352,10 @@
       <div class="results-detail-grid">
         <div class="card"><h3>Category Breakdown</h3>
           <div class="breakdown-list">
-            <div class="breakdown-item"><span>📖 Reading</span><div class="bd-bar"><div style="width:78%;background:linear-gradient(90deg,#6C3DE8,#8B5CF6)"></div></div><span>78%</span></div>
-            <div class="breakdown-item"><span>🎙️ Speaking</span><div class="bd-bar"><div style="width:85%;background:linear-gradient(90deg,#0EA5E9,#00D4FF)"></div></div><span>85%</span></div>
-            <div class="breakdown-item"><span>🧠 Quiz</span><div class="bd-bar"><div style="width:92%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div><span>92%</span></div>
-            <div class="breakdown-item"><span>⚡ Fluency</span><div class="bd-bar"><div style="width:65%;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div></div><span>65%</span></div>
+            <div class="breakdown-item"><span>📖 Reading</span><div class="bd-bar"><div class="w-78 grad-purple-90"></div></div><span>78%</span></div>
+            <div class="breakdown-item"><span>🎙️ Speaking</span><div class="bd-bar"><div class="w-85 grad-blue-90"></div></div><span>85%</span></div>
+            <div class="breakdown-item"><span>🧠 Quiz</span><div class="bd-bar"><div class="w-92 grad-green-90"></div></div><span>92%</span></div>
+            <div class="breakdown-item"><span>⚡ Fluency</span><div class="bd-bar"><div class="w-65 grad-amber-90"></div></div><span>65%</span></div>
           </div>
         </div>
         <div class="card"><h3>Best Sessions</h3>
@@ -375,7 +376,7 @@
             <span class="quiz-num" id="quizNum">Question 1 of 5</span>
             <div class="quiz-timer" id="quizTimer">⏱️ 30s</div>
           </div>
-          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quizProgressFill" style="width:20%"></div></div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill w-20" id="quizProgressFill"></div></div>
           <div class="question-area">
             <h3 id="questionText">Which of the following best describes "word stress" in English?</h3>
             <div class="options-grid" id="optionsGrid">
@@ -510,14 +511,14 @@
           <input type="password" id="passwordInput" placeholder="••••••••" />
         </div>
         <button class="btn-primary auth-btn" id="email-action-btn" onclick="loginWithEmail()">Log In</button>
-        <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--ui-border); text-align: center;">
-          <span id="email-auth-hint" style="color: var(--text2); font-size: 0.85rem; display: block; margin-bottom: 0.75rem;">Don't have an account?</span> 
-          <button type="button" class="btn-outline" style="width: 100%;" id="email-auth-toggle" onclick="toggleEmailMode()">Create an Account</button>
+        <div class="auth-footer-note">
+          <span id="email-auth-hint" class="auth-hint-small">Don't have an account?</span> 
+          <button type="button" class="btn-outline w-full" id="email-auth-toggle" onclick="toggleEmailMode()">Create an Account</button>
         </div>
       </div>
 
       <!-- Phone Auth Section -->
-      <div id="phone-auth-section" style="display: none;">
+      <div id="phone-auth-section" class="hidden">
         <div class="input-group">
           <label>Mobile Number</label>
           <input type="tel" id="phoneInput" placeholder="+1 (555) 000-0000" />
@@ -526,7 +527,7 @@
       </div>
 
       <!-- OTP Verification Section -->
-      <div id="otp-auth-section" style="display: none;">
+      <div id="otp-auth-section" class="hidden">
         <label>Enter Verification Code</label>
         <p class="auth-hint">We sent a 6-digit code to your phone.</p>
         <div class="otp-group">

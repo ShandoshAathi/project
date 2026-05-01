@@ -13,8 +13,8 @@
 
   /* Frosted glass */
   background: var(--glass);
-  backdrop-filter: var(--blur);
   -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
   border-bottom: 1px solid var(--glass-border);
 }
 
@@ -38,6 +38,7 @@
   font-size: 1.15rem; font-weight: 700;
   background: linear-gradient(90deg, var(--primary2), var(--accent));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: -0.02em;
 }
@@ -106,8 +107,8 @@
   border-radius: 20px;
   font-size: .78rem;
   color: #d97706; /* darker amber for light mode */
-  backdrop-filter: var(--blur-sm);
   -webkit-backdrop-filter: var(--blur-sm);
+  backdrop-filter: var(--blur-sm);
 }
 .avatar {
   width: 34px; height: 34px;

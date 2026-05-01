@@ -3,8 +3,8 @@
    ══════════════════════════════════════════════════════════════ */
 .card {
   background: var(--card);
-  backdrop-filter: var(--blur-sm);
   -webkit-backdrop-filter: var(--blur-sm);
+  backdrop-filter: var(--blur-sm);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 1.5rem;
@@ -55,8 +55,8 @@
   border-radius: var(--radius-sm);
   font-weight: 500; font-size: .88rem;
   cursor: pointer;
-  backdrop-filter: var(--blur-sm);
   -webkit-backdrop-filter: var(--blur-sm);
+  backdrop-filter: var(--blur-sm);
   transition: all .25s cubic-bezier(.25,.46,.45,.94);
 }
 .btn-outline:hover {

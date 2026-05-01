@@ -9,8 +9,8 @@
 
 .unit-card {
   background: var(--card);
-  backdrop-filter: var(--blur-sm);
   -webkit-backdrop-filter: var(--blur-sm);
+  backdrop-filter: var(--blur-sm);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 1.5rem;

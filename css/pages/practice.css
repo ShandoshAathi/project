@@ -17,8 +17,8 @@
   border: 1px solid rgba(245, 158, 11, 0.2);
   padding: .3rem .7rem;
   border-radius: 20px; font-size: .78rem;
-  backdrop-filter: var(--blur-sm);
   -webkit-backdrop-filter: var(--blur-sm);
+  backdrop-filter: var(--blur-sm);
 }
 
 /* ── Passage ──────────────────────────────────────────────────── */
@@ -129,8 +129,8 @@
   padding: .75rem 1rem; margin-top: .75rem;
   font-size: .8rem; color: var(--text2);
   line-height: 1.6;
-  backdrop-filter: var(--blur-sm);
   -webkit-backdrop-filter: var(--blur-sm);
+  backdrop-filter: var(--blur-sm);
 }
 
 /* ── Session History ──────────────────────────────────────────── */

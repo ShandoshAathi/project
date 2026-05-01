@@ -10,8 +10,8 @@
 /* ── Chapters Panel ───────────────────────────────────────────── */
 .chapters-panel {
   background: var(--card);
-  backdrop-filter: var(--blur-sm);
   -webkit-backdrop-filter: var(--blur-sm);
+  backdrop-filter: var(--blur-sm);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 1.25rem;
@@ -73,7 +73,7 @@
   border-left: 2px solid rgba(99, 102, 241, 0.4);
   padding: 1rem 1.25rem;
   border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
-  backdrop-filter: var(--blur-sm);
   -webkit-backdrop-filter: var(--blur-sm);
+  backdrop-filter: var(--blur-sm);
 }
 .content-actions { display: flex; gap: .75rem; margin-top: 1.5rem; }
