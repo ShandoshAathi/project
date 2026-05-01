@@ -1,11 +1,12 @@
-/**
- * ai_generator.js — Generates dynamic content using Gemini API
- */
-import { GEMINI_API_KEY } from './config.js';
+import { GEMINI_API_KEY, OPENAI_API_KEY } from './config.js';
 import { getProfile } from './storage.js';
 import { getCurrentUser } from './auth.js';
 
-const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
+
+// Choose your preferred provider: 'gemini' or 'openai'
+const AI_PROVIDER = 'openai'; 
 
 /**
  * Generate a reading passage based on user level
@@ -19,7 +20,9 @@ export async function generatePracticePassage() {
     Return ONLY the plain text of the passage, nothing else.`;
 
   try {
-    const text = await callGemini(prompt);
+    const text = AI_PROVIDER === 'openai' 
+      ? await callOpenAI(prompt)
+      : await callGemini(prompt);
     return text.trim();
   } catch (err) {
     console.error("Passage Generation Failed:", err);
@@ -43,7 +46,10 @@ export async function generateQuizQuestions(topic = "Reading Fluency") {
     Return ONLY the raw JSON array, no markdown blocks.`;
 
   try {
-    const responseText = await callGemini(prompt);
+    const responseText = AI_PROVIDER === 'openai'
+      ? await callOpenAI(prompt)
+      : await callGemini(prompt);
+      
     // Clean up potential markdown formatting
     const jsonStr = responseText.replace(/```json|```/g, '').trim();
     return JSON.parse(jsonStr);
@@ -60,7 +66,7 @@ async function callGemini(prompt) {
     throw new Error("Missing Gemini API Key");
   }
 
-  const response = await fetch(`${API_URL}?key=${GEMINI_API_KEY}`, {
+  const response = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -75,6 +81,33 @@ async function callGemini(prompt) {
 
   const data = await response.json();
   return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+}
+
+async function callOpenAI(prompt) {
+  if (!OPENAI_API_KEY || OPENAI_API_KEY.includes('PASTE_YOUR_KEY')) {
+    throw new Error("Missing OpenAI API Key");
+  }
+
+  const response = await fetch(OPENAI_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: "gpt-3.5-turbo", // or "gpt-4"
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7
+    })
+  });
+
+  if (!response.ok) {
+    const errData = await response.json();
+    throw new Error(errData.error?.message || "OpenAI API Request Failed");
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || "";
 }
 
 async function getUserLevel() {
