@@ -128,6 +128,22 @@ function highlightWords(transcript) {
 
 /* ── Passages ─────────────────────────────────────────────────── */
 
+export function startPractice() {
+  const overlay = document.getElementById('practice-start-overlay');
+  const content = document.getElementById('practice-content');
+  if (overlay) overlay.classList.remove('hidden');
+  if (content) content.classList.add('hidden');
+}
+
+export async function initiatePractice() {
+  const overlay = document.getElementById('practice-start-overlay');
+  const content = document.getElementById('practice-content');
+  if (overlay) overlay.classList.add('hidden');
+  if (content) content.classList.remove('hidden');
+  
+  newPassage();
+}
+
 export async function newPassage() {
   if (isRecording) stopRecording();
   recordedWords = [];

@@ -287,7 +287,21 @@
 
     <!-- Practice Page -->
     <div class="page" id="page-practice">
-      <div class="practice-layout">
+      <!-- Practice Start Overlay -->
+      <div id="practice-start-overlay" class="quiz-overlay">
+        <div class="auth-card text-center">
+          <div class="auth-logo mb-4">P</div>
+          <h2>Ready for Practice?</h2>
+          <p class="mb-6">Improve your pronunciation by reading dynamic passages aloud.</p>
+          <div class="quiz-meta mb-6 justify-center">
+            <div class="qm-item"><span>📖 Activity</span><span>Read Aloud</span></div>
+            <div class="qm-item"><span>🎯 Goal</span><span>Accuracy & Fluency</span></div>
+          </div>
+          <button class="btn-primary auth-btn" onclick="initiatePractice()">Start Practice</button>
+        </div>
+      </div>
+
+      <div class="practice-layout hidden" id="practice-content">
         <div class="practice-text-card card">
           <div class="practice-header">
             <h3>Read Aloud</h3>
@@ -390,7 +404,21 @@
 
     <!-- Quiz Page -->
     <div class="page" id="page-quiz">
-      <div class="quiz-layout">
+      <!-- Quiz Start Overlay -->
+      <div id="quiz-start-overlay" class="quiz-overlay">
+        <div class="auth-card text-center">
+          <div class="auth-logo mb-4">Q</div>
+          <h2>Ready to start the Quiz?</h2>
+          <p class="mb-6">Test your knowledge with 5 dynamic questions tailored to your level.</p>
+          <div class="quiz-meta mb-6 justify-center">
+            <div class="qm-item"><span>📚 Topic</span><span>General English</span></div>
+            <div class="qm-item"><span>❓ Questions</span><span>5</span></div>
+          </div>
+          <button class="btn-primary auth-btn" onclick="initiateQuiz()">Start Quiz Now</button>
+        </div>
+      </div>
+
+      <div class="quiz-layout hidden" id="quiz-content">
         <div class="quiz-main card">
           <div class="quiz-header">
             <span class="quiz-num" id="quizNum">Question 1 of 5</span>

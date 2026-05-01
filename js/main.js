@@ -3,8 +3,8 @@
  * Wires all modules together and attaches global event handlers.
  */
 import { navigate, setPageChangeCallback } from './navigation.js';
-import { startQuiz, nextQuestion, prevQuestion, goToQ } from './quiz.js';
-import { toggleMic, newPassage, submitPractice } from './practice.js';
+import { startQuiz, initiateQuiz, nextQuestion, prevQuestion, goToQ } from './quiz.js';
+import { toggleMic, newPassage, submitPractice, startPractice, initiatePractice } from './practice.js';
 import { loadChapter } from './study.js';
 import { editProfile } from './profile.js';
 import { getSavedName, getResults, getProfile } from './storage.js';
@@ -22,6 +22,8 @@ window.editProfile     = editProfile;
 window.nextQuestion    = nextQuestion;
 window.prevQuestion    = prevQuestion;
 window.goToQ           = goToQ;
+window.initiateQuiz    = initiateQuiz;
+window.initiatePractice = initiatePractice;
 window.selectOption    = () => {};   // handled internally by quiz.js
 
 // Onboarding
@@ -43,6 +45,7 @@ window.logout            = logout;
 /* ── Page-change hook ─────────────────────────────────────────── */
 setPageChangeCallback(page => {
   if (page === 'quiz') startQuiz();
+  if (page === 'practice') startPractice();
   if (page === 'dashboard') refreshDashboard();
   if (page === 'results') refreshResults();
   if (page === 'profile') refreshProfile();

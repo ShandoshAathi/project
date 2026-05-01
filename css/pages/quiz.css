@@ -101,3 +101,16 @@
   border-color: rgba(16, 185, 129, 0.2);
   color: var(--success);
 }
+
+.quiz-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  width: 100%;
+}
+
+.text-center { text-align: center; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.justify-center { justify-content: center; }

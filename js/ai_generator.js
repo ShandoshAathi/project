@@ -12,11 +12,13 @@ const AI_PROVIDER = 'openai';
  * Generate a reading passage based on user level
  */
 export async function generatePracticePassage() {
-  const level = await getUserLevel();
-  const prompt = `Generate a reading practice passage in English for a ${level} level learner. 
+  const { level, occupation } = await getUserContext();
+  const seed = Math.random().toString(36).substring(7);
+  const prompt = `Generate a unique reading practice passage in English for a ${level} level learner who is a ${occupation}. 
+    Reference Seed: ${seed}
     The passage should be exactly 2-3 sentences long. 
-    Choose a unique and interesting topic (e.g., science, history, daily life, travel).
-    Ensure the passage is different from typical common examples.
+    Use vocabulary and scenarios related to their background as a ${occupation} if appropriate, or choose a highly unique and fresh topic.
+    CRITICAL: Ensure the passage is completely different from previous common examples. Be creative.
     Return ONLY the plain text of the passage, nothing else.`;
 
   try {
@@ -34,10 +36,13 @@ export async function generatePracticePassage() {
  * Generate quiz questions based on topic and user level
  */
 export async function generateQuizQuestions(topic = "Reading Fluency") {
-  const level = await getUserLevel();
-  const prompt = `Generate 5 multiple-choice questions about '${topic}' in English for a ${level} learner. 
-    Ensure the questions are unique and cover different aspects of the topic.
-    Choose interesting real-world scenarios or sentence examples.
+  const { level, occupation } = await getUserContext();
+  const seed = Math.random().toString(36).substring(7);
+  const prompt = `Generate 5 unique multiple-choice questions about '${topic}' in English for a ${level} learner who is a ${occupation}. 
+    Reference Seed: ${seed}
+    Incorporate scenarios or terminology relevant to a ${occupation} where it makes sense to keep it engaging.
+    Ensure the questions are fresh, unique, and cover different aspects of the topic.
+    CRITICAL: Do not repeat common questions. Be highly creative with scenarios.
     Return the response as a JSON array of objects.
     Each object MUST have:
     - "q": The question text
@@ -97,7 +102,7 @@ async function callOpenAI(prompt) {
     body: JSON.stringify({
       model: "gpt-3.5-turbo", // or "gpt-4"
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.7
+      temperature: 0.8
     })
   });
 
@@ -110,20 +115,20 @@ async function callOpenAI(prompt) {
   return data.choices?.[0]?.message?.content || "";
 }
 
-async function getUserLevel() {
+async function getUserContext() {
   const user = getCurrentUser();
-  if (!user) return "Beginner";
+  if (!user) return { level: "Beginner", occupation: "Student" };
 
   const profile = await getProfile(user.id);
-  if (!profile) return "Beginner";
+  if (!profile) return { level: "Beginner", occupation: "Student" };
 
-  // Infer level from goal or use a default if not explicitly saved
-  // For now, let's assume "Intermediate" if they have a goal, or "Beginner" otherwise.
-  // We can enhance this by adding a level field to onboarding later.
   const goal = profile.learning_goal || "";
-  if (goal === "Business Communication" || goal === "Public Speaking") return "Advanced";
-  if (goal === "Pass an Exam (IELTS/TOEFL)" || goal === "Improve Fluency") return "Intermediate";
-  if (goal === "Daily Conversation") return "Beginner";
+  const occupation = profile.occupation || "Student";
+  let level = "Beginner";
+
+  if (goal === "Business Communication" || goal === "Public Speaking") level = "Advanced";
+  else if (goal === "Pass an Exam (IELTS/TOEFL)" || goal === "Improve Fluency") level = "Intermediate";
+  else if (goal === "Daily Conversation") level = "Beginner";
   
-  return "Beginner";
+  return { level, occupation };
 }

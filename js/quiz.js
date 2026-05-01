@@ -39,8 +39,23 @@ let timeLeft = 30;
 /* ── Public API ──────────────────────────────────────────────── */
 
 export async function startQuiz() {
+  const overlay = document.getElementById('quiz-start-overlay');
+  const content = document.getElementById('quiz-content');
+  if (overlay) overlay.classList.remove('hidden');
+  if (content) content.classList.add('hidden');
+  
+  // Clear any existing timer
+  if (timerInterval) clearInterval(timerInterval);
+}
+
+export async function initiateQuiz() {
+  const overlay = document.getElementById('quiz-start-overlay');
+  const content = document.getElementById('quiz-content');
+  
+  if (overlay) overlay.classList.add('hidden');
+  if (content) content.classList.remove('hidden');
+
   const grid = document.getElementById('optionsGrid');
-  const originalGrid = grid.innerHTML;
   grid.innerHTML = '<div class="grid-span-2-center">✨ Generating personalized questions...</div>';
 
   const dynamicQs = await generateQuizQuestions();
