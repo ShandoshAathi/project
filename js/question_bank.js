@@ -1,5 +1,5 @@
 /**
- * question_bank.js — Static questions from Suguna College Verbal Aptitude Workbook (Module II)
+ * question_bank.js — Static questions from the Verbal Aptitude Workbook (Module II)
  */
 export const questionBank = {
   "Sentence Pattern": [
