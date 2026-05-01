@@ -31,6 +31,17 @@
   overflow-y: auto;
   padding-right: 0.5rem;
 }
+.module-header {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text3);
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+  padding-left: 0.7rem;
+  font-weight: 700;
+}
+.module-header:first-child { margin-top: 0; }
 .chapter-item {
   display: flex; align-items: center; gap: .5rem;
   padding: .6rem .7rem;
