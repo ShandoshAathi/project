@@ -23,7 +23,14 @@
   border-bottom: 1px solid var(--ui-border);
 }
 
-.chapter-list { display: flex; flex-direction: column; gap: .2rem; }
+.chapter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
 .chapter-item {
   display: flex; align-items: center; gap: .5rem;
   padding: .6rem .7rem;

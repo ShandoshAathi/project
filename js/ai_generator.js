@@ -13,6 +13,7 @@ export async function generatePracticePassage() {
   const seed = Date.now().toString(36) + Math.random().toString(36).substring(2);
   const prompt = `Generate a highly unique and creative reading practice passage in English for a ${level} level learner who is a ${occupation}. 
     Reference ID: ${seed}
+    Include advanced verbal aptitude elements from Module II (e.g., complex sentence patterns like S+V+O+C, active/passive voice, or phrasal verbs) to make it professionally relevant.
     The passage should be exactly 2-3 sentences long. 
     Use complex, specific vocabulary and scenarios related to their background as a ${occupation}.
     CRITICAL: DO NOT use generic topics like 'The sun rises'. Choose something niche, modern, or unexpected.
@@ -32,12 +33,13 @@ export async function generatePracticePassage() {
 /**
  * Generate quiz questions based on topic and user level
  */
-export async function generateQuizQuestions(topic = "Reading Fluency") {
+export async function generateQuizQuestions(topic = "Verbal Aptitude (Module II)") {
   const { level, occupation } = await getUserContext();
   const seed = Date.now().toString(36) + Math.random().toString(36).substring(2);
   const prompt = `Generate 10 unique, high-variety multiple-choice questions about '${topic}' in English for a ${level} learner who is a ${occupation}. 
     Reference ID: ${seed}
-    Use diverse question types: vocabulary, comprehension, grammar, and situational scenarios relevant to a ${occupation}.
+    Focus on topics from Module II: Sentence Patterns, Verb Tenses, Voice, Reported Speech, Concord, Prepositions, Phrasal Verbs, Conditionals, Adverbs, Articles, or Dangling Modifiers.
+    Use diverse question types: vocabulary, comprehension, grammar, and situational scenarios.
     CRITICAL: Avoid standard textbook examples. Be imaginative and challenging.
     Return the response as a JSON array of 10 objects.
     Each object MUST have:
