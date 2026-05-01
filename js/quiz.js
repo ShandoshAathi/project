@@ -140,7 +140,12 @@ function startTimer() {
 
 function updateQNav() {
   document.querySelectorAll('.q-dot').forEach((d, i) => {
-    d.className = 'q-dot' + (i === currentQ ? ' active-q' : userAnswers[i] !== null ? ' answered' : '');
+    let cls = 'q-dot';
+    if (i === currentQ) cls += ' active-q';
+    if (userAnswers[i] !== null) {
+      cls += (userAnswers[i] === questions[i].ans) ? ' correct' : ' wrong';
+    }
+    d.className = cls;
   });
 }
 
