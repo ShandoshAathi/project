@@ -45,11 +45,24 @@
           <label for="onboard-name">Full Name</label>
           <input type="text" id="onboard-name" placeholder="John Doe" />
         </div>
+        <div class="social-auth-grid mb-6">
+          <div class="input-group">
+            <label for="onboard-occupation">Study / Job</label>
+            <input type="text" id="onboard-occupation" placeholder="Software Engineer" />
+          </div>
+          <div class="input-group">
+            <label for="onboard-age">Age</label>
+            <input type="number" id="onboard-age" placeholder="24" />
+          </div>
+        </div>
         <div class="input-group">
           <label for="onboard-language">Native Language</label>
           <select id="onboard-language" title="Select your native language">
             <option value="Tamil">Tamil</option>
             <option value="Hindi">Hindi</option>
+            <option value="Malayalam">Malayalam</option>
+            <option value="Telugu">Telugu</option>
+            <option value="Kannada">Kannada</option>
             <option value="Spanish">Spanish</option>
             <option value="French">French</option>
             <option value="Other">Other</option>
@@ -57,7 +70,14 @@
         </div>
         <div class="input-group">
           <label for="onboard-goal">Learning Goal</label>
-          <textarea id="onboard-goal" placeholder="e.g. Improve my pronunciation for business meetings" rows="3"></textarea>
+          <select id="onboard-goal" title="Select your learning goal">
+            <option value="Improve Fluency">Improve Fluency</option>
+            <option value="Pass an Exam (IELTS/TOEFL)">Pass an Exam (IELTS/TOEFL)</option>
+            <option value="Business Communication">Business Communication</option>
+            <option value="Daily Conversation">Daily Conversation</option>
+            <option value="Public Speaking">Public Speaking</option>
+            <option value="Other">Other</option>
+          </select>
         </div>
 
         <button class="btn-primary auth-btn" onclick="saveOnboarding()">Finish Setup</button>
@@ -433,6 +453,8 @@
             <div class="info-grid" id="infoGrid">
               <div class="info-item"><label>Full Name</label><p id="infoName">User</p></div>
               <div class="info-item"><label>Email</label><p id="infoEmail">user@example.com</p></div>
+              <div class="info-item"><label>Occupation</label><p id="infoOccupation">Not set</p></div>
+              <div class="info-item"><label>Age</label><p id="infoAge">Not set</p></div>
               <div class="info-item"><label>Language</label><p id="infoLang">English</p></div>
               <div class="info-item"><label>Level</label><p>Beginner</p></div>
               <div class="info-item"><label>Joined</label><p id="infoJoined">Today</p></div>

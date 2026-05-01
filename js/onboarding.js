@@ -47,6 +47,8 @@ export function extractProviderDetails() {
 /** Save and continue to dashboard */
 export async function saveOnboarding() {
   const name = document.getElementById('onboard-name').value;
+  const occupation = document.getElementById('onboard-occupation').value;
+  const age = document.getElementById('onboard-age').value;
   const lang = document.getElementById('onboard-language').value;
   const goal = document.getElementById('onboard-goal').value;
 
@@ -59,6 +61,8 @@ export async function saveOnboarding() {
   try {
     await saveProfile({
       full_name: name,
+      occupation: occupation,
+      age: age,
       native_language: lang,
       learning_goal: goal
     });

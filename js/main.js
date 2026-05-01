@@ -7,7 +7,7 @@ import { startQuiz, nextQuestion, prevQuestion, goToQ } from './quiz.js';
 import { toggleMic, newPassage, submitPractice } from './practice.js';
 import { loadChapter } from './study.js';
 import { editProfile } from './profile.js';
-import { getSavedName, getResults } from './storage.js';
+import { getSavedName, getResults, getProfile } from './storage.js';
 import { initAuth, loginWithGoogle, loginWithGithub, switchAuthType, loginWithEmail, signUpWithEmail, toggleEmailMode, sendOTP, verifyOTP, resetPhoneAuth, logout, getCurrentUser } from './auth.js';
 
 import { extractProviderDetails, saveOnboarding } from './onboarding.js';
@@ -66,11 +66,24 @@ export async function refreshProfile() {
   if (avgEl) avgEl.textContent = avg + '%';
   if (streakEl) streakEl.textContent = streak;
 
-  // Update Personal Info (from Supabase if available)
+  // Update Personal Info
   const user = getCurrentUser();
   if (user) {
     const emailEl = document.getElementById('infoEmail');
     if (emailEl) emailEl.textContent = user.email;
+
+    const profile = await getProfile(user.id);
+    if (profile) {
+      if (document.getElementById('infoName')) document.getElementById('infoName').textContent = profile.full_name || 'User';
+      if (document.getElementById('infoOccupation')) document.getElementById('infoOccupation').textContent = profile.occupation || 'Not set';
+      if (document.getElementById('infoAge')) document.getElementById('infoAge').textContent = profile.age || 'Not set';
+      if (document.getElementById('infoLang')) document.getElementById('infoLang').textContent = profile.native_language || 'Not set';
+      if (document.getElementById('infoGoal')) document.getElementById('infoGoal').textContent = profile.learning_goal || 'Not set';
+      
+      // Also update the sidebar/header name if it changed
+      const sideName = document.getElementById('profileName');
+      if (sideName) sideName.textContent = profile.full_name || 'User';
+    }
   }
 }
 

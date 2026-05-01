@@ -120,9 +120,10 @@ async function getUserLevel() {
   // Infer level from goal or use a default if not explicitly saved
   // For now, let's assume "Intermediate" if they have a goal, or "Beginner" otherwise.
   // We can enhance this by adding a level field to onboarding later.
-  const goal = profile.learning_goal?.toLowerCase() || "";
-  if (goal.includes("advanced") || goal.includes("business") || goal.includes("fluent")) return "Advanced";
-  if (goal.includes("improve") || goal.includes("better") || goal.includes("intermediate")) return "Intermediate";
+  const goal = profile.learning_goal || "";
+  if (goal === "Business Communication" || goal === "Public Speaking") return "Advanced";
+  if (goal === "Pass an Exam (IELTS/TOEFL)" || goal === "Improve Fluency") return "Intermediate";
+  if (goal === "Daily Conversation") return "Beginner";
   
   return "Beginner";
 }
