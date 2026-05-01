@@ -277,9 +277,9 @@
             <p>Practice reading aloud, paying close attention to which words feel naturally emphasized. Record yourself and compare with native speakers to improve your stress patterns.</p>
           </div>
           <div class="content-actions">
-            <button class="btn-outline">← Previous</button>
+            <button class="btn-outline" onclick="prevChapter()">← Previous</button>
             <button class="btn-primary" onclick="navigate('practice')">Practice This →</button>
-            <button class="btn-outline">Next Chapter →</button>
+            <button class="btn-outline" onclick="nextChapter()">Next Chapter →</button>
           </div>
         </div>
       </div>
@@ -590,6 +590,43 @@
         </div>
         <button class="btn-primary auth-btn" onclick="verifyOTP()">Verify & Login</button>
         <button class="btn-text" onclick="switchAuthType('phone')">Change Phone Number</button>
+      </div>
+    </div>
+  </div>
+  <!-- Profile Edit Modal -->
+  <div id="profile-edit-modal" class="auth-page hidden">
+    <div class="auth-card animate-in">
+      <div class="auth-header">
+        <div class="auth-logo">P</div>
+        <h2>Edit Profile</h2>
+        <p>Update your personal information</p>
+      </div>
+      <div class="input-group">
+        <label for="edit-name">Full Name</label>
+        <input type="text" id="edit-name" />
+      </div>
+      <div class="input-group">
+        <label for="edit-occupation">Study / Job</label>
+        <input type="text" id="edit-occupation" />
+      </div>
+      <div class="input-group">
+        <label for="edit-age">Age</label>
+        <input type="number" id="edit-age" />
+      </div>
+      <div class="input-group">
+        <label for="edit-goal">Learning Goal</label>
+        <select id="edit-goal">
+          <option value="Improve Fluency">Improve Fluency</option>
+          <option value="Pass an Exam (IELTS/TOEFL)">Pass an Exam (IELTS/TOEFL)</option>
+          <option value="Business Communication">Business Communication</option>
+          <option value="Daily Conversation">Daily Conversation</option>
+          <option value="Public Speaking">Public Speaking</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="modal-actions" style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <button class="btn-outline w-full" onclick="closeProfileModal()">Cancel</button>
+        <button class="btn-primary w-full" onclick="saveProfileEdit()">Save Changes</button>
       </div>
     </div>
   </div>

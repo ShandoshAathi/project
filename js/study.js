@@ -17,15 +17,26 @@ const chapters = [
     body: '<p>This chapter contains your unit assessment. Practice all reading passages, record yourself, and compare your performance metrics over time...</p>' },
 ];
 
+let currentIdx = 0;
+
 export function loadChapter(idx) {
+  currentIdx = idx;
   document.querySelectorAll('.chapter-item').forEach((c, i) => {
     c.className = 'chapter-item' + (i < idx ? ' done' : i === idx ? ' active-ch' : '');
   });
   document.getElementById('chapterTitle').textContent = chapters[idx].title;
   document.getElementById('chapterBody').innerHTML    = chapters[idx].body;
-  document.querySelector('.mini-fill').style.width     = `${Math.round(((idx + 1) / 6) * 100)}%`;
-  document.querySelector('.content-progress span').textContent = `${idx + 1} of 6`;
+  document.querySelector('.mini-fill').style.width     = `${Math.round(((idx + 1) / chapters.length) * 100)}%`;
+  document.querySelector('.content-progress span').textContent = `${idx + 1} of ${chapters.length}`;
 
   localStorage.setItem('last_chapter_index', idx);
   localStorage.setItem('last_chapter_title', chapters[idx].title);
+}
+
+export function prevChapter() {
+  if (currentIdx > 0) loadChapter(currentIdx - 1);
+}
+
+export function nextChapter() {
+  if (currentIdx < chapters.length - 1) loadChapter(currentIdx + 1);
 }

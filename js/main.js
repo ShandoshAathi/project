@@ -5,8 +5,8 @@
 import { navigate, setPageChangeCallback } from './navigation.js';
 import { startQuiz, initiateQuiz, nextQuestion, prevQuestion, goToQ } from './quiz.js';
 import { toggleMic, newPassage, submitPractice, startPractice, initiatePractice } from './practice.js';
-import { loadChapter } from './study.js';
-import { editProfile } from './profile.js';
+import { loadChapter, prevChapter, nextChapter } from './study.js';
+import { editProfile, closeProfileModal, saveProfileEdit } from './profile.js';
 import { getSavedName, getResults, getProfile } from './storage.js';
 import { initAuth, loginWithGoogle, loginWithGithub, switchAuthType, loginWithEmail, signUpWithEmail, toggleEmailMode, sendOTP, verifyOTP, resetPhoneAuth, logout, getCurrentUser } from './auth.js';
 
@@ -18,7 +18,11 @@ window.toggleMic       = toggleMic;
 window.newPassage      = newPassage;
 window.submitPractice  = submitPractice;
 window.loadChapter     = loadChapter;
+window.prevChapter     = prevChapter;
+window.nextChapter     = nextChapter;
 window.editProfile     = editProfile;
+window.closeProfileModal = closeProfileModal;
+window.saveProfileEdit   = saveProfileEdit;
 window.nextQuestion    = nextQuestion;
 window.prevQuestion    = prevQuestion;
 window.goToQ           = goToQ;
