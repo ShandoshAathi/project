@@ -41,7 +41,7 @@ let timeLeft = 30;
 export async function startQuiz() {
   const grid = document.getElementById('optionsGrid');
   const originalGrid = grid.innerHTML;
-  grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:2rem;">✨ Generating personalized questions...</div>';
+  grid.innerHTML = '<div class="grid-span-2-center">✨ Generating personalized questions...</div>';
 
   const dynamicQs = await generateQuizQuestions();
   if (dynamicQs && dynamicQs.length > 0) {
@@ -135,11 +135,10 @@ function showResults() {
   const pct = Math.round((score / questions.length) * 100);
 
   document.getElementById('optionsGrid').innerHTML = `
-    <div style="grid-column:span 2;text-align:center;padding:2rem;">
-      <div style="font-size:3rem;font-weight:800;background:linear-gradient(90deg,#8B5CF6,#00D4FF);
-        -webkit-background-clip:text;-webkit-text-fill-color:transparent;">${pct}%</div>
-      <p style="margin:.5rem 0;color:#A0A0C0;">You got ${score} out of ${questions.length} correct</p>
-      <button class="btn-primary" id="retryBtn" style="margin-top:1rem;">Try Again</button>
+    <div class="grid-span-2-center">
+      <div class="big-score-dynamic">${pct}%</div>
+      <p class="score-desc">You got ${score} out of ${questions.length} correct</p>
+      <button class="btn-primary mt-4" id="retryBtn">Try Again</button>
     </div>`;
 
   document.getElementById('retryBtn').onclick = () => startQuiz();

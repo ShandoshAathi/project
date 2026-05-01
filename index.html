@@ -42,7 +42,7 @@
         </div>
 
         <div class="input-group">
-          <label>Full Name</label>
+          <label for="onboard-name">Full Name</label>
           <input type="text" id="onboard-name" placeholder="John Doe" />
         </div>
         <div class="input-group">
@@ -56,7 +56,7 @@
           </select>
         </div>
         <div class="input-group">
-          <label>Learning Goal</label>
+          <label for="onboard-goal">Learning Goal</label>
           <textarea id="onboard-goal" placeholder="e.g. Improve my pronunciation for business meetings" rows="3"></textarea>
         </div>
 
@@ -503,11 +503,11 @@
       <!-- Email Auth Section -->
       <div id="email-auth-section">
         <div class="input-group">
-          <label>Email Address</label>
+          <label for="emailInput">Email Address</label>
           <input type="email" id="emailInput" placeholder="you@example.com" />
         </div>
         <div class="input-group">
-          <label>Password</label>
+          <label for="passwordInput">Password</label>
           <input type="password" id="passwordInput" placeholder="••••••••" />
         </div>
         <button class="btn-primary auth-btn" id="email-action-btn" onclick="loginWithEmail()">Log In</button>
@@ -520,7 +520,7 @@
       <!-- Phone Auth Section -->
       <div id="phone-auth-section" class="hidden">
         <div class="input-group">
-          <label>Mobile Number</label>
+          <label for="phoneInput">Mobile Number</label>
           <input type="tel" id="phoneInput" placeholder="+1 (555) 000-0000" />
         </div>
         <button class="btn-primary auth-btn" onclick="sendOTP()">Send Verification Code</button>
@@ -528,7 +528,7 @@
 
       <!-- OTP Verification Section -->
       <div id="otp-auth-section" class="hidden">
-        <label>Enter Verification Code</label>
+        <label for="otpInput">Enter Verification Code</label>
         <p class="auth-hint">We sent a 6-digit code to your phone.</p>
         <div class="otp-group">
           <input type="text" id="otpInput" placeholder="123456" maxlength="6" />

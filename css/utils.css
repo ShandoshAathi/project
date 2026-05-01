@@ -91,3 +91,25 @@
 .stop-blue   { stop-color: #00D4FF; }
 .stop-transparent { stop-color: transparent; }
 
+/* Dynamic Content Utilities */
+.grid-span-2-center {
+  grid-column: span 2;
+  text-align: center;
+  padding: 2rem;
+}
+
+.big-score-dynamic {
+  font-size: 3rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #8B5CF6, #00D4FF);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.score-desc {
+  margin: 0.5rem 0;
+  color: #A0A0C0;
+}
+
+

@@ -91,7 +91,7 @@ export async function refreshResults() {
   if (bestList) {
     const best = [...results].sort((a, b) => b.score - a.score).slice(0, 3);
     if (best.length === 0) {
-      bestList.innerHTML = '<p style="font-size:0.8rem; color:var(--text2)">No sessions yet.</p>';
+      bestList.innerHTML = '<p class="text-sm text-muted">No sessions yet.</p>';
     } else {
       bestList.innerHTML = best.map(r => `
         <div class="best-item">
@@ -222,7 +222,7 @@ function updateRecentActivity(recent) {
   if (!list) return;
 
   if (recent.length === 0) {
-    list.innerHTML = `<p style="color:var(--text2); font-size:0.85rem; padding:1rem 0;">No recent activity yet.</p>`;
+    list.innerHTML = `<p class="empty-state">No recent activity yet.</p>`;
     return;
   }
 
