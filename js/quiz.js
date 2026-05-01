@@ -3,6 +3,7 @@
  */
 import { saveResult } from './storage.js';
 import { generateQuizQuestions } from './ai_generator.js';
+import { questionBank } from './question_bank.js';
 
 let questions = [
   { q: "Which of the following best describes 'word stress' in English?",
@@ -58,10 +59,33 @@ export async function initiateQuiz() {
   const grid = document.getElementById('optionsGrid');
   grid.innerHTML = '<div class="grid-span-2-center">✨ Generating personalized questions...</div>';
 
-  const dynamicQs = await generateQuizQuestions();
-  if (dynamicQs && dynamicQs.length > 0) {
-    questions = dynamicQs;
+  // 1. Get some questions from the static bank (e.g., 5 random ones)
+  let pool = [];
+  Object.values(questionBank).forEach(topicQs => {
+    pool = pool.concat(topicQs);
+  });
+  
+  // Shuffle and pick 5
+  let bankQs = pool.sort(() => 0.5 - Math.random()).slice(0, 5);
+
+  // 2. Get 5 more from the AI
+  let dynamicQs = [];
+  try {
+    dynamicQs = await generateQuizQuestions("Verbal Aptitude (Module II)");
+  } catch (err) {
+    console.warn("AI generation failed, using more bank questions", err);
   }
+
+  // 3. Combine
+  if (dynamicQs && dynamicQs.length > 0) {
+    questions = [...bankQs, ...dynamicQs.slice(0, 5)];
+  } else {
+    // Fallback: pick 10 from bank
+    questions = pool.sort(() => 0.5 - Math.random()).slice(0, 10);
+  }
+
+  // Shuffle final list
+  questions = questions.sort(() => 0.5 - Math.random());
 
   currentQ = 0;
   userAnswers = new Array(questions.length).fill(null);
