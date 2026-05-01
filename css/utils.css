@@ -112,4 +112,10 @@
   color: #A0A0C0;
 }
 
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
 
