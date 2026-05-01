@@ -8,17 +8,14 @@ const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
 // Choose your preferred provider: 'gemini' or 'openai'
 const AI_PROVIDER = 'openai'; 
 
-/**
- * Generate a reading passage based on user level
- */
 export async function generatePracticePassage() {
   const { level, occupation } = await getUserContext();
-  const seed = Math.random().toString(36).substring(7);
-  const prompt = `Generate a unique reading practice passage in English for a ${level} level learner who is a ${occupation}. 
-    Reference Seed: ${seed}
+  const seed = Date.now().toString(36) + Math.random().toString(36).substring(2);
+  const prompt = `Generate a highly unique and creative reading practice passage in English for a ${level} level learner who is a ${occupation}. 
+    Reference ID: ${seed}
     The passage should be exactly 2-3 sentences long. 
-    Use vocabulary and scenarios related to their background as a ${occupation} if appropriate, or choose a highly unique and fresh topic.
-    CRITICAL: Ensure the passage is completely different from previous common examples. Be creative.
+    Use complex, specific vocabulary and scenarios related to their background as a ${occupation}.
+    CRITICAL: DO NOT use generic topics like 'The sun rises'. Choose something niche, modern, or unexpected.
     Return ONLY the plain text of the passage, nothing else.`;
 
   try {
@@ -37,13 +34,12 @@ export async function generatePracticePassage() {
  */
 export async function generateQuizQuestions(topic = "Reading Fluency") {
   const { level, occupation } = await getUserContext();
-  const seed = Math.random().toString(36).substring(7);
-  const prompt = `Generate 5 unique multiple-choice questions about '${topic}' in English for a ${level} learner who is a ${occupation}. 
-    Reference Seed: ${seed}
-    Incorporate scenarios or terminology relevant to a ${occupation} where it makes sense to keep it engaging.
-    Ensure the questions are fresh, unique, and cover different aspects of the topic.
-    CRITICAL: Do not repeat common questions. Be highly creative with scenarios.
-    Return the response as a JSON array of objects.
+  const seed = Date.now().toString(36) + Math.random().toString(36).substring(2);
+  const prompt = `Generate 10 unique, high-variety multiple-choice questions about '${topic}' in English for a ${level} learner who is a ${occupation}. 
+    Reference ID: ${seed}
+    Use diverse question types: vocabulary, comprehension, grammar, and situational scenarios relevant to a ${occupation}.
+    CRITICAL: Avoid standard textbook examples. Be imaginative and challenging.
+    Return the response as a JSON array of 10 objects.
     Each object MUST have:
     - "q": The question text
     - "opts": An array of exactly 4 options
@@ -102,7 +98,9 @@ async function callOpenAI(prompt) {
     body: JSON.stringify({
       model: "gpt-3.5-turbo", // or "gpt-4"
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.8
+      temperature: 0.9,
+      presence_penalty: 0.6,
+      frequency_penalty: 0.6
     })
   });
 

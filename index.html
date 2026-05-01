@@ -409,10 +409,10 @@
         <div class="auth-card text-center">
           <div class="auth-logo mb-4">Q</div>
           <h2>Ready to start the Quiz?</h2>
-          <p class="mb-6">Test your knowledge with 5 dynamic questions tailored to your level.</p>
+          <p class="mb-6">Test your knowledge with 10 dynamic questions tailored to your level.</p>
           <div class="quiz-meta mb-6 justify-center">
             <div class="qm-item"><span>📚 Topic</span><span>General English</span></div>
-            <div class="qm-item"><span>❓ Questions</span><span>5</span></div>
+            <div class="qm-item"><span>❓ Questions</span><span>10</span></div>
           </div>
           <button class="btn-primary auth-btn" onclick="initiateQuiz()">Start Quiz Now</button>
         </div>
@@ -421,7 +421,7 @@
       <div class="quiz-layout hidden" id="quiz-content">
         <div class="quiz-main card">
           <div class="quiz-header">
-            <span class="quiz-num" id="quizNum">Question 1 of 5</span>
+            <span class="quiz-num" id="quizNum">Question 1 of 10</span>
             <div class="quiz-timer" id="quizTimer">⏱️ 30s</div>
           </div>
           <div class="quiz-progress-bar"><div class="quiz-progress-fill w-20" id="quizProgressFill"></div></div>
@@ -443,7 +443,7 @@
           <div class="card"><h3>Quiz Info</h3>
             <div class="quiz-meta">
               <div class="qm-item"><span>📚 Topic</span><span>Reading Fluency</span></div>
-              <div class="qm-item"><span>❓ Questions</span><span>5</span></div>
+              <div class="qm-item"><span>❓ Questions</span><span>10</span></div>
               <div class="qm-item"><span>⏱️ Time</span><span>30s each</span></div>
               <div class="qm-item"><span>🏆 Pass Mark</span><span>70%</span></div>
             </div>
@@ -455,6 +455,11 @@
               <div class="q-dot" onclick="goToQ(2)">3</div>
               <div class="q-dot" onclick="goToQ(3)">4</div>
               <div class="q-dot" onclick="goToQ(4)">5</div>
+              <div class="q-dot" onclick="goToQ(5)">6</div>
+              <div class="q-dot" onclick="goToQ(6)">7</div>
+              <div class="q-dot" onclick="goToQ(7)">8</div>
+              <div class="q-dot" onclick="goToQ(8)">9</div>
+              <div class="q-dot" onclick="goToQ(9)">10</div>
             </div>
           </div>
         </div>
