@@ -118,4 +118,87 @@
   margin-top: 1.5rem;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   SCROLL BUTTONS — Exact Uiverse.io style (vinodjangid07)
+   ══════════════════════════════════════════════════════════════ */
+.scroll-btns {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
+  z-index: 999;
+}
 
+.scroll-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: rgb(20, 20, 20);
+  border: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 0px 0px 4px rgba(180, 160, 255, 0.253);
+  cursor: pointer;
+  transition-duration: 0.3s;
+  overflow: hidden;
+  position: relative;
+  /* Auto-hide until scrolled */
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition: width 0.3s, border-radius 0.3s, background-color 0.3s,
+              opacity 0.3s, transform 0.3s;
+}
+
+.scroll-btn.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.scroll-btn-icon {
+  width: 12px;
+  transition-duration: 0.3s;
+  flex-shrink: 0;
+}
+
+.scroll-btn-icon path {
+  fill: white;
+}
+
+/* The hover label — sits below the button by default */
+.scroll-btn-label {
+  position: absolute;
+  bottom: -20px;
+  font-size: 0px;
+  color: white;
+  font-weight: 600;
+  white-space: nowrap;
+  transition-duration: 0.3s;
+}
+
+/* Hover: expand to pill */
+.scroll-btn:hover {
+  width: 140px;
+  border-radius: 50px;
+  transition-duration: 0.3s;
+  background-color: rgb(181, 160, 255);
+  align-items: center;
+}
+
+.scroll-btn:hover .scroll-btn-icon {
+  transition-duration: 0.3s;
+  transform: translateY(-200%);
+}
+
+.scroll-btn:hover .scroll-btn-label {
+  font-size: 13px;
+  opacity: 1;
+  bottom: unset;
+  transition-duration: 0.3s;
+}

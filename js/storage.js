@@ -4,11 +4,12 @@
  */
 
 import { supabase } from './supabase.js';
-import { getCurrentUser } from './auth.js';
+import { getCurrentUser } from './state.js';
 
 const KEYS = {
   NAME:    'vaaniName',
   RESULTS: 'vaaniResults',
+  CHAT:    'vaaniChatHistory',
 };
 
 /** Save a practice / quiz score */
@@ -116,4 +117,19 @@ export function saveName(name) {
 /** Get saved user name locally */
 export function getSavedName() {
   return localStorage.getItem(KEYS.NAME);
+}
+/** Save Chat History */
+export function saveChatHistory(history) {
+  localStorage.setItem(KEYS.CHAT, JSON.stringify(history));
+}
+
+/** Get Chat History */
+export function getChatHistory() {
+  const stored = localStorage.getItem(KEYS.CHAT);
+  return stored ? JSON.parse(stored) : [];
+}
+
+/** Clear Chat History */
+export function clearChatHistory() {
+  localStorage.removeItem(KEYS.CHAT);
 }

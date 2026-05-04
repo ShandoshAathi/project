@@ -59,39 +59,27 @@ export async function initiateQuiz() {
   const grid = document.getElementById('optionsGrid');
   grid.innerHTML = '<div class="grid-span-2-center">✨ Generating personalized questions...</div>';
 
-  // 1. Get some questions from the static bank (e.g., 5 random ones)
-  let pool = [];
-  Object.values(questionBank).forEach(topicQs => {
-    pool = pool.concat(topicQs);
-  });
-  
-  // Shuffle and pick 5
-  let bankQs = pool.sort(() => 0.5 - Math.random()).slice(0, 5);
-
-  // 2. Get 5 more from the AI
-  let dynamicQs = [];
+  let dynamicQs = null;
   try {
-    dynamicQs = await generateQuizQuestions("Verbal Aptitude (Module II)");
+    dynamicQs = await generateQuizQuestions("Verbal Aptitude (Module)");
   } catch (err) {
-    console.warn("AI generation failed, using more bank questions", err);
+    console.error("AI generation failed", err);
   }
 
-  // 3. Combine
-  if (dynamicQs && dynamicQs.length > 0) {
-    questions = [...bankQs, ...dynamicQs.slice(0, 5)];
+  if (dynamicQs && dynamicQs.length === 10) {
+    questions = dynamicQs;
   } else {
-    // Fallback: pick 10 from bank
-    questions = pool.sort(() => 0.5 - Math.random()).slice(0, 10);
+    // If real-time AI generation fails completely, gracefully degrade
+    grid.innerHTML = '<div class="grid-span-2-center" style="color: #EF4444;">⚠️ AI connection failed. Please check your API keys or try again later.</div>';
+    setTimeout(() => startQuiz(), 3000);
+    return;
   }
-
-  // Shuffle final list
-  questions = questions.sort(() => 0.5 - Math.random());
 
   currentQ = 0;
   userAnswers = new Array(questions.length).fill(null);
   timeLeft = 30;
-  document.getElementById('nextBtn').style.display = '';
-  document.getElementById('prevBtn').style.display = '';
+  document.getElementById('nextBtn').classList.remove('hidden');
+  document.getElementById('prevBtn').classList.remove('hidden');
   renderQuestion();
   startTimer();
 }
@@ -186,7 +174,7 @@ function showResults() {
     </div>`;
 
   document.getElementById('retryBtn').onclick = () => startQuiz();
-  document.getElementById('nextBtn').style.display = 'none';
-  document.getElementById('prevBtn').style.display = 'none';
+  document.getElementById('nextBtn').classList.add('hidden');
+  document.getElementById('prevBtn').classList.add('hidden');
   saveResult(pct);
 }

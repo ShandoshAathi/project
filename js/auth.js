@@ -5,20 +5,18 @@ import { supabase } from './supabase.js';
 import { navigate } from './navigation.js';
 import { getProfile } from './storage.js';
 import { showOnboarding } from './onboarding.js';
-
-let currentUser = null;
+import { getCurrentUser, setCurrentUser } from './state.js';
 let currentPhone = '';
-
-export function getCurrentUser() {
-  return currentUser;
-}
 
 /** Check if user needs onboarding */
 async function checkOnboarding(user) {
   if (!user) return;
   
+  // Always hide login page first
+  const loginPage = document.getElementById('page-login');
+  if (loginPage) loginPage.classList.remove('active');
+
   if (user.id.startsWith('sim-')) {
-    // For simulation, check local storage for profile
     const storedProfile = localStorage.getItem('vaaniai_simulated_profile');
     if (storedProfile) {
       document.querySelector('.topnav').classList.remove('hidden');
@@ -32,11 +30,9 @@ async function checkOnboarding(user) {
 
   const profile = await getProfile(user.id);
   if (profile) {
-    // Profile exists, go to dashboard
     document.querySelector('.topnav').classList.remove('hidden');
     navigate('dashboard');
   } else {
-    // No profile, show onboarding
     document.querySelector('.topnav').classList.add('hidden');
     showOnboarding();
   }
@@ -46,33 +42,44 @@ async function checkOnboarding(user) {
 export async function initAuth() {
   const splash = document.getElementById('splash');
   
-  // Simulate network delay for Splash Screen (2 seconds)
-  setTimeout(async () => {
-    // Hide splash screen
+  try {
+    // Check auth state while splash is still showing
+    if (supabase) {
+      const { data: { session } } = await supabase.auth.getSession();
+      setCurrentUser(session?.user || null);
+    } else {
+      const stored = localStorage.getItem('vaaniai_simulated_user');
+      setCurrentUser(stored ? JSON.parse(stored) : null);
+    }
+  } catch (err) {
+    console.error('Auth check failed:', err);
+    setCurrentUser(null);
+  }
+
+  // Branded splash — 2.5s then dismiss
+  setTimeout(() => {
     splash.classList.add('fade-out');
+
     setTimeout(() => {
       splash.classList.remove('active');
-    }, 800);
 
-    // Check auth state
-    if (supabase) {
-      // Real Supabase check
-      const { data: { session } } = await supabase.auth.getSession();
-      currentUser = session?.user || null;
-    } else {
-      // Simulated check (look in localStorage)
-      const stored = localStorage.getItem('vaaniai_simulated_user');
-      currentUser = stored ? JSON.parse(stored) : null;
-    }
-
-    if (currentUser) {
-      checkOnboarding(currentUser);
-    } else {
-      // Not logged in, show login screen
-      document.querySelector('.topnav').classList.add('hidden');
-      navigate('login');
-    }
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        checkOnboarding(currentUser);
+      } else {
+        showLoginPage();
+      }
+    }, 350);
   }, 2000);
+}
+
+/** Show the login page (auth-page needs flex, not block) */
+export function showLoginPage() {
+  document.querySelector('.topnav')?.classList.add('hidden');
+  const loginPage = document.getElementById('page-login');
+  if (loginPage) {
+    loginPage.classList.add('active');
+  }
 }
 
 /* ── Google Auth ──────────────────────────────────────────────── */
@@ -86,10 +93,11 @@ export async function loginWithGoogle() {
     if (textSpan) textSpan.textContent = 'Connecting...';
     
     setTimeout(() => {
-      currentUser = { id: 'sim-1', email: 'user@gmail.com', name: 'Google User', app_metadata: { provider: 'google' } };
-      localStorage.setItem('vaaniai_simulated_user', JSON.stringify(currentUser));
+      const user = { id: 'sim-1', email: 'user@gmail.com', name: 'Google User', app_metadata: { provider: 'google' } };
+      setCurrentUser(user);
+      localStorage.setItem('vaaniai_simulated_user', JSON.stringify(user));
       if (textSpan) textSpan.textContent = originalText;
-      checkOnboarding(currentUser);
+      checkOnboarding(user);
     }, 1000);
   }
 }
@@ -105,10 +113,11 @@ export async function loginWithGithub() {
     if (textSpan) textSpan.textContent = 'Connecting...';
     
     setTimeout(() => {
-      currentUser = { id: 'sim-github-1', email: 'githubuser@example.com', name: 'GitHub User', app_metadata: { provider: 'github' } };
-      localStorage.setItem('vaaniai_simulated_user', JSON.stringify(currentUser));
+      const user = { id: 'sim-github-1', email: 'githubuser@example.com', name: 'GitHub User', app_metadata: { provider: 'github' } };
+      setCurrentUser(user);
+      localStorage.setItem('vaaniai_simulated_user', JSON.stringify(user));
       if (textSpan) textSpan.textContent = originalText;
-      checkOnboarding(currentUser);
+      checkOnboarding(user);
     }, 1000);
   }
 }
@@ -118,9 +127,18 @@ export function switchAuthType(type) {
   document.getElementById('btn-email-toggle').classList.toggle('active', type === 'email');
   document.getElementById('btn-phone-toggle').classList.toggle('active', type === 'phone');
   
-  document.getElementById('email-auth-section').style.display = type === 'email' ? 'block' : 'none';
-  document.getElementById('phone-auth-section').style.display = type === 'phone' ? 'block' : 'none';
-  document.getElementById('otp-auth-section').style.display = 'none'; // reset otp on switch
+  const emailSection = document.getElementById('email-auth-section');
+  const phoneSection = document.getElementById('phone-auth-section');
+  const otpSection = document.getElementById('otp-auth-section');
+
+  if (type === 'email') {
+    emailSection.classList.remove('hidden');
+    phoneSection.classList.add('hidden');
+  } else {
+    emailSection.classList.add('hidden');
+    phoneSection.classList.remove('hidden');
+  }
+  otpSection.classList.add('hidden'); // reset otp on switch
 }
 
 /* ── Email Auth ───────────────────────────────────────────────── */
@@ -163,14 +181,16 @@ export async function loginWithEmail() {
     btn.innerHTML = originalText;
     if (error) return alert("Login failed: " + error.message);
     
-    currentUser = data.user;
-    checkOnboarding(currentUser);
+    const user = data.user;
+    setCurrentUser(user);
+    checkOnboarding(user);
   } else {
     setTimeout(() => {
       btn.innerHTML = originalText;
-      currentUser = { id: 'sim-email-1', email, name: 'Email User', app_metadata: { provider: 'email' } };
-      localStorage.setItem('vaaniai_simulated_user', JSON.stringify(currentUser));
-      checkOnboarding(currentUser);
+      const user = { id: 'sim-email-1', email, name: 'Email User', app_metadata: { provider: 'email' } };
+      setCurrentUser(user);
+      localStorage.setItem('vaaniai_simulated_user', JSON.stringify(user));
+      checkOnboarding(user);
     }, 1000);
   }
 }
@@ -187,32 +207,33 @@ export async function signUpWithEmail() {
     alert("Signup successful! Please check your email to verify your account, then log in.");
   } else {
     const btn = document.getElementById('email-action-btn') || document.querySelector('#email-auth-section .btn-primary');
-    if (btn) {
-      const originalText = btn.innerHTML;
-      btn.innerHTML = 'Signing up...';
-      setTimeout(() => {
-        btn.innerHTML = originalText;
-        currentUser = { id: 'sim-email-1', email, name: 'Email User', app_metadata: { provider: 'email' } };
-        localStorage.setItem('vaaniai_simulated_user', JSON.stringify(currentUser));
-        checkOnboarding(currentUser);
-      }, 1000);
-    } else {
-      currentUser = { id: 'sim-email-1', email, name: 'Email User', app_metadata: { provider: 'email' } };
-      localStorage.setItem('vaaniai_simulated_user', JSON.stringify(currentUser));
-      checkOnboarding(currentUser);
-    }
+    const originalText = btn ? btn.innerHTML : '';
+    if (btn) btn.innerHTML = 'Signing up...';
+    setTimeout(() => {
+      if (btn) btn.innerHTML = originalText;
+      const user = { id: 'sim-email-1', email, name: 'Email User', app_metadata: { provider: 'email' } };
+      setCurrentUser(user);
+      localStorage.setItem('vaaniai_simulated_user', JSON.stringify(user));
+      checkOnboarding(user);
+    }, 1000);
   }
 }
 
 /* ── Mobile Phone Auth (OTP) ──────────────────────────────────── */
+export function updatePhonePlaceholder() {
+  // Optional: could update placeholder based on country
+}
+
 export async function sendOTP() {
-  const phoneInput = document.getElementById('phoneInput').value;
-  if (!phoneInput || phoneInput.length < 5) {
-    alert("Please enter a valid phone number.");
+  const countryCode = document.getElementById('countryCode')?.value || '+91';
+  const phoneNumber = document.getElementById('phoneInput').value.trim().replace(/\s/g, '');
+
+  if (!phoneNumber || phoneNumber.length < 5) {
+    alert('Please enter a valid phone number.');
     return;
   }
 
-  currentPhone = phoneInput;
+  currentPhone = countryCode + phoneNumber;
   const btn = document.querySelector('#phone-auth-section .btn-primary');
   const originalText = btn.innerHTML;
   btn.innerHTML = 'Sending...';
@@ -231,8 +252,8 @@ export async function sendOTP() {
   }
 
   // Show OTP section
-  document.getElementById('phone-auth-section').style.display = 'none';
-  document.getElementById('otp-auth-section').style.display = 'block';
+  document.getElementById('phone-auth-section').classList.add('hidden');
+  document.getElementById('otp-auth-section').classList.remove('hidden');
   document.getElementById('otpInput').focus();
 }
 
@@ -254,19 +275,20 @@ export async function verifyOTP() {
       type: 'sms'
     });
     btn.innerHTML = originalText;
-    
+
     if (error) {
-      alert("Invalid code: " + error.message);
+      alert('Invalid code: ' + error.message);
       return;
     }
-    currentUser = data.user;
+    setCurrentUser(data.user);
   } else {
     // Simulate OTP Verify
     await new Promise(r => setTimeout(r, 1000));
     btn.innerHTML = originalText;
-    if (otp === '123456') { // Mock correct code
-      currentUser = { id: 'sim-2', phone: currentPhone, name: 'Mobile User' };
-      localStorage.setItem('vaaniai_simulated_user', JSON.stringify(currentUser));
+    if (otp === '123456') {
+      const user = { id: 'sim-2', phone: currentPhone, name: 'Mobile User', app_metadata: { provider: 'phone' } };
+      setCurrentUser(user);
+      localStorage.setItem('vaaniai_simulated_user', JSON.stringify(user));
     } else {
       alert("Invalid code. For simulation, use '123456'.");
       return;
@@ -275,12 +297,12 @@ export async function verifyOTP() {
 
   // Success
   document.getElementById('otpInput').value = '';
-  checkOnboarding(currentUser);
+  checkOnboarding(getCurrentUser());
 }
 
 export function resetPhoneAuth() {
-  document.getElementById('otp-auth-section').style.display = 'none';
-  document.getElementById('phone-auth-section').style.display = 'block';
+  document.getElementById('otp-auth-section').classList.add('hidden');
+  document.getElementById('phone-auth-section').classList.remove('hidden');
   document.getElementById('otpInput').value = '';
 }
 
@@ -290,7 +312,7 @@ export async function logout() {
   } else {
     localStorage.removeItem('vaaniai_simulated_user');
   }
-  currentUser = null;
+  setCurrentUser(null);
   document.querySelector('.topnav').classList.add('hidden');
   
   // Reset auth UI
@@ -302,8 +324,5 @@ export async function logout() {
   document.getElementById('phoneInput').value = '';
   
   // Ensure login page is visible
-  const loginPage = document.getElementById('page-login');
-  if (loginPage) loginPage.style.display = 'flex';
-  
-  navigate('login');
+  showLoginPage();
 }

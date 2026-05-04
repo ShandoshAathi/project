@@ -168,7 +168,7 @@
       <!-- Module II Guide Section -->
       <div class="card mt-6 grad-purple guide-card">
         <div class="guide-bg-icon">📚</div>
-        <h3 class="guide-title">Module II: Verbal Aptitude is Live! 🚀</h3>
+        <h3 class="guide-title">Module: Verbal Aptitude is Live! 🚀</h3>
         <p class="guide-text">Master the Verbal Aptitude Workbook through our integrated 3-step learning flow.</p>
         <div class="guide-steps">
           <div class="guide-step">
@@ -244,7 +244,22 @@
           </div>
           <button class="btn-primary w-full mt-4" onclick="navigate('study')">Resume →</button>
         </div>
+
+        <!-- NEW: Daily Challenge -->
+        <div class="card daily-challenge-card" id="daily-challenge-card">
+          <h3 class="card-title">Daily Mission</h3>
+          <div class="challenge-box">
+            <div class="challenge-icon">✨</div>
+            <p class="challenge-text" id="challenge-display-text">Loading today's mission...</p>
+            <div class="challenge-meta">
+              <span class="xp-badge">+100 XP</span>
+              <span class="diff-label" id="challenge-type">Flash-Chat</span>
+            </div>
+            <button class="btn-primary btn-sm w-full mt-4" id="btn-start-challenge" onclick="startDailyChallenge()">Start Mission</button>
+          </div>
+        </div>
       </div>
+
     </div>
 
     <!-- Syllabus Page -->
@@ -253,12 +268,12 @@
         <p class="subtitle">Your personalized learning roadmap</p>
       </div>
       <div class="syllabus-grid">
-        <div class="unit-card completed"><div class="unit-badge">✓</div><div class="unit-num">Unit 1</div><h3>Foundations of Reading</h3><p>Basic phonics, letter sounds, and simple words</p><div class="unit-progress"><div class="unit-bar w-100"></div></div><span class="unit-status done">Completed</span></div>
-        <div class="unit-card completed"><div class="unit-badge">✓</div><div class="unit-num">Unit 2</div><h3>Sentence Formation</h3><p>Building simple and compound sentences</p><div class="unit-progress"><div class="unit-bar w-100"></div></div><span class="unit-status done">Completed</span></div>
-        <div class="unit-card active-unit"><div class="unit-badge current">●</div><div class="unit-num">Unit 3</div><h3>Reading Fluency (Mod I)</h3><p>Speed reading, rhythm and intonation patterns</p><div class="unit-progress"><div class="unit-bar w-65"></div></div><span class="unit-status progress">65% Done</span></div>
-        <div class="unit-card"><div class="unit-badge">📖</div><div class="unit-num">Unit 4</div><h3>Verbal Aptitude (Mod II)</h3><p>Sentence patterns, voice, tenses and grammar mastery</p><div class="unit-progress"><div class="unit-bar w-0"></div></div><span class="unit-status progress">0% Done</span></div>
-        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Unit 5</div><h3>Vernacular Integration</h3><p>Tamil-English bilingual reading exercises</p><div class="unit-progress"><div class="unit-bar w-0"></div></div><span class="unit-status locked-s">Locked</span></div>
-        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Unit 6</div><h3>Mastery Assessment</h3><p>Final evaluation and certification</p><div class="unit-progress"><div class="unit-bar w-0"></div></div><span class="unit-status locked-s">Locked</span></div>
+        <div class="unit-card completed"><div class="unit-badge">✓</div><div class="unit-num">Module 1</div><h3>Foundations of Reading</h3><p>Basic phonics, letter sounds, and simple words</p><div class="unit-progress"><div class="unit-bar w-100"></div></div><span class="unit-status done">Completed</span></div>
+        <div class="unit-card completed"><div class="unit-badge">✓</div><div class="unit-num">Module 2</div><h3>Sentence Formation</h3><p>Building simple and compound sentences</p><div class="unit-progress"><div class="unit-bar w-100"></div></div><span class="unit-status done">Completed</span></div>
+        <div class="unit-card active-unit"><div class="unit-badge current">●</div><div class="unit-num">Module 3</div><h3>Reading Fluency (Mod I)</h3><p>Speed reading, rhythm and intonation patterns</p><div class="unit-progress"><div class="unit-bar w-65"></div></div><span class="unit-status progress">65% Done</span></div>
+        <div class="unit-card"><div class="unit-badge">📖</div><div class="unit-num">Module 4</div><h3>Verbal Aptitude (Module)</h3><p>Sentence patterns, voice, tenses and grammar mastery</p><div class="unit-progress"><div class="unit-bar w-0"></div></div><span class="unit-status progress">0% Done</span></div>
+        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Module 5</div><h3>Vernacular Integration</h3><p>Tamil-English bilingual reading exercises</p><div class="unit-progress"><div class="unit-bar w-0"></div></div><span class="unit-status locked-s">Locked</span></div>
+        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Module 6</div><h3>Mastery Assessment</h3><p>Final evaluation and certification</p><div class="unit-progress"><div class="unit-bar w-0"></div></div><span class="unit-status locked-s">Locked</span></div>
       </div>
     </div>
 
@@ -266,7 +281,7 @@
     <div class="page" id="page-study">
       <div class="study-layout">
         <div class="chapters-panel">
-          <h3>Unit 3 – Reading Fluency</h3>
+          <h3>Module 3 – Reading Fluency</h3>
           <div class="chapter-list">
             <div class="module-header">Module I: Reading Fluency</div>
             <div class="chapter-item done" onclick="loadChapter(0)"><span>✓</span> Ch 1: Speed Reading</div>
@@ -276,7 +291,7 @@
             <div class="chapter-item" onclick="loadChapter(4)"><span>○</span> Ch 5: Adv Pronunciation</div>
             <div class="chapter-item" onclick="loadChapter(5)"><span>○</span> Ch 6: Assessment</div>
             
-            <div class="module-header">Module II: Verbal Aptitude</div>
+            <div class="module-header">Module: Verbal Aptitude</div>
             <div class="chapter-item" onclick="loadChapter(6)"><span>○</span> Ch 7: Sentence Patterns</div>
             <div class="chapter-item" onclick="loadChapter(7)"><span>○</span> Ch 8: Advanced Tenses</div>
             <div class="chapter-item" onclick="loadChapter(8)"><span>○</span> Ch 9: Active/Passive</div>
@@ -428,8 +443,8 @@
         </div>
         <div class="card"><h3>Best Sessions</h3>
           <div class="best-list">
-            <div class="best-item"><div><p>Unit 2 Practice</p><small>Apr 20, 2026</small></div><span class="score-pill good">95%</span></div>
-            <div class="best-item"><div><p>Quiz – Unit 3</p><small>Apr 22, 2026</small></div><span class="score-pill good">92%</span></div>
+            <div class="best-item"><div><p>Module 2 Practice</p><small>Apr 20, 2026</small></div><span class="score-pill good">95%</span></div>
+            <div class="best-item"><div><p>Quiz – Module 3</p><small>Apr 22, 2026</small></div><span class="score-pill good">92%</span></div>
             <div class="best-item"><div><p>Reading – Ch 3</p><small>Apr 23, 2026</small></div><span class="score-pill ok">88%</span></div>
           </div>
         </div>
@@ -534,7 +549,7 @@
               <div class="achievement earned"><div>🎯</div><p>First Perfect</p></div>
               <div class="achievement earned"><div>🔥</div><p>7-Day Streak</p></div>
               <div class="achievement earned"><div>📚</div><p>10 Lessons</p></div>
-              <div class="achievement"><div>🏆</div><p>Unit Master</p></div>
+              <div class="achievement"><div>🏆</div><p>Module Master</p></div>
               <div class="achievement"><div>⭐</div><p>Top Scorer</p></div>
               <div class="achievement"><div>🎓</div><p>Graduate</p></div>
             </div>
@@ -610,9 +625,27 @@
       <div id="phone-auth-section" class="hidden">
         <div class="input-group">
           <label for="phoneInput">Mobile Number</label>
-          <input type="tel" id="phoneInput" placeholder="+1 (555) 000-0000" />
+          <div class="phone-input-wrapper">
+            <div class="phone-country-selector">
+              <select id="countryCode" title="Country code" onchange="updatePhonePlaceholder()">
+                <option value="+91">🇮🇳 +91</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+44">🇬🇧 +44</option>
+                <option value="+61">🇦🇺 +61</option>
+                <option value="+971">🇦🇪 +971</option>
+                <option value="+65">🇸🇬 +65</option>
+                <option value="+60">🇲🇾 +60</option>
+                <option value="+94">🇱🇰 +94</option>
+                <option value="+880">🇧🇩 +880</option>
+                <option value="+92">🇵🇰 +92</option>
+              </select>
+            </div>
+            <input type="tel" id="phoneInput" placeholder="98765 43210" class="phone-number-input" />
+          </div>
         </div>
-        <button class="btn-primary auth-btn" onclick="sendOTP()">Send Verification Code</button>
+        <button class="btn-primary auth-btn" onclick="sendOTP()">
+          📱 Send Verification Code
+        </button>
       </div>
 
       <!-- OTP Verification Section -->
@@ -627,57 +660,247 @@
       </div>
     </div>
   </div>
-  <!-- Profile Edit Modal -->
-  <div id="profile-edit-modal" class="auth-page hidden">
-    <div class="auth-card animate-in">
-      <div class="auth-header">
-        <div class="auth-logo">P</div>
-        <h2>Edit Profile</h2>
-        <p>Update your personal information</p>
-      </div>
-      <div class="input-group">
-        <label for="edit-name">Full Name</label>
-        <input type="text" id="edit-name" />
-      </div>
-      <div class="input-group">
-        <label for="edit-occupation">Study / Job</label>
-        <input type="text" id="edit-occupation" />
-      </div>
-      <div class="input-group">
-        <label for="edit-age">Age</label>
-        <input type="number" id="edit-age" />
-      </div>
-      <div class="input-group">
-        <label for="edit-goal">Learning Goal</label>
-        <select id="edit-goal">
-          <option value="Improve Fluency">Improve Fluency</option>
-          <option value="Pass an Exam (IELTS/TOEFL)">Pass an Exam (IELTS/TOEFL)</option>
-          <option value="Business Communication">Business Communication</option>
-          <option value="Daily Conversation">Daily Conversation</option>
-          <option value="Public Speaking">Public Speaking</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-outline w-full" onclick="closeProfileModal()">Cancel</button>
-        <button class="btn-primary w-full" onclick="saveProfileEdit()">Save Changes</button>
-      </div>
+  </div>
+</div>
+
+<!-- Profile Edit Modal -->
+<div id="profile-edit-modal" class="auth-page hidden">
+  <div class="auth-card animate-in">
+    <div class="auth-header">
+      <div class="auth-logo">P</div>
+      <h2>Edit Profile</h2>
+      <p>Update your personal information</p>
+    </div>
+    <div class="input-group">
+      <label for="edit-name">Full Name</label>
+      <input type="text" id="edit-name" />
+    </div>
+    <div class="input-group">
+      <label for="edit-occupation">Study / Job</label>
+      <input type="text" id="edit-occupation" />
+    </div>
+    <div class="input-group">
+      <label for="edit-age">Age</label>
+      <input type="number" id="edit-age" />
+    </div>
+    <div class="input-group">
+      <label for="edit-goal">Learning Goal</label>
+      <select id="edit-goal">
+        <option value="Improve Fluency">Improve Fluency</option>
+        <option value="Pass an Exam (IELTS/TOEFL)">Pass an Exam (IELTS/TOEFL)</option>
+        <option value="Business Communication">Business Communication</option>
+        <option value="Daily Conversation">Daily Conversation</option>
+        <option value="Public Speaking">Public Speaking</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-outline w-full" onclick="closeProfileModal()">Cancel</button>
+      <button class="btn-primary w-full" onclick="saveProfileEdit()">Save Changes</button>
     </div>
   </div>
 </div>
 
+<!-- ── Challenge Modal ────────────────────────────────────────── -->
+<div id="challenge-modal" class="modal-overlay hidden">
+  <div class="auth-card challenge-modal-content animate-in">
+    <div class="modal-close" onclick="closeChallengeModal()">×</div>
+    <div class="auth-header">
+      <div class="auth-logo">✨</div>
+      <h2 id="modal-challenge-title">Daily Mission</h2>
+      <p id="modal-challenge-scenario">Scenario loading...</p>
+    </div>
+
+    <div class="challenge-task-box">
+      <p><strong>Your Task:</strong></p>
+      <p id="modal-challenge-task">Task loading...</p>
+    </div>
+
+    <div class="input-group mt-6">
+      <label for="challengeResponse" class="challenge-label">Your Response</label>
+      <textarea id="challengeResponse" class="challenge-textarea" placeholder="Type or speak your response here..." rows="4"></textarea>
+    </div>
+
+    <div class="challenge-actions">
+      <button class="mic-btn-small" id="challenge-mic" onclick="toggleChallengeMic()">🎙️</button>
+      <button class="btn-primary w-full" id="btn-submit-challenge" onclick="submitChallenge()">Submit Mission</button>
+    </div>
+
+    <div id="challenge-result" class="hidden mt-6 animate-in">
+      <div class="result-divider"></div>
+      <div class="result-score-mini">
+        <span class="label">Accuracy Score:</span>
+        <span class="value" id="challenge-score">0%</span>
+      </div>
+      <p class="feedback-text" id="challenge-feedback"></p>
+      <div class="suggestion-box">
+        <p><strong>Try this:</strong></p>
+        <p id="challenge-suggestion"></p>
+      </div>
+      <button class="btn-outline w-full mt-4" onclick="closeChallengeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- App Modules -->
-<script type="module" src="js/storage.js?v=1.1"></script>
-<script type="module" src="js/supabase.js?v=1.1"></script>
-<script type="module" src="js/auth.js?v=1.1"></script>
-<script type="module" src="js/navigation.js?v=1.1"></script>
-<script type="module" src="js/quiz.js?v=1.1"></script>
-<script type="module" src="js/practice.js?v=1.1"></script>
-<script type="module" src="js/study.js?v=1.1"></script>
-<script type="module" src="js/profile.js?v=1.1"></script>
-<script type="module" src="js/main.js?v=1.1"></script>
+<!-- Floating AI Coach FAB (Floating Action Button) -->
+<button class="ai-fab" id="ai-fab" onclick="toggleChatbot()" title="Ask AI Coach">
+  <div class="ai-fab-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
+      <path d="M12 8V4H8"/>
+      <rect width="16" height="12" x="4" y="8" rx="2"/>
+      <path d="M2 14h2"/>
+      <path d="M20 14h2"/>
+      <path d="M15 13v2"/>
+      <path d="M9 13v2"/>
+    </svg>
+  </div>
+</button>
+
+<!-- Floating AI Smart Coach Window -->
+<div class="card ai-coach-card floating-coach" id="ai-coach-card">
+  <!-- Header -->
+  <div class="coach-header">
+    <div class="coach-avatar-wrap">
+      <div class="coach-avatar-pulse"></div>
+      <div class="coach-avatar">✨</div>
+    </div>
+    <div class="coach-header-info">
+      <h3 class="card-title">AI Smart Coach</h3>
+      <div class="coach-ai-badges">
+        <span class="coach-status-dot" title="AI Online"></span>
+        <button class="btn-icon-xs" id="coach-tts-toggle" onclick="toggleCoachVoice()" title="Toggle Voice Output">🔊</button>
+        <select class="coach-personality-select" id="coach-personality" onchange="changeCoachPersonality(this.value)" title="Choose AI Coach Personality">
+          <option value="Friendly">😊 Friendly</option>
+          <option value="Professional">💼 Professional</option>
+          <option value="Strict">🎓 Strict</option>
+        </select>
+      </div>
+    </div>
+    <div class="coach-header-actions">
+      <button class="btn-icon-sm" id="coach-reset-btn" onclick="resetCoachChat()" title="New Chat">↺</button>
+      <button class="btn-icon-sm" onclick="toggleChatbot()" title="Close">✕</button>
+    </div>
+  </div>
+
+  <!-- Chat Panel (Always Expanded in Floating Mode) -->
+  <div class="coach-chat-panel chat-open" id="coach-chat-panel">
+    <!-- Message Feed -->
+    <div class="coach-chat-feed" id="coach-chat-feed">
+      <!-- Welcome message injected by JS on load -->
+      <div class="chat-bubble coach-bubble animate-in">
+        <span class="ai-source-badge">✨ VaaniAI Coach</span>
+        <div class="bubble-text">Hello! I'm your <strong>VaaniAI Smart Coach</strong>. Ask me anything — grammar, vocabulary, practice tips, or any question! 🚀</div>
+      </div>
+    </div>
+
+    <!-- Quick Prompts (Now inside the chat panel) -->
+    <div class="quick-prompts coach-quick-prompts-floater" id="quick-prompts">
+      <button class="quick-btn" onclick="quickAsk('Explain sentence patterns with examples')">📖 Sentence Patterns</button>
+      <button class="quick-btn" onclick="quickAsk('Give me 5 practice tips to improve English fluency')">💡 Fluency Tips</button>
+    </div>
+
+    <!-- Image Preview Area -->
+    <div id="coach-image-preview" class="coach-image-preview hidden">
+      <img src="" id="coach-preview-img" alt="Preview" />
+      <button class="remove-preview" onclick="clearImageAttachment()">×</button>
+    </div>
+
+    <!-- Input Row -->
+    <div class="coach-input-row">
+      <textarea
+        id="coach-chat-input"
+        class="coach-input"
+        placeholder="Ask anything..."
+        rows="1"
+        onkeydown="handleChatKeydown(event)"
+      ></textarea>
+      <input type="file" id="coach-file-input" accept="image/*" class="hidden" onchange="handleImageSelect(event)" title="Choose an image to upload" />
+      <button class="coach-attach-btn" id="coach-attach-btn" onclick="document.getElementById('coach-file-input').click()" title="Attach Image">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+        </svg>
+      </button>
+      <button class="coach-mic-btn" id="coach-mic-btn" onclick="toggleCoachMic()" title="Voice Input">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+          <line x1="12" y1="19" x2="12" y2="23" />
+          <line x1="8" y1="23" x2="16" y2="23" />
+        </svg>
+      </button>
+      <button class="coach-send-btn" id="coach-send-btn" onclick="sendCoachMessage()" title="Send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+          <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- App Entry Point -->
+<script type="module" src="js/main.js?v=1.4"></script>
+
+<!-- ── Scroll Buttons ─────────────────────────────────────────── -->
+<div class="scroll-btns" id="scroll-btns">
+  <!-- Scroll Up -->
+  <button class="scroll-btn" id="scroll-up-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to Top">
+    <svg class="scroll-btn-icon" viewBox="0 0 384 512">
+      <path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/>
+    </svg>
+    <span class="scroll-btn-label">Scroll Up</span>
+  </button>
+
+  <!-- Scroll Down -->
+  <button class="scroll-btn" id="scroll-down-btn" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})" title="Scroll to Bottom">
+    <svg class="scroll-btn-icon" viewBox="0 0 384 512">
+      <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/>
+    </svg>
+    <span class="scroll-btn-label">Scroll Down</span>
+  </button>
+</div>
+
+<script>
+  // Show/hide scroll buttons based on scroll position
+  (function() {
+    const upBtn   = document.getElementById('scroll-up-btn');
+    const downBtn = document.getElementById('scroll-down-btn');
+
+    function updateScrollBtns() {
+      const scrolled  = window.scrollY;
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+
+      // Show "up" only when scrolled down a bit
+      upBtn.classList.toggle('visible', scrolled > 100);
+      // Show "down" only when not at the bottom
+      downBtn.classList.toggle('visible', scrolled < maxScroll - 50);
+    }
+
+    window.addEventListener('scroll', updateScrollBtns, { passive: true });
+    // Run once on load
+    setTimeout(updateScrollBtns, 500);
+  })();
+</script>
+
+<script>
+  // Quick-prompt helper: fills the chat input and sends
+  window.quickAsk = function(text) {
+    // Open chatbot if not open
+    const coachCard = document.getElementById('ai-coach-card');
+    if (!coachCard.classList.contains('chat-open')) {
+      window.toggleChatbot();
+    }
+    // Fill and send
+    const input = document.getElementById('coach-chat-input');
+    if (input) {
+      input.value = text;
+      window.sendCoachMessage && window.sendCoachMessage();
+    }
+  };
+</script>
+
 </body>
 </html>

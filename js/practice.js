@@ -160,13 +160,9 @@ export async function newPassage() {
   }
   
   if (!p) {
-    let nextIdx;
-    do {
-      nextIdx = Math.floor(Math.random() * passages.length);
-    } while (nextIdx === lastPassageIndex);
-    
-    lastPassageIndex = nextIdx;
-    p = passages[nextIdx];
+    statusEl.textContent = "⚠️ AI generation failed. Please check your API keys or try again.";
+    statusEl.style.color = '#EF4444';
+    return;
   }
   
   loadPassage(p);

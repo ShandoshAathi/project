@@ -1,7 +1,7 @@
 /**
  * onboarding.js — Handles the candidate details collection
  */
-import { getCurrentUser } from './auth.js';
+import { getCurrentUser } from './state.js';
 import { saveProfile } from './storage.js';
 import { navigate } from './navigation.js';
 
@@ -11,7 +11,7 @@ export function showOnboarding() {
   const overlay = document.getElementById('onboarding-overlay');
   const loginPage = document.getElementById('page-login');
   
-  if (loginPage) loginPage.style.display = 'none';
+  if (loginPage) loginPage.classList.add('hidden');
   overlay.classList.remove('hidden');
   overlay.classList.add('active');
 
@@ -22,10 +22,10 @@ export function showOnboarding() {
   if (user && user.app_metadata && user.app_metadata.provider) {
     const provider = user.app_metadata.provider;
     if (provider === 'google' || provider === 'github') {
-      extractSection.style.display = 'grid';
+      extractSection.classList.remove('hidden');
       providerSpan.textContent = provider.charAt(0).toUpperCase() + provider.slice(1);
     } else {
-      extractSection.style.display = 'none';
+      extractSection.classList.add('hidden');
     }
   }
 }

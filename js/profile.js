@@ -2,8 +2,7 @@
  * profile.js — User profile editing
  */
 import { saveProfile, getProfile } from './storage.js';
-import { getCurrentUser } from './auth.js';
-import { refreshProfile } from './main.js';
+import { getCurrentUser } from './state.js';
 
 export async function editProfile() {
   const user = getCurrentUser();
@@ -17,11 +16,15 @@ export async function editProfile() {
     document.getElementById('edit-goal').value = profile.learning_goal || 'Improve Fluency';
   }
 
-  document.getElementById('profile-edit-modal').classList.remove('hidden');
+  const modal = document.getElementById('profile-edit-modal');
+  modal.classList.remove('hidden');
+  setTimeout(() => modal.classList.add('active'), 10);
 }
 
 export function closeProfileModal() {
-  document.getElementById('profile-edit-modal').classList.add('hidden');
+  const modal = document.getElementById('profile-edit-modal');
+  modal.classList.remove('active');
+  setTimeout(() => modal.classList.add('hidden'), 400);
 }
 
 export async function saveProfileEdit() {
@@ -30,7 +33,7 @@ export async function saveProfileEdit() {
   const age  = document.getElementById('edit-age').value;
   const goal = document.getElementById('edit-goal').value;
 
-  if (!name) return alert("Name is required");
+  if (!name) return alert('Name is required');
 
   const btn = document.querySelector('#profile-edit-modal .btn-primary');
   const originalText = btn.textContent;
@@ -43,12 +46,12 @@ export async function saveProfileEdit() {
       age: age,
       learning_goal: goal
     });
-    
     closeProfileModal();
-    refreshProfile();
+    // Trigger dashboard refresh via window global (avoids circular import)
+    if (typeof window.refreshProfile === 'function') window.refreshProfile();
   } catch (err) {
     console.error(err);
-    alert("Save failed");
+    alert('Save failed');
   } finally {
     btn.textContent = originalText;
   }

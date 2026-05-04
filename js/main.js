@@ -7,10 +7,16 @@ import { startQuiz, initiateQuiz, nextQuestion, prevQuestion, goToQ } from './qu
 import { toggleMic, newPassage, submitPractice, startPractice, initiatePractice } from './practice.js';
 import { loadChapter, prevChapter, nextChapter } from './study.js';
 import { editProfile, closeProfileModal, saveProfileEdit } from './profile.js';
-import { getSavedName, getResults, getProfile } from './storage.js';
-import { initAuth, loginWithGoogle, loginWithGithub, switchAuthType, loginWithEmail, signUpWithEmail, toggleEmailMode, sendOTP, verifyOTP, resetPhoneAuth, logout, getCurrentUser } from './auth.js';
+import { getResults, getProfile } from './storage.js';
+import { initAuth, loginWithGoogle, loginWithGithub, switchAuthType, loginWithEmail, signUpWithEmail, toggleEmailMode, sendOTP, verifyOTP, resetPhoneAuth, logout, updatePhonePlaceholder } from './auth.js';
+import { getCurrentUser } from './state.js';
 
 import { extractProviderDetails, saveOnboarding } from './onboarding.js';
+import { generateDailyChallenge, evaluateChallengeResponse } from './ai_generator.js';
+import { saveResult } from './storage.js';
+import { sendChatMessage, resetChatHistory, setCoachPersonality, getChatHistoryLength } from './ai_chatbot.js';
+import { initSpeechToText, startListening, stopListening, speak, toggleTTS, isTTSEnabled } from './voice_engine.js';
+import { getChatHistory } from './storage.js';
 
 /* ── Expose to HTML onclick handlers ──────────────────────────── */
 window.navigate        = navigate;
@@ -23,6 +29,7 @@ window.nextChapter     = nextChapter;
 window.editProfile     = editProfile;
 window.closeProfileModal = closeProfileModal;
 window.saveProfileEdit   = saveProfileEdit;
+window.refreshProfile    = refreshProfile;
 window.nextQuestion    = nextQuestion;
 window.prevQuestion    = prevQuestion;
 window.goToQ           = goToQ;
@@ -45,6 +52,25 @@ window.sendOTP           = sendOTP;
 window.verifyOTP         = verifyOTP;
 window.resetPhoneAuth    = resetPhoneAuth;
 window.logout            = logout;
+window.updatePhonePlaceholder = updatePhonePlaceholder;
+
+// Challenge handlers
+window.startDailyChallenge = startDailyChallenge;
+window.closeChallengeModal = closeChallengeModal;
+window.submitChallenge     = submitChallenge;
+window.toggleChallengeMic  = toggleChallengeMic;
+
+// AI Chatbot handlers
+window.sendCoachMessage   = sendCoachMessage;
+window.resetCoachChat     = resetCoachChat;
+window.handleChatKeydown  = handleChatKeydown;
+window.toggleChatbot      = toggleChatbot;
+window.toggleCoachMic      = toggleCoachMic;
+window.toggleCoachVoice    = toggleCoachVoice;
+window.changeCoachPersonality = changeCoachPersonality;
+window.handleImageSelect   = handleImageSelect;
+window.clearImageAttachment = clearImageAttachment;
+window.speakMessage        = speakMessage;
 
 /* ── Page-change hook ─────────────────────────────────────────── */
 setPageChangeCallback(page => {
@@ -130,12 +156,15 @@ export async function refreshResults() {
 
 export async function refreshDashboard() {
   // Update Profile Name
-  const name = getSavedName();
-  if (name) {
-    const el   = document.getElementById('profileName');
-    const info = document.getElementById('infoName');
-    if (el)   el.textContent   = name;
-    if (info) info.textContent = name;
+  const user = getCurrentUser();
+  if (user) {
+    const profile = await getProfile(user.id);
+    if (profile) {
+      const el   = document.getElementById('profileName');
+      const info = document.getElementById('infoName');
+      if (el)   el.textContent   = profile.full_name || 'User';
+      if (info) info.textContent = profile.full_name || 'User';
+    }
   }
 
   // Fetch results from DB or local
@@ -182,6 +211,117 @@ export async function refreshDashboard() {
 
   // Continue Learning
   updateContinueLearning();
+
+  // Load Daily Challenge
+  loadTodayChallenge();
+}
+
+/* ── Daily Challenge Logic ────────────────────────────────────── */
+let currentChallenge = null;
+let challengeRecognition = null;
+let isChallengeRecording = false;
+
+async function loadTodayChallenge() {
+  const displayEl = document.getElementById('challenge-display-text');
+  if (!displayEl) return;
+
+  // Check if we already have a challenge for today in local storage
+  const today = new Date().toDateString();
+  const saved = localStorage.getItem('daily_challenge_data');
+  const savedDate = localStorage.getItem('daily_challenge_date');
+
+  if (saved && savedDate === today) {
+    currentChallenge = JSON.parse(saved);
+  } else {
+    displayEl.textContent = "✨ Generating mission...";
+    currentChallenge = await generateDailyChallenge();
+    localStorage.setItem('daily_challenge_data', JSON.stringify(currentChallenge));
+    localStorage.setItem('daily_challenge_date', today);
+  }
+
+  displayEl.textContent = currentChallenge.scenario.substring(0, 80) + "...";
+  document.getElementById('challenge-type').textContent = currentChallenge.title;
+}
+
+export function startDailyChallenge() {
+  if (!currentChallenge) return;
+  
+  const modal = document.getElementById('challenge-modal');
+  modal.classList.remove('hidden');
+  
+  document.getElementById('modal-challenge-title').textContent = currentChallenge.title;
+  document.getElementById('modal-challenge-scenario').textContent = currentChallenge.scenario;
+  document.getElementById('modal-challenge-task').textContent = currentChallenge.task;
+  
+  // Reset previous state
+  document.getElementById('challengeResponse').value = '';
+  document.getElementById('challenge-result').classList.add('hidden');
+  document.getElementById('btn-submit-challenge').disabled = false;
+  document.getElementById('btn-submit-challenge').textContent = 'Submit Mission';
+}
+
+export function closeChallengeModal() {
+  document.getElementById('challenge-modal').classList.add('hidden');
+  if (isChallengeRecording) toggleChallengeMic();
+}
+
+export async function submitChallenge() {
+  const response = document.getElementById('challengeResponse').value;
+  if (!response || response.length < 5) return alert("Please provide a more detailed response.");
+
+  const btn = document.getElementById('btn-submit-challenge');
+  btn.disabled = true;
+  btn.textContent = 'Evaluating...';
+
+  const result = await evaluateChallengeResponse(currentChallenge.task, response);
+  
+  // Show result
+  document.getElementById('challenge-result').classList.remove('hidden');
+  document.getElementById('challenge-score').textContent = result.score + '%';
+  document.getElementById('challenge-feedback').textContent = result.feedback;
+  document.getElementById('challenge-suggestion').textContent = result.suggestion;
+  
+  btn.textContent = 'Mission Complete!';
+  
+  // Save result
+  saveResult(result.score, 'challenge');
+}
+
+export function toggleChallengeMic() {
+  const micBtn = document.getElementById('challenge-mic');
+  const textarea = document.getElementById('challengeResponse');
+
+  if (!isChallengeRecording) {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      return alert("Speech recognition not supported in this browser.");
+    }
+    
+    isChallengeRecording = true;
+    micBtn.classList.add('active');
+    
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    challengeRecognition = new SR();
+    challengeRecognition.continuous = true;
+    challengeRecognition.interimResults = true;
+    
+    challengeRecognition.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        transcript += event.results[i][0].transcript;
+      }
+      textarea.value = transcript;
+    };
+    
+    challengeRecognition.onerror = () => toggleChallengeMic();
+    challengeRecognition.start();
+  } else {
+    isChallengeRecording = false;
+    micBtn.classList.remove('active');
+    if (challengeRecognition) {
+      challengeRecognition.stop();
+      challengeRecognition = null;
+    }
+  }
 }
 
 function updateContinueLearning() {
@@ -269,6 +409,203 @@ function updateRecentActivity(recent) {
   }).join('');
 }
 
+/* ── AI Chatbot Logic ─────────────────────────────────────────── */
+let isChatbotOpen = false;
+
+export function toggleChatbot() {
+  const coachCard = document.getElementById('ai-coach-card');
+  if (!coachCard) return;
+  
+  isChatbotOpen = !isChatbotOpen;
+  coachCard.classList.toggle('chat-open', isChatbotOpen);
+  
+  if (isChatbotOpen) {
+    // Focus input
+    setTimeout(() => {
+      const inp = document.getElementById('coach-chat-input');
+      if (inp) inp.focus();
+    }, 300);
+  }
+}
+
+export function handleChatKeydown(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendCoachMessage();
+  }
+}
+
+export async function sendCoachMessage() {
+  const input   = document.getElementById('coach-chat-input');
+  const feed    = document.getElementById('coach-chat-feed');
+  const sendBtn = document.getElementById('coach-send-btn');
+  if (!input || !feed) return;
+
+  const text = input.value.trim();
+  const imageData = currentAttachedImage;
+
+  if (!text && !imageData) return;
+
+  // Clear input & disable
+  input.value = '';
+  clearImageAttachment();
+  input.disabled = true;
+  sendBtn.disabled = true;
+
+  // Append user bubble (show image thumbnail if present)
+  appendChatBubble(feed, text, 'user', '', imageData);
+
+  // Show typing indicator
+  const typingId = 'typing-' + Date.now();
+  feed.insertAdjacentHTML('beforeend', `
+    <div class="chat-bubble coach-bubble typing-indicator" id="${typingId}">
+      <span class="ai-source-badge">✨ AI</span>
+      <div class="typing-dots"><span></span><span></span><span></span></div>
+    </div>
+  `);
+  feed.scrollTop = feed.scrollHeight;
+
+  try {
+    const { text: reply, source } = await sendChatMessage(text, imageData);
+    // Remove typing indicator
+    document.getElementById(typingId)?.remove();
+    // Append AI bubble with source badge
+    appendChatBubble(feed, reply, 'coach', source);
+    // Voice Output
+    speak(reply);
+  } catch (err) {
+    document.getElementById(typingId)?.remove();
+    appendChatBubble(feed, '⚠️ Could not get a response. Please check your API keys.', 'coach', 'Error');
+  }
+
+  input.disabled = false;
+  sendBtn.disabled = false;
+  input.focus();
+  feed.scrollTop = feed.scrollHeight;
+}
+
+export function resetCoachChat() {
+  const feed = document.getElementById('coach-chat-feed');
+  if (feed) feed.innerHTML = getWelcomeBubble();
+  resetChatHistory();
+}
+
+let isCoachMicActive = false;
+let chatRecognition = null;
+
+export function toggleCoachMic() {
+  const micBtn = document.getElementById('coach-mic-btn');
+  const input = document.getElementById('coach-chat-input');
+
+  if (!isCoachMicActive) {
+    isCoachMicActive = true;
+    micBtn.classList.add('recording');
+    
+    if (!chatRecognition) {
+      chatRecognition = initSpeechToText(
+        (text) => { input.value = text; },
+        () => { toggleCoachMic(); },
+        () => { toggleCoachMic(); }
+      );
+    }
+    startListening();
+  } else {
+    isCoachMicActive = false;
+    micBtn.classList.remove('recording');
+    stopListening();
+  }
+}
+
+export function toggleCoachVoice() {
+  const btn = document.getElementById('coach-tts-toggle');
+  const enabled = !isTTSEnabled();
+  toggleTTS(enabled);
+  btn.classList.toggle('active', enabled);
+  btn.textContent = enabled ? '🔊' : '🔇';
+}
+
+export function changeCoachPersonality(p) {
+  setCoachPersonality(p);
+  // Optional: show a small toast or just reset chat to apply immediately if empty
+  if (getChatHistoryLength() === 0) {
+    resetCoachChat();
+  }
+}
+
+function appendChatBubble(feed, text, type, source = '', imageData = null) {
+  const isCoach = type === 'coach';
+  const badge   = isCoach ? `<span class="ai-source-badge source-vaaniai">✨ VaaniAI Coach</span>` : '';
+  
+  // Per-message speaker button for AI
+  const speakBtn = isCoach ? `<button class="btn-speak-msg" onclick="speakMessage(this.parentElement.querySelector('.bubble-text').innerText)" title="Speak Message">🔊</button>` : '';
+
+  const imageTag = imageData ? `<div class="chat-image-attachment"><img src="data:image/jpeg;base64,${imageData}" /></div>` : '';
+
+  // Convert newlines to <br> and markdown bold **text** to <strong>
+  const html = text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+
+  feed.insertAdjacentHTML('beforeend', `
+    <div class="chat-bubble ${isCoach ? 'coach-bubble' : 'user-bubble'} animate-in">
+      ${isCoach ? badge : ''}
+      ${speakBtn}
+      ${imageTag}
+      <div class="bubble-text">${html}</div>
+    </div>
+  `);
+  feed.scrollTop = feed.scrollHeight;
+}
+
+let currentAttachedImage = null;
+
+export function handleImageSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (file.size > 4 * 1024 * 1024) {
+    alert("Image is too large (max 4MB)");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const base64 = e.target.result.split(',')[1];
+    currentAttachedImage = base64;
+    
+    // Show preview
+    document.getElementById('coach-image-preview').classList.remove('hidden');
+    document.getElementById('coach-preview-img').src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+export function clearImageAttachment() {
+  currentAttachedImage = null;
+  document.getElementById('coach-file-input').value = '';
+  document.getElementById('coach-image-preview').classList.add('hidden');
+}
+
+export function speakMessage(text) {
+  speak(text);
+}
+
+function getSourceIcon(source) {
+  if (source === 'Gemini') return '🔷';
+  if (source === 'OpenAI') return '🟢';
+  return '⚠️';
+}
+
+function getWelcomeBubble() {
+  return `
+    <div class="chat-bubble coach-bubble animate-in">
+      <span class="ai-source-badge">✨ VaaniAI Coach</span>
+      <div class="bubble-text">Hello! I'm your <strong>VaaniAI Smart Coach</strong>. Ask me anything — grammar, vocabulary, practice tips, or any question you have! 🚀</div>
+    </div>
+  `;
+}
+
 /* ── Init ─────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   // Hide topnav initially while splash/auth is checking
@@ -276,4 +613,14 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initialize Auth (handles Splash Screen and routing)
   initAuth();
+
+  // Load existing chat history if any
+  const history = getChatHistory();
+  if (history && history.length > 0) {
+    const feed = document.getElementById('coach-chat-feed');
+    if (feed) {
+      feed.innerHTML = ''; // Clear welcome
+      history.forEach(m => appendChatBubble(feed, m.content, m.role === 'assistant' ? 'coach' : 'user'));
+    }
+  }
 });
