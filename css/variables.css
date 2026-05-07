@@ -53,30 +53,38 @@
   --shadow-glow:0 0 40px rgba(14, 165, 233, 0.15);
 }
 
-/* ── Dark Mode ── */
+/* ── Dark Mode (Deep Ocean Premium) ── */
 [data-theme="dark"] {
-  --bg:         #0f172a;
-  --bg2:        rgba(15, 23, 42, 0.8);
+  --bg:         #020617; /* Deepest Midnight */
+  --bg2:        rgba(2, 6, 23, 0.8);
   --bg3:        rgba(15, 23, 42, 0.6);
 
-  --glass:      rgba(30, 41, 59, 0.7);
-  --glass-hover:rgba(30, 41, 59, 0.9);
-  --glass-solid:rgba(30, 41, 59, 1);
-  --glass-border:rgba(255, 255, 255, 0.1);
-  --glass-glow: rgba(14, 165, 233, 0.15);
+  /* Richer glass effect with a subtle blue tint */
+  --glass:      rgba(15, 23, 42, 0.7);
+  --glass-hover:rgba(30, 41, 59, 0.8);
+  --glass-solid:rgba(15, 23, 42, 1);
+  --glass-border:rgba(255, 255, 255, 0.06);
+  --glass-glow: rgba(56, 189, 248, 0.1);
 
-  --text:       #f8fafc;
-  --text2:      #cbd5e1;
-  --text3:      #64748b;
+  /* Brighter primary/accent for contrast */
+  --primary:    #38bdf8; 
+  --primary2:   #7dd3fc;
+  --accent:     #818cf8;
+  --accent2:    #a5b4fc;
 
-  --card:       rgba(30, 41, 59, 0.7);
-  --border:     rgba(255, 255, 255, 0.1);
-  --ui-bg:      rgba(255, 255, 255, 0.05);
-  --ui-bg-hover:rgba(255, 255, 255, 0.1);
-  --ui-border:  rgba(255, 255, 255, 0.1);
+  --text:       #f1f5f9;
+  --text2:      #94a3b8;
+  --text3:      #475569;
 
-  --shadow:     0 8px 32px rgba(0, 0, 0, 0.4);
-  --shadow-sm:  0 4px 16px rgba(0, 0, 0, 0.2);
+  --card:       rgba(15, 23, 42, 0.6);
+  --border:     rgba(255, 255, 255, 0.05);
+  --ui-bg:      rgba(255, 255, 255, 0.03);
+  --ui-bg-hover:rgba(255, 255, 255, 0.06);
+  --ui-border:  rgba(255, 255, 255, 0.08);
+
+  --shadow:     0 20px 50px rgba(0, 0, 0, 0.5);
+  --shadow-sm:  0 10px 20px rgba(0, 0, 0, 0.3);
+  --shadow-glow:0 0 30px rgba(56, 189, 248, 0.08);
 }
 
 /* ── Font Sizes ── */
