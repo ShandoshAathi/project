@@ -4,7 +4,7 @@
  * Groq is used as a lightning-fast, 100% free alternative to OpenAI.
  */
 import { GROQ_API_KEY } from './config.js';
-import { getProfile, saveChatHistory, getChatHistory, clearChatHistory } from './storage.js';
+import { getProfile, saveChatHistory, getChatHistory, clearChatHistory, addXP } from './storage.js';
 import { getActiveGroqKey } from './settings.js';
 import { getCurrentUser } from './state.js';
 
@@ -62,6 +62,9 @@ Your capabilities:
 - Give practice tips, study plans, and encouragement
 - Answer general knowledge questions the user asks (you are a capable AI assistant)
 - Keep responses concise, clear, and motivating — use emojis sparingly for a premium feel
+
+CRITICAL: If the user makes a recurring grammar or vocabulary mistake, conclude your message with exactly: [MISTAKE: CategoryName]
+Categories: Tenses, Voice, Reported Speech, Concord, Prepositions, Phrasal Verbs, Articles, Adverbs, Modifiers.
 
 Always personalize responses to ${name}'s level (${level}) and occupation (${occupation}).
 If asked about topics outside English learning, answer helpfully but briefly encourage returning to their study goal.`;
@@ -143,6 +146,18 @@ export async function sendChatMessage(userMessage, imageData = null) {
 
   chatHistory.push({ role: 'assistant', content: result.text });
   saveChatHistory(chatHistory);
+  addXP(10); // Reward for each interaction
+
+  // Check for mistake tagging
+  const mistakeMatch = result.text.match(/\[MISTAKE:\s*(.*?)\]/i);
+  if (mistakeMatch) {
+    const category = mistakeMatch[1].trim();
+    import('./storage.js').then(m => m.trackMistake(category));
+    // Clean the tag from the text before returning if desired, 
+    // or keep it for internal logic. We'll clean it for UI.
+    result.text = result.text.replace(/\[MISTAKE:.*?\]/i, '').trim();
+  }
+
   return result;
 }
 

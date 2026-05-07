@@ -696,4 +696,30 @@
   .coach-chat-feed { height: 260px; }
 }
 
-
+/* ── Level Progress Card ───────────────────────────────────────── */
+.level-progress-card {
+  padding: 1.5rem;
+}
+.level-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+.progress-bar-container {
+  height: 12px;
+  background: var(--ui-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+}
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 10px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 15px var(--primary-glow);
+}

@@ -21,10 +21,20 @@
 <link rel="stylesheet" href="css/pages/profile.css"/>
 <link rel="stylesheet" href="css/pages/auth.css"/>
 <link rel="stylesheet" href="css/pages/settings.css"/>
+<link rel="stylesheet" href="css/pages/flashcards.css"/>
 <link rel="stylesheet" href="css/responsive.css"/>
 <link rel="stylesheet" href="css/utils.css"/>
 </head>
 <body>
+  <!-- Splash Screen -->
+  <div id="splash" class="splash-screen active">
+    <div class="splash-content">
+      <div class="splash-logo">V</div>
+      <div class="splash-title">VaaniAI</div>
+      <div class="splash-subtitle">Your AI Language Tutor</div>
+    </div>
+  </div>
+
 <div class="app">
   <!-- Onboarding Overlay -->
   <div id="onboarding-overlay" class="auth-page hidden">
@@ -103,6 +113,9 @@
       <a class="nav-item" data-page="quiz" onclick="navigate('quiz')">
         <span class="nav-icon">🧠</span><span>Quiz</span>
       </a>
+      <a class="nav-item" data-page="flashcards" onclick="navigate('flashcards')">
+        <span class="nav-icon">🗂️</span><span>Flashcards</span>
+      </a>
       <a class="nav-item" data-page="study" onclick="navigate('study')">
         <span class="nav-icon">📖</span><span>Study</span>
       </a>
@@ -156,12 +169,22 @@
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon grad-green">🏆</div>
+          <div class="stat-icon grad-indigo">✨</div>
           <div class="stat-info">
-            <p class="stat-label">Quiz Score</p>
-            <h3 class="stat-value" id="stat-quiz">0%</h3>
-            <p class="stat-change positive">+8% improvement</p>
+            <p class="stat-label">Current Level</p>
+            <h3 class="stat-value" id="stat-level">Lvl 1</h3>
+            <p class="stat-change positive" id="stat-xp">0 XP Total</p>
           </div>
+        </div>
+      </div>
+
+      <div class="card mt-6 level-progress-card">
+        <div class="level-header">
+          <span>Level Progress</span>
+          <span id="level-percentage">0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="level-progress-fill"></div>
         </div>
       </div>
       
@@ -372,6 +395,17 @@
           </div>
         </div>
         <div class="feedback-panel">
+          <div class="card roleplay-card grad-blue" id="roleplayCard">
+            <div class="roleplay-badge">NEW MISSION</div>
+            <h3>Roleplay Scenario</h3>
+            <p id="roleplay-scenario">Generate a mission to start real-world practice!</p>
+            <div class="mission-details">
+              <div><strong>AI Character:</strong> <span id="roleplay-ai">Waiting...</span></div>
+              <div><strong>Goal:</strong> <span id="roleplay-goal">Waiting...</span></div>
+            </div>
+            <button class="btn-primary auth-btn mt-4" onclick="initiateRoleplay()">Start Mission →</button>
+          </div>
+
           <div class="card" id="feedbackCard">
             <h3>Feedback</h3>
             <div class="score-ring">
@@ -400,6 +434,25 @@
               <div class="session-item"><span>Session 3</span><span class="good">88%</span></div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flashcards Page -->
+    <div class="page" id="page-flashcards">
+      <div class="flashcard-container">
+        <div id="flashcard-stack">
+          <!-- Flashcards will be injected here -->
+          <div class="empty-state">
+            <div class="empty-icon">🗂️</div>
+            <h3>Your Word Bank is Empty</h3>
+            <p>Save interesting words from the AI Coach to start practicing!</p>
+          </div>
+        </div>
+        
+        <div class="flashcard-actions hidden" id="flashcard-controls">
+          <button class="btn-wrong" onclick="reviewWord(false)">Forgot ❌</button>
+          <button class="btn-correct" onclick="reviewWord(true)">Remembered ✅</button>
         </div>
       </div>
     </div>

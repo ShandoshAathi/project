@@ -7,16 +7,17 @@ import { startQuiz, initiateQuiz, nextQuestion, prevQuestion, goToQ } from './qu
 import { toggleMic, newPassage, submitPractice, startPractice, initiatePractice } from './practice.js';
 import { loadChapter, prevChapter, nextChapter } from './study.js';
 import { editProfile, closeProfileModal, saveProfileEdit } from './profile.js';
-import { getResults, getProfile } from './storage.js';
+import { getResults, getProfile, saveResult, addXP, getXP, getLevel, getXPProgress, getChatHistory, getTopMistakes } from './storage.js';
+import { getFlashcards, getDueWords, updateSRS, saveWord } from './flashcards.js';
 import { initAuth, loginWithGoogle, loginWithGithub, switchAuthType, loginWithEmail, signUpWithEmail, toggleEmailMode, sendOTP, verifyOTP, resetPhoneAuth, logout, updatePhonePlaceholder } from './auth.js';
 import { getCurrentUser } from './state.js';
 
 import { extractProviderDetails, saveOnboarding } from './onboarding.js';
-import { generateDailyChallenge, evaluateChallengeResponse } from './ai_generator.js';
-import { saveResult } from './storage.js';
+import { generateDailyChallenge, evaluateChallengeResponse, generateRoleplayScenario } from './ai_generator.js';
+
 import { sendChatMessage, resetChatHistory, setCoachPersonality, getChatHistoryLength } from './ai_chatbot.js';
 import { initSpeechToText, startListening, stopListening, speak, toggleTTS, isTTSEnabled } from './voice_engine.js';
-import { getChatHistory } from './storage.js';
+
 import { loadSettings, saveSettings, refreshChatHistorySettings, clearFullChatHistory, toggleKeyVisibility } from './settings.js';
 
 /* ── Expose to HTML onclick handlers ──────────────────────────── */
@@ -57,6 +58,24 @@ window.updatePhonePlaceholder = updatePhonePlaceholder;
 
 // Challenge handlers
 window.startDailyChallenge = startDailyChallenge;
+window.initiateRoleplay    = initiateRoleplay;
+
+// Chat & Flashcards
+window.resetChatHistory = resetChatHistory;
+window.setCoachPersonality = setCoachPersonality;
+window.saveWordToFlashcards = (w, d) => {
+  saveWord(w, d);
+  alert(`✨ "${w}" saved to Flashcards!`);
+};
+window.flipCard = (el) => el.classList.toggle('flipped');
+window.reviewWord = (remembered) => {
+  const current = currentDueWords[currentCardIndex];
+  if (current) {
+    updateSRS(current.word, remembered);
+    currentCardIndex++;
+    showNextCard();
+  }
+};
 window.closeChallengeModal = closeChallengeModal;
 window.submitChallenge     = submitChallenge;
 window.toggleChallengeMic  = toggleChallengeMic;
@@ -210,6 +229,16 @@ export async function refreshDashboard() {
   if (streakBadge) {
     streakBadge.textContent = `🔥 ${streak} Day Streak`;
   }
+
+  // Level & XP
+  const level = getLevel();
+  const xp = getXP();
+  const progress = getXPProgress();
+
+  document.getElementById('stat-level').textContent = `Lvl ${level}`;
+  document.getElementById('stat-xp').textContent    = `${xp} XP Total`;
+  document.getElementById('level-percentage').textContent = `${Math.floor(progress)}%`;
+  document.getElementById('level-progress-fill').style.width = `${progress}%`;
 
   // Recent Activity
   updateRecentActivity(results.slice(0, 4));
@@ -632,3 +661,106 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
+/* ── Flashcard Logic ─────────────────────────────────────────── */
+let currentDueWords = [];
+let currentCardIndex = 0;
+
+function renderFlashcards() {
+  currentDueWords = getDueWords();
+  currentCardIndex = 0;
+  showNextCard();
+}
+
+function showNextCard() {
+  const stack = document.getElementById('flashcard-stack');
+  const controls = document.getElementById('flashcard-controls');
+  if (!stack) return;
+
+  if (currentCardIndex >= currentDueWords.length) {
+    stack.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">✅</div>
+        <h3>All caught up!</h3>
+        <p>No words due for review right now. Come back later!</p>
+      </div>`;
+    if (controls) controls.classList.add('hidden');
+    return;
+  }
+
+  const card = currentDueWords[currentCardIndex];
+  stack.innerHTML = `
+    <div class="flashcard" onclick="flipCard(this)">
+      <div class="flashcard-front">
+        <div class="flashcard-word">${card.word}</div>
+        <div class="flashcard-hint">Click to flip 🔄</div>
+      </div>
+      <div class="flashcard-back">
+        <div class="flashcard-definition">${card.definition}</div>
+        <div class="flashcard-hint">Click to flip 🔄</div>
+      </div>
+    </div>`;
+  if (controls) controls.classList.remove('hidden');
+}
+
+// Hook into navigation
+setPageChangeCallback((page) => {
+  if (page === 'dashboard') refreshDashboard();
+  if (page === 'flashcards') renderFlashcards();
+  if (page === 'study' || page === 'syllabus') highlightWeaknesses();
+});
+
+function highlightWeaknesses() {
+  const topMistakes = getTopMistakes();
+  document.querySelectorAll('.chapter-item').forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.classList.remove('weakness-highlight');
+    if (topMistakes.some(m => text.includes(m.toLowerCase()))) {
+      item.classList.add('weakness-highlight');
+    }
+  });
+}
+
+
+});
+
+/* ── Roleplay Logic ─────────────────────────────────────────── */
+async function initiateRoleplay() {
+  const btn = document.querySelector('#roleplayCard button');
+  if (!btn) return;
+  
+  const originalText = btn.textContent;
+  btn.textContent = '✨ Generating...';
+  btn.disabled = true;
+
+  try {
+    const mission = await generateRoleplayScenario();
+    
+    // Open Chatbot
+    const coach = document.getElementById('aiCoachFloating');
+    if (coach) coach.classList.add('chat-open');
+    
+    // Reset Chat for the mission
+    resetChatHistory();
+    const feed = document.getElementById('coach-chat-feed');
+    if (feed) {
+      feed.innerHTML = `
+        <div class="chat-bubble coach-bubble">
+          <div class="bubble-text">
+            <strong>MISSION: ${mission.scenario}</strong><br/>
+            Target Character: ${mission.ai_character}<br/>
+            Goal: ${mission.goal}<br/><br/>
+            <em>${mission.first_message}</em>
+          </div>
+        </div>
+      `;
+    }
+    
+  } catch (err) {
+    console.error("Roleplay Start Failed:", err);
+    alert("Mission generation failed. Please check your API keys!");
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+}

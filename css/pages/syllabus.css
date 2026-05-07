@@ -65,3 +65,20 @@
 .unit-status.done     { color: var(--success); }
 .unit-status.progress { color: var(--accent); }
 .unit-status.locked-s { color: var(--text3); }
+
+/* ── Personalized Weakness Highlighting ── */
+.chapter-item.weakness-highlight {
+  border-left: 3px solid #ef4444 !important;
+  background: rgba(239, 68, 68, 0.05) !important;
+  position: relative;
+}
+.chapter-item.weakness-highlight::after {
+  content: '⚠️ Review Needed';
+  position: absolute;
+  right: 0.75rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #ef4444;
+  opacity: 0.8;
+}
+

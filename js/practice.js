@@ -1,7 +1,7 @@
 /**
  * practice.js — Mic recording, passage management, feedback
  */
-import { saveResult } from './storage.js';
+import { saveResult, addXP } from './storage.js';
 import { GEMINI_API_KEY } from './config.js';
 import { generatePracticePassage } from './ai_generator.js';
 
@@ -257,7 +257,8 @@ Respond ONLY with a valid JSON object. No markdown formatting, no backticks, jus
     overall >= 80 ? '#10B981' : overall >= 60 ? '#00D4FF' : '#F59E0B'
   );
 
-  saveResult(overall);
+  saveResult(overall, 'practice');
+  addXP(Math.round(overall * 1.5)); // Up to 150 XP per session
   recordedWords = [];   // reset for next round
   finalTranscript = ''; // reset transcript
 }

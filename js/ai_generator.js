@@ -101,6 +101,38 @@ export async function generateDailyChallenge() {
 }
 
 /**
+ * Generate a Roleplay Scenario
+ */
+export async function generateRoleplayScenario() {
+  const { level, occupation } = await getUserContext();
+  const prompt = `Generate a real-world English roleplay scenario for a ${level} level learner who is a ${occupation}.
+    The scenario should involve a conversation with an AI character.
+    Examples: 
+    - At a doctor's appointment (Beginner)
+    - Negotiating a contract (Advanced)
+    - Handling a customer complaint (Intermediate)
+    Return the response as a JSON object with:
+    - "scenario": A brief description of the setting
+    - "ai_character": Who the AI is acting as
+    - "goal": What the user needs to achieve
+    - "first_message": The AI's opening line to start the roleplay
+    Return ONLY the raw JSON, no markdown blocks.`;
+
+  try {
+    const responseText = await callGroq(prompt);
+    return JSON.parse(responseText.replace(/```json|```/g, '').trim());
+  } catch (err) {
+    console.error("Roleplay Generation Failed:", err);
+    return {
+      scenario: "Checking into a hotel",
+      ai_character: "Hotel Receptionist",
+      goal: "Check into your room and ask about breakfast times",
+      first_message: "Welcome to the Grand View Hotel! How can I help you today?"
+    };
+  }
+}
+
+/**
  * Evaluate a user's response to a challenge
  */
 export async function evaluateChallengeResponse(task, userResponse) {

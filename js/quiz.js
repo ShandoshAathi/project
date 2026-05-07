@@ -1,7 +1,7 @@
 /**
  * quiz.js — Quiz engine
  */
-import { saveResult } from './storage.js';
+import { saveResult, addXP } from './storage.js';
 import { generateQuizQuestions } from './ai_generator.js';
 import { questionBank } from './question_bank.js';
 
@@ -174,7 +174,7 @@ function showResults() {
     </div>`;
 
   document.getElementById('retryBtn').onclick = () => startQuiz();
-  document.getElementById('nextBtn').classList.add('hidden');
   document.getElementById('prevBtn').classList.add('hidden');
-  saveResult(pct);
+  saveResult(pct, 'quiz');
+  addXP(pct * 2); // Up to 200 XP for a perfect score
 }

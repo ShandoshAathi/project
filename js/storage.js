@@ -10,6 +10,8 @@ const KEYS = {
   NAME:    'vaaniName',
   RESULTS: 'vaaniResults',
   CHAT:    'vaaniChatHistory',
+  XP:      'vaaniXP',
+  MISTAKES: 'vaaniMistakes',
 };
 
 /** Save a practice / quiz score */
@@ -132,4 +134,48 @@ export function getChatHistory() {
 /** Clear Chat History */
 export function clearChatHistory() {
   localStorage.removeItem(KEYS.CHAT);
+}
+
+/** XP & Leveling Logic */
+export function addXP(amount) {
+  const currentXP = getXP();
+  const newXP = currentXP + amount;
+  localStorage.setItem(KEYS.XP, newXP.toString());
+  return newXP;
+}
+
+export function getXP() {
+  return parseInt(localStorage.getItem(KEYS.XP) || '0');
+}
+
+export function getLevel() {
+  const xp = getXP();
+  // Simple formula: Level 1 starts at 0, each level requires 1000 XP
+  return Math.floor(xp / 1000) + 1;
+}
+
+export function getXPProgress() {
+  const xp = getXP();
+  const levelXP = xp % 1000;
+  return (levelXP / 1000) * 100; // Percentage to next level
+}
+
+/** Personalized Learning Path (Mistakes) */
+export function trackMistake(category) {
+  const mistakes = getMistakes();
+  mistakes[category] = (mistakes[category] || 0) + 1;
+  localStorage.setItem(KEYS.MISTAKES, JSON.stringify(mistakes));
+}
+
+export function getMistakes() {
+  const stored = localStorage.getItem(KEYS.MISTAKES);
+  return stored ? JSON.parse(stored) : {};
+}
+
+export function getTopMistakes() {
+  const mistakes = getMistakes();
+  return Object.entries(mistakes)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(entry => entry[0]);
 }

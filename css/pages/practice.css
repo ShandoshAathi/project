@@ -140,3 +140,27 @@
   font-size: .83rem; padding: .4rem 0;
   border-bottom: 1px solid var(--ui-border);
 }
+
+/* ── Roleplay Card ────────────────────────────────────────────── */
+.roleplay-card {
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  color: #fff !important;
+}
+.roleplay-card h3 { color: #fff !important; margin-bottom: 0.5rem; }
+.roleplay-card p { font-size: 0.85rem; opacity: 0.9; margin-bottom: 1.25rem; line-height: 1.5; }
+.roleplay-badge {
+  position: absolute; top: 0; right: 0;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.3rem 0.8rem; border-bottom-left-radius: 12px;
+  font-size: 0.65rem; font-weight: 800; letter-spacing: 0.05em;
+}
+.mission-details {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.75rem; border-radius: 12px;
+  font-size: 0.8rem;
+}
+.mission-details div { display: flex; justify-content: space-between; gap: 1rem; }
+.roleplay-card .btn-primary { background: #fff !important; color: var(--primary) !important; border: none !important; }
