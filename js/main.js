@@ -17,6 +17,7 @@ import { saveResult } from './storage.js';
 import { sendChatMessage, resetChatHistory, setCoachPersonality, getChatHistoryLength } from './ai_chatbot.js';
 import { initSpeechToText, startListening, stopListening, speak, toggleTTS, isTTSEnabled } from './voice_engine.js';
 import { getChatHistory } from './storage.js';
+import { loadSettings, saveSettings, refreshChatHistorySettings, clearFullChatHistory, toggleKeyVisibility } from './settings.js';
 
 /* ── Expose to HTML onclick handlers ──────────────────────────── */
 window.navigate        = navigate;
@@ -71,6 +72,9 @@ window.changeCoachPersonality = changeCoachPersonality;
 window.handleImageSelect   = handleImageSelect;
 window.clearImageAttachment = clearImageAttachment;
 window.speakMessage        = speakMessage;
+window.applySettings       = saveSettings;
+window.clearFullChatHistory = clearFullChatHistory;
+window.toggleKeyVisibility = toggleKeyVisibility;
 
 /* ── Page-change hook ─────────────────────────────────────────── */
 setPageChangeCallback(page => {
@@ -79,6 +83,7 @@ setPageChangeCallback(page => {
   if (page === 'dashboard') refreshDashboard();
   if (page === 'results') refreshResults();
   if (page === 'profile') refreshProfile();
+  if (page === 'settings') refreshChatHistorySettings();
 });
 
 export async function refreshProfile() {
@@ -608,6 +613,9 @@ function getWelcomeBubble() {
 
 /* ── Init ─────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
+  // Load user settings
+  loadSettings();
+
   // Hide topnav initially while splash/auth is checking
   document.querySelector('.topnav').classList.add('hidden');
   

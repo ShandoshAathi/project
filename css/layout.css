@@ -166,3 +166,23 @@
   z-index: 2000;
   padding: 1.5rem;
 }
+
+/* ── Practice Page Dynamic Nav ── */
+.app[data-active-page="practice"] .nav-item:not(.active) {
+  opacity: 0;
+  visibility: hidden;
+  max-width: 0;
+  padding-left: 0;
+  padding-right: 0;
+  margin: 0;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app[data-active-page="practice"] .topnav:hover .nav-item {
+  opacity: 1;
+  visibility: visible;
+  max-width: 150px;
+  padding-left: 0.9rem;
+  padding-right: 0.9rem;
+}

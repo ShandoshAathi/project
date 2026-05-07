@@ -1,6 +1,7 @@
 import { GROQ_API_KEY } from './config.js';
 import { getProfile } from './storage.js';
 import { getCurrentUser } from './state.js';
+import { getActiveGroqKey } from './settings.js';
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
@@ -125,15 +126,18 @@ export async function evaluateChallengeResponse(task, userResponse) {
 /* ── Internal Helpers ────────────────────────────────────────── */
 
 async function callGroq(prompt) {
-  if (!GROQ_API_KEY || GROQ_API_KEY.includes('PASTE_YOUR_KEY')) {
-    throw new Error("Missing Groq API Key");
+  const userKey = getActiveGroqKey();
+  const apiKey = userKey || GROQ_API_KEY;
+
+  if (!apiKey || apiKey.includes('PASTE_YOUR_KEY')) {
+    throw new Error("Missing Groq API Key. Please set it in Settings.");
   }
 
   const response = await fetch(GROQ_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${GROQ_API_KEY}`
+      'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
       model: 'llama-3.3-70b-versatile',

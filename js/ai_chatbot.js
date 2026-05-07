@@ -3,11 +3,11 @@
  * Races Google Gemini vs Groq (Llama 3)
  * Groq is used as a lightning-fast, 100% free alternative to OpenAI.
  */
-import { GEMINI_API_KEY, GROQ_API_KEY } from './config.js';
+import { GROQ_API_KEY } from './config.js';
 import { getProfile, saveChatHistory, getChatHistory, clearChatHistory } from './storage.js';
+import { getActiveGroqKey } from './settings.js';
 import { getCurrentUser } from './state.js';
 
-const GEMINI_URL  = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 const GROQ_URL    = 'https://api.groq.com/openai/v1/chat/completions'; // OpenAI compatible endpoint
 
 // Conversation history (OpenAI format)
@@ -68,65 +68,14 @@ If asked about topics outside English learning, answer helpfully but briefly enc
 }
 
 /**
- * Call Gemini Flash — returns text or throws
- */
-async function callGemini(systemPrompt, messages) {
-  if (!GEMINI_API_KEY || GEMINI_API_KEY.includes('PASTE_YOUR_KEY')) {
-    throw new Error('Missing Gemini API Key');
-  }
-
-  const contents = [];
-  contents.push({
-    role: 'user',
-    parts: [{ text: systemPrompt + '\n\n[Conversation starts below]' }]
-  });
-  contents.push({
-    role: 'model',
-    parts: [{ text: 'Understood! I\'m VaaniAI Smart Coach, ready to help you excel in English. What would you like to learn or ask today? 🎯' }]
-  });
-
-  for (const m of messages) {
-    const parts = [{ text: m.content }];
-    
-    // Add image if present in this specific message
-    if (m.imageData) {
-      parts.push({
-        inline_data: {
-          mime_type: 'image/jpeg',
-          data: m.imageData // Base64
-        }
-      });
-    }
-
-    contents.push({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts
-    });
-  }
-
-  const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents })
-  });
-
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error?.message || 'Gemini API Failed');
-  }
-
-  const data = await res.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  if (!text) throw new Error('Gemini returned empty response');
-  return { text, source: 'Gemini' };
-}
-
-/**
  * Call Groq (Llama 3) — 100% free, OpenAI-compatible API
  */
 async function callGroq(systemPrompt, messages) {
-  if (!GROQ_API_KEY || GROQ_API_KEY.includes('PASTE_YOUR_KEY')) {
-    throw new Error('Missing Groq API Key');
+  const userKey = getActiveGroqKey();
+  const apiKey = userKey || GROQ_API_KEY;
+
+  if (!apiKey || apiKey.includes('PASTE_YOUR_KEY')) {
+    throw new Error('Missing Groq API Key. Please set it in Settings.');
   }
 
   const groqMessages = [
@@ -137,8 +86,8 @@ async function callGroq(systemPrompt, messages) {
   const res = await fetch(GROQ_URL, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${GROQ_API_KEY}`
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
       model: 'llama-3.3-70b-versatile', // Latest free model, replaced decommissioned 8b
@@ -160,7 +109,7 @@ async function callGroq(systemPrompt, messages) {
 }
 
 /**
- * Main chat function — Race Gemini vs Groq
+ * Main chat function — Groq only
  *
  * @param {string} userMessage
  * @returns {Promise<{text: string, source: string}>}
@@ -177,34 +126,18 @@ export async function sendChatMessage(userMessage, imageData = null) {
 
   let result;
 
-  // If there is an image, only use Gemini (Groq doesn't support vision yet)
+  // If there is an image, we can't use Groq since it doesn't support vision yet
   if (imageData) {
-    try {
-      result = await callGemini(systemPrompt, messages);
-    } catch (err) {
-      result = { text: "I couldn't analyze that image. Please try again or use text only.", source: 'Error' };
-    }
+    result = { text: "I couldn't analyze that image because Groq does not support image analysis yet. Please try again with text only.", source: 'Error' };
   } else {
     try {
-      // Race both for text-only
-      result = await Promise.any([
-        callGemini(systemPrompt, messages),
-        callGroq(systemPrompt, messages)
-      ]);
-    } catch (aggregateError) {
-      console.warn('[VaaniAI Chat] Both AIs failed. Sequential fallback...');
-      try {
-        result = await callGemini(systemPrompt, messages);
-      } catch (_) {
-        try {
-          result = await callGroq(systemPrompt, messages);
-        } catch (__) {
-          result = {
-            text: "I'm having trouble connecting to the AI right now. Please verify your free API keys in config.js! 🔧",
-            source: 'Error'
-          };
-        }
-      }
+      result = await callGroq(systemPrompt, messages);
+    } catch (err) {
+      console.error('[VaaniAI Chat] Groq failed:', err);
+      result = {
+        text: "I'm having trouble connecting to the AI right now. Please verify your free API keys in config.js! 🔧",
+        source: 'Error'
+      };
     }
   }
 

@@ -52,3 +52,40 @@
   --shadow-sm:  0 4px 16px rgba(15, 23, 42, 0.04);
   --shadow-glow:0 0 40px rgba(14, 165, 233, 0.15);
 }
+
+/* ── Dark Mode ── */
+[data-theme="dark"] {
+  --bg:         #0f172a;
+  --bg2:        rgba(15, 23, 42, 0.8);
+  --bg3:        rgba(15, 23, 42, 0.6);
+
+  --glass:      rgba(30, 41, 59, 0.7);
+  --glass-hover:rgba(30, 41, 59, 0.9);
+  --glass-solid:rgba(30, 41, 59, 1);
+  --glass-border:rgba(255, 255, 255, 0.1);
+  --glass-glow: rgba(14, 165, 233, 0.15);
+
+  --text:       #f8fafc;
+  --text2:      #cbd5e1;
+  --text3:      #64748b;
+
+  --card:       rgba(30, 41, 59, 0.7);
+  --border:     rgba(255, 255, 255, 0.1);
+  --ui-bg:      rgba(255, 255, 255, 0.05);
+  --ui-bg-hover:rgba(255, 255, 255, 0.1);
+  --ui-border:  rgba(255, 255, 255, 0.1);
+
+  --shadow:     0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-sm:  0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Font Sizes ── */
+html {
+  font-size: 16px;
+}
+html[data-font-size="small"] {
+  font-size: 14px;
+}
+html[data-font-size="large"] {
+  font-size: 18px;
+}

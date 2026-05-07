@@ -2,7 +2,7 @@
  * navigation.js — SPA page routing
  */
 
-const pages  = ['dashboard', 'syllabus', 'study', 'practice', 'results', 'quiz', 'profile', 'login'];
+const pages  = ['dashboard', 'syllabus', 'study', 'practice', 'results', 'quiz', 'profile', 'settings', 'login'];
 const titles = {
   dashboard: 'Dashboard',
   syllabus:  'Syllabus',
@@ -11,6 +11,7 @@ const titles = {
   results:   'Results',
   quiz:      'Quiz',
   profile:   'Profile',
+  settings:  'Settings',
   login:     'Login',
 };
 
@@ -33,6 +34,9 @@ export function navigate(page) {
   /* Show target page */
   document.getElementById('page-' + page)?.classList.add('active');
   document.getElementById('pageTitle').textContent = titles[page] || page;
+
+  /* Set attribute for CSS hooks */
+  document.querySelector('.app')?.setAttribute('data-active-page', page);
 
   /* Update Glider Position */
   updateGlider();

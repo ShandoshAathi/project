@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="css/pages/quiz.css"/>
 <link rel="stylesheet" href="css/pages/profile.css"/>
 <link rel="stylesheet" href="css/pages/auth.css"/>
+<link rel="stylesheet" href="css/pages/settings.css"/>
 <link rel="stylesheet" href="css/responsive.css"/>
 <link rel="stylesheet" href="css/utils.css"/>
 </head>
@@ -96,20 +97,20 @@
       <a class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
         <span class="nav-icon">🏠</span><span>Dashboard</span>
       </a>
-      <a class="nav-item" data-page="syllabus" onclick="navigate('syllabus')">
-        <span class="nav-icon">📚</span><span>Syllabus</span>
+      <a class="nav-item" data-page="practice" onclick="navigate('practice')">
+        <span class="nav-icon">🎙️</span><span>Practice</span>
+      </a>
+      <a class="nav-item" data-page="quiz" onclick="navigate('quiz')">
+        <span class="nav-icon">🧠</span><span>Quiz</span>
       </a>
       <a class="nav-item" data-page="study" onclick="navigate('study')">
         <span class="nav-icon">📖</span><span>Study</span>
       </a>
-      <a class="nav-item" data-page="practice" onclick="navigate('practice')">
-        <span class="nav-icon">🎙️</span><span>Practice</span>
+      <a class="nav-item" data-page="syllabus" onclick="navigate('syllabus')">
+        <span class="nav-icon">📚</span><span>Syllabus</span>
       </a>
       <a class="nav-item" data-page="results" onclick="navigate('results')">
         <span class="nav-icon">📊</span><span>Results</span>
-      </a>
-      <a class="nav-item" data-page="quiz" onclick="navigate('quiz')">
-        <span class="nav-icon">🧠</span><span>Quiz</span>
       </a>
       <a class="nav-item" data-page="profile" onclick="navigate('profile')">
         <span class="nav-icon">👤</span><span>Profile</span>
@@ -118,7 +119,6 @@
     <div class="topnav-right">
       <div class="streak-badge" id="streak-badge">🔥 0 Day Streak</div>
       <div class="avatar" onclick="navigate('profile')">A</div>
-      <button class="btn-outline btn-sm" onclick="logout()">Logout</button>
     </div>
   </nav>
 
@@ -527,7 +527,17 @@
             <div class="ps"><h4 id="profile-avg">0%</h4><p>Avg Score</p></div>
             <div class="ps"><h4 id="profile-streak">0</h4><p>Day Streak</p></div>
           </div>
-          <button class="btn-primary" onclick="editProfile()">Edit Profile</button>
+          <div class="profile-actions-list">
+            <button class="profile-action-btn" onclick="editProfile()">
+              <span class="pbtn-icon">✏️</span> Edit Profile
+            </button>
+            <button class="profile-action-btn" onclick="navigate('settings')">
+              <span class="pbtn-icon">⚙️</span> Settings
+            </button>
+            <button class="profile-action-btn btn-danger-text" onclick="logout()">
+              <span class="pbtn-icon">🚪</span> Logout
+            </button>
+          </div>
         </div>
         <div class="profile-details">
           <div class="card">
@@ -554,6 +564,106 @@
               <div class="achievement"><div>🎓</div><p>Graduate</p></div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div class="page" id="page-settings">
+      <div class="settings-layout">
+        <div class="card">
+          <h3>Appearance</h3>
+          <div class="setting-item">
+            <div class="setting-info">
+              <label>Theme</label>
+              <p>Toggle between Light and Dark mode</p>
+            </div>
+            <select id="setting-theme" onchange="applySettings()">
+              <option value="light">Light Mode</option>
+              <option value="dark">Dark Mode</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <label>Font Size</label>
+              <p>Adjust the text size across the application</p>
+            </div>
+            <select id="setting-font-size" onchange="applySettings()">
+              <option value="small">Small</option>
+              <option value="medium" selected>Medium</option>
+              <option value="large">Large</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="card mt-6">
+          <h3>AI Coach Settings</h3>
+          <div class="setting-item">
+            <div class="setting-info">
+              <label>Voice Output</label>
+              <p>Enable text-to-speech for AI responses</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-ai-voice" onchange="applySettings()">
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <label>Default Personality</label>
+              <p>How should the AI respond to you?</p>
+            </div>
+            <select id="setting-ai-personality" onchange="applySettings()">
+              <option value="Friendly">😊 Friendly</option>
+              <option value="Professional">💼 Professional</option>
+              <option value="Strict">🎓 Strict</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card mt-6">
+          <h3>API Configuration</h3>
+          <p class="text-sm text-muted mb-4">Set your personal API keys here. These are saved only in your browser's local storage.</p>
+          <div class="setting-item">
+            <div class="setting-info">
+              <label>Groq API Key</label>
+              <p>Used for the AI Chatbot and Exercises</p>
+            </div>
+            <div class="input-with-toggle">
+              <input type="password" id="setting-groq-key" placeholder="gsk_..." onchange="applySettings()">
+              <button class="btn-icon-sm" onclick="toggleKeyVisibility('setting-groq-key')">👁️</button>
+            </div>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <label>Gemini API Key</label>
+              <p>Backup Google AI engine</p>
+            </div>
+            <div class="input-with-toggle">
+              <input type="password" id="setting-gemini-key" placeholder="AIza..." onchange="applySettings()">
+              <button class="btn-icon-sm" onclick="toggleKeyVisibility('setting-gemini-key')">👁️</button>
+            </div>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <label>OpenAI API Key</label>
+              <p>Backup OpenAI engine</p>
+            </div>
+            <div class="input-with-toggle">
+              <input type="password" id="setting-openai-key" placeholder="sk-..." onchange="applySettings()">
+              <button class="btn-icon-sm" onclick="toggleKeyVisibility('setting-openai-key')">👁️</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-6">
+          <h3>Chat History</h3>
+          <p class="text-sm text-muted mb-4">Your recent conversations with the AI Coach are stored locally.</p>
+          <div id="settings-chat-history" class="settings-history-list">
+            <!-- Dynamic history items -->
+            <p class="empty-state">No chat history found.</p>
+          </div>
+          <button class="btn-outline btn-sm mt-4 btn-danger-hover" onclick="clearFullChatHistory()">🗑️ Clear All Chat History</button>
         </div>
       </div>
     </div>
