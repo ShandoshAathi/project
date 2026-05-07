@@ -127,8 +127,13 @@ export function saveChatHistory(history) {
 
 /** Get Chat History */
 export function getChatHistory() {
-  const stored = localStorage.getItem(KEYS.CHAT);
-  return stored ? JSON.parse(stored) : [];
+  try {
+    const stored = localStorage.getItem(KEYS.CHAT);
+    return stored ? JSON.parse(stored) : [];
+  } catch (e) {
+    console.error("Failed to parse chat history:", e);
+    return [];
+  }
 }
 
 /** Clear Chat History */

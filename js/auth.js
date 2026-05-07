@@ -41,36 +41,64 @@ async function checkOnboarding(user) {
 /* ── Init Auth State ────────────────────────────────────────────── */
 export async function initAuth() {
   const splash = document.getElementById('splash');
-  
-  try {
-    // Check auth state while splash is still showing
-    if (supabase) {
-      const { data: { session } } = await supabase.auth.getSession();
-      setCurrentUser(session?.user || null);
+  if (!splash) return;
+
+  let authChecked = false;
+  let timerFinished = false;
+
+  // Function to actually hide splash and proceed
+  const proceed = () => {
+    if (!authChecked || !timerFinished) return;
+    
+    if (typeof window.dismissSplash === 'function') {
+      window.dismissSplash();
     } else {
-      const stored = localStorage.getItem('vaaniai_simulated_user');
-      setCurrentUser(stored ? JSON.parse(stored) : null);
-    }
-  } catch (err) {
-    console.error('Auth check failed:', err);
-    setCurrentUser(null);
-  }
-
-  // Branded splash — 2.5s then dismiss
-  setTimeout(() => {
-    splash.classList.add('fade-out');
-
-    setTimeout(() => {
+      // Fallback
       splash.classList.remove('active');
+    }
 
-      const currentUser = getCurrentUser();
-      if (currentUser) {
-        checkOnboarding(currentUser);
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      checkOnboarding(currentUser);
+    } else {
+      showLoginPage();
+    }
+  };
+
+  // 1. Start Auth Check (parallel)
+  (async () => {
+    try {
+      if (supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        setCurrentUser(session?.user || null);
       } else {
-        showLoginPage();
+        const stored = localStorage.getItem('vaaniai_simulated_user');
+        setCurrentUser(stored ? JSON.parse(stored) : null);
       }
-    }, 350);
+    } catch (err) {
+      console.error('Auth check failed:', err);
+      setCurrentUser(null);
+    } finally {
+      authChecked = true;
+      proceed();
+    }
+  })();
+
+  // 2. Branded splash timer (min wait 2s)
+  setTimeout(() => {
+    timerFinished = true;
+    proceed();
   }, 2000);
+
+  // 3. Safety Fail-safe: Force dismiss after 6 seconds if still stuck
+  setTimeout(() => {
+    if (splash.classList.contains('active')) {
+      console.warn("Auth check timed out in auth.js. Forcing proceed.");
+      authChecked = true;
+      timerFinished = true;
+      proceed();
+    }
+  }, 6000);
 }
 
 /** Show the login page (auth-page needs flex, not block) */

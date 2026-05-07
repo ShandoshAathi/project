@@ -18,7 +18,16 @@ const DEFAULT_SETTINGS = {
 
 export function loadSettings() {
   const saved = localStorage.getItem('vaaniai_settings');
-  const settings = saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
+  let settings = DEFAULT_SETTINGS;
+  
+  if (saved) {
+    try {
+      settings = { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+    } catch (e) {
+      console.error("Failed to parse settings:", e);
+      // Fallback to defaults
+    }
+  }
   
   // Set UI elements to match loaded settings
   const themeSelect = document.getElementById('setting-theme');

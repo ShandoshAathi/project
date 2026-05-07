@@ -2,7 +2,7 @@
  * navigation.js — SPA page routing
  */
 
-const pages  = ['dashboard', 'syllabus', 'study', 'practice', 'results', 'quiz', 'profile', 'settings', 'login'];
+const pages  = ['dashboard', 'syllabus', 'study', 'practice', 'results', 'quiz', 'profile', 'settings', 'login', 'flashcards'];
 const titles = {
   dashboard: 'Dashboard',
   syllabus:  'Syllabus',
@@ -13,6 +13,7 @@ const titles = {
   profile:   'Profile',
   settings:  'Settings',
   login:     'Login',
+  flashcards: 'Flashcards'
 };
 
 /** Callback that fires after a page becomes active (set by main.js) */

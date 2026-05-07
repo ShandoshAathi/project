@@ -32,8 +32,42 @@
       <div class="splash-logo">V</div>
       <div class="splash-title">VaaniAI</div>
       <div class="splash-subtitle">Your AI Language Tutor</div>
+      <button id="skip-splash" class="btn-text" style="display:none; margin-top: 2rem; color: rgba(255,255,255,0.5);" onclick="window.dismissSplash()">
+        Skip Splash Screen
+      </button>
     </div>
   </div>
+
+  <script>
+    // Super-robust splash screen dismissal
+    (function() {
+      const splash = document.getElementById('splash');
+      if (!splash) return;
+      
+      // Auto-show skip button after 3s
+      setTimeout(() => {
+        const skip = document.getElementById('skip-splash');
+        if (skip) skip.style.display = 'block';
+      }, 3000);
+      
+      window.dismissSplash = function() {
+        splash.style.opacity = '0';
+        splash.style.transition = 'opacity 0.5s ease-out';
+        
+        setTimeout(() => {
+          splash.style.setProperty('display', 'none', 'important');
+          splash.style.zIndex = '-1';
+          splash.classList.remove('active');
+        }, 500);
+      };
+      
+      // Safety fail-safe dismissal after 7s
+      setTimeout(() => {
+        console.warn("Splash fail-safe triggered.");
+        window.dismissSplash();
+      }, 7000);
+    })();
+  </script>
 
 <div class="app">
   <!-- Onboarding Overlay -->
@@ -723,15 +757,6 @@
   </main>
 </div>
 
-<!-- ── Splash Screen ────────────────────────────────────────────── -->
-<div id="splash" class="splash-screen active">
-  <div class="splash-content">
-    <div class="splash-logo">V</div>
-    <h1 class="splash-title">VaaniAI</h1>
-    <p class="splash-subtitle">Your AI Language Tutor</p>
-    <div class="splash-loader"></div>
-  </div>
-</div>
 
 <!-- ── Login Page ───────────────────────────────────────────────── -->
 <div id="page-login" class="page auth-page">
@@ -1032,19 +1057,33 @@
     const upBtn   = document.getElementById('scroll-up-btn');
     const downBtn = document.getElementById('scroll-down-btn');
 
-    function updateScrollBtns() {
+    window.updateScrollBtns = function() {
       const scrolled  = window.scrollY;
-      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const totalHeight = document.documentElement.scrollHeight;
+      const viewportHeight = window.innerHeight;
+      const maxScroll = totalHeight - viewportHeight;
+
+      // Hide scroll buttons if an overlay (Login, Onboarding, Splash) is active
+      const isOverlayActive = document.querySelector('.auth-page.active, .splash-screen.active');
+      
+      // Only show buttons if the page content actually exceeds the viewport AND no overlay is active
+      if (maxScroll <= 20 || isOverlayActive) {
+        upBtn.classList.remove('visible');
+        downBtn.classList.remove('visible');
+        return;
+      }
 
       // Show "up" only when scrolled down a bit
       upBtn.classList.toggle('visible', scrolled > 100);
       // Show "down" only when not at the bottom
       downBtn.classList.toggle('visible', scrolled < maxScroll - 50);
-    }
+    };
 
-    window.addEventListener('scroll', updateScrollBtns, { passive: true });
-    // Run once on load
-    setTimeout(updateScrollBtns, 500);
+    window.addEventListener('scroll', window.updateScrollBtns, { passive: true });
+    window.addEventListener('resize', window.updateScrollBtns);
+    
+    // Initial check
+    setTimeout(window.updateScrollBtns, 800);
   })();
 </script>
 

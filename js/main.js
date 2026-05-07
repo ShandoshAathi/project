@@ -649,7 +649,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.topnav').classList.add('hidden');
   
   // Initialize Auth (handles Splash Screen and routing)
-  initAuth();
+  try {
+    initAuth();
+  } catch (e) {
+    console.error("Critical error during Auth Init:", e);
+    // Emergency: Hide splash if it's stuck
+    const splash = document.getElementById('splash');
+    if (splash) splash.classList.remove('active');
+  }
 
   // Load existing chat history if any
   const history = getChatHistory();
@@ -708,6 +715,12 @@ setPageChangeCallback((page) => {
   if (page === 'dashboard') refreshDashboard();
   if (page === 'flashcards') renderFlashcards();
   if (page === 'study' || page === 'syllabus') highlightWeaknesses();
+  
+  // Update scroll button visibility for the new page
+  if (window.updateScrollBtns) {
+    setTimeout(window.updateScrollBtns, 100);
+    setTimeout(window.updateScrollBtns, 500); // Second check after content renders
+  }
 });
 
 function highlightWeaknesses() {
@@ -720,9 +733,6 @@ function highlightWeaknesses() {
     }
   });
 }
-
-
-});
 
 /* ── Roleplay Logic ─────────────────────────────────────────── */
 async function initiateRoleplay() {
