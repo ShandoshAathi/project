@@ -3,11 +3,11 @@
  * Wires all modules together and attaches global event handlers.
  */
 import { navigate, setPageChangeCallback } from './navigation.js';
-import { startQuiz, initiateQuiz, nextQuestion, prevQuestion, goToQ } from './quiz.js';
-import { toggleMic, newPassage, submitPractice, startPractice, initiatePractice } from './practice.js';
-import { loadChapter, prevChapter, nextChapter } from './study.js';
+import { startQuiz, initiateQuiz, nextQuestion, prevQuestion, goToQ, selectOption, updateHistory } from './quiz.js';
+import { toggleMic, newPassage, submitPractice, startPractice, initiatePractice, refreshPracticeUI } from './practice.js';
+import { loadChapter, prevChapter, nextChapter, refreshSyllabusUI } from './study.js';
 import { editProfile, closeProfileModal, saveProfileEdit } from './profile.js';
-import { getResults, getProfile, saveResult, addXP, getXP, getLevel, getXPProgress, getChatHistory, getTopMistakes } from './storage.js';
+import { getResults, getProfile, saveResult, addXP, getXP, getLevel, getXPProgress, getChatHistory, getTopMistakes, getCurrentSubject, saveCurrentSubject } from './storage.js';
 import { getFlashcards, getDueWords, updateSRS, saveWord } from './flashcards.js';
 import { initAuth, loginWithGoogle, loginWithGithub, switchAuthType, loginWithEmail, signUpWithEmail, toggleEmailMode, sendOTP, verifyOTP, resetPhoneAuth, logout, updatePhonePlaceholder } from './auth.js';
 import { getCurrentUser } from './state.js';
@@ -37,7 +37,7 @@ window.prevQuestion    = prevQuestion;
 window.goToQ           = goToQ;
 window.initiateQuiz    = initiateQuiz;
 window.initiatePractice = initiatePractice;
-window.selectOption    = () => {};   // handled internally by quiz.js
+window.selectOption    = selectOption;
 
 // Onboarding
 window.extractProviderDetails = extractProviderDetails;
@@ -94,6 +94,46 @@ window.speakMessage        = speakMessage;
 window.applySettings       = saveSettings;
 window.clearFullChatHistory = clearFullChatHistory;
 window.toggleKeyVisibility = toggleKeyVisibility;
+window.switchSubject = (subject) => {
+  saveCurrentSubject(subject);
+  refreshSubjectUI();
+  refreshSyllabusUI();
+  refreshPracticeUI();
+  resetCoachChat(); // Clear chat to re-initialize with new subject persona
+  addXP(10); // Small reward for exploring
+  
+  // Update active class in subject cards
+  document.querySelectorAll('.subject-card').forEach(card => {
+    card.classList.toggle('active', card.querySelector('h4').textContent.includes(subject));
+  });
+};
+
+function formatSubjectName(subject) {
+  if (!subject) return '';
+  const map = {
+    'cpp': 'C++',
+    'python': 'Python',
+    'java': 'Java',
+    'english': 'English'
+  };
+  return map[subject.toLowerCase()] || subject.charAt(0).toUpperCase() + subject.slice(1);
+}
+
+export function refreshSubjectUI() {
+  const subject = getCurrentSubject();
+  const formattedSubject = formatSubjectName(subject);
+  
+  const titleEls = document.querySelectorAll('.dynamic-subject-name');
+  titleEls.forEach(el => el.textContent = formattedSubject);
+  
+  // Update dashboard specific elements
+  const dashHeading = document.querySelector('.dashboard-header h1');
+  if (dashHeading) dashHeading.innerHTML = `Welcome back to <span class="text-primary">${formattedSubject}</span>!`;
+  
+  // Update Syllabus header
+  const sylHeader = document.querySelector('#page-syllabus h2');
+  if (sylHeader) sylHeader.textContent = `${formattedSubject} Curriculum`;
+}
 
 /* ── Page-change hook ─────────────────────────────────────────── */
 setPageChangeCallback(page => {
@@ -667,6 +707,17 @@ document.addEventListener('DOMContentLoaded', () => {
       history.forEach(m => appendChatBubble(feed, m.content, m.role === 'assistant' ? 'coach' : 'user'));
     }
   }
+
+  // Refresh Subject UI (Syllabus, Dashboard Headings)
+  refreshSubjectUI();
+  refreshSyllabusUI();
+  refreshPracticeUI();
+  
+  // Set initial active state in subject cards
+  const subject = getCurrentSubject();
+  document.querySelectorAll('.subject-card').forEach(card => {
+    card.classList.toggle('active', card.querySelector('h4').textContent.includes(subject));
+  });
 });
 
 /* ── Flashcard Logic ─────────────────────────────────────────── */
@@ -714,6 +765,7 @@ function showNextCard() {
 setPageChangeCallback((page) => {
   if (page === 'dashboard') refreshDashboard();
   if (page === 'flashcards') renderFlashcards();
+  if (page === 'quiz') updateHistory();
   if (page === 'study' || page === 'syllabus') highlightWeaknesses();
   
   // Update scroll button visibility for the new page

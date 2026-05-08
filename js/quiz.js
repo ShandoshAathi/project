@@ -129,7 +129,7 @@ function renderQuestion() {
   updateQNav();
 }
 
-function selectOption(btn, idx) {
+export function selectOption(btn, idx) {
   userAnswers[currentQ] = idx;
   const grid = document.getElementById('optionsGrid');
   grid.querySelectorAll('.option-btn').forEach((b, i) => {
@@ -177,4 +177,29 @@ function showResults() {
   document.getElementById('prevBtn').classList.add('hidden');
   saveResult(pct, 'quiz');
   addXP(pct * 2); // Up to 200 XP for a perfect score
+  updateHistory();
+}
+
+export async function updateHistory() {
+  const list = document.getElementById('quiz-history-list');
+  if (!list) return;
+
+  const results = await import('./storage.js').then(m => m.getResults());
+  const quizzes = results.filter(r => r.activity_type === 'quiz').slice(0, 5);
+
+  if (quizzes.length === 0) {
+    list.innerHTML = `<p class="empty-state-sm">No history yet</p>`;
+    return;
+  }
+
+  list.innerHTML = quizzes.map((q, i) => {
+    const date = new Date(q.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    const cls = q.score >= 80 ? 'good' : q.score >= 60 ? 'ok' : 'warn';
+    return `
+      <div class="history-item">
+        <span class="hist-date">${date}</span>
+        <span class="hist-score ${cls}">${q.score}%</span>
+      </div>
+    `;
+  }).join('');
 }

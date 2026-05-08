@@ -1,28 +1,71 @@
-/**
- * practice.js — Mic recording, passage management, feedback
- */
-import { saveResult, addXP } from './storage.js';
+import { saveResult, addXP, getCurrentSubject } from './storage.js';
 import { GEMINI_API_KEY } from './config.js';
 import { generatePracticePassage } from './ai_generator.js';
+import { saveWord } from './flashcards.js';
+
+export function refreshPracticeUI() {
+  const subject = getCurrentSubject();
+  const isCoding = subject !== 'English';
+  
+  // Update Overlay
+  const overlayTitle = document.querySelector('#practice-start-overlay h2');
+  const overlayDesc = document.querySelector('#practice-start-overlay p');
+  const overlayGoal = document.querySelector('#practice-start-overlay .qm-item:last-child span:last-child');
+  const overlayActivity = document.querySelector('#practice-start-overlay .qm-item:first-child span:last-child');
+  
+  if (overlayTitle) overlayTitle.textContent = isCoding ? `${subject} Code Analysis` : 'Ready for Practice?';
+  if (overlayDesc) overlayDesc.textContent = isCoding ? `Analyze the generated ${subject} snippet and explain its logic verbally.` : 'Improve your pronunciation by reading dynamic passages aloud.';
+  if (overlayGoal) overlayGoal.textContent = isCoding ? 'Logic & Technical Clarity' : 'Accuracy & Fluency';
+  if (overlayActivity) overlayActivity.textContent = isCoding ? 'Code Explainer' : 'Read Aloud';
+
+  // Update Main Practice UI
+  const practiceTitle = document.querySelector('.practice-header h3');
+  if (practiceTitle) practiceTitle.textContent = isCoding ? 'Code Explainer' : 'Read Aloud';
+  
+  const passageContainer = document.getElementById('practicePassage');
+  if (passageContainer) {
+    passageContainer.classList.toggle('is-code', isCoding);
+  }
+  
+  // Update Metrics Labels
+  const metrics = document.querySelectorAll('.feedback-metrics .metric span:first-child');
+  if (metrics.length >= 4) {
+    if (isCoding) {
+      metrics[0].textContent = 'Logic';
+      metrics[1].textContent = 'Clarity';
+      metrics[2].textContent = 'Keywords';
+      metrics[3].textContent = 'Complexity';
+    } else {
+      metrics[0].textContent = 'Accuracy';
+      metrics[1].textContent = 'Fluency';
+      metrics[2].textContent = 'Pronunciation';
+      metrics[3].textContent = 'Speed';
+    }
+  }
+}
 
 /* ── Passages ─────────────────────────────────────────────────── */
-const passages = [
-  "The sun rises in the east and sets in the west. Every morning brings a new beginning, full of possibilities and opportunities waiting to be discovered.",
-  "Reading is a gateway to the world of knowledge. It opens doors to new ideas, cultures, and experiences that we might never encounter in our daily lives.",
-  "Language is the most powerful tool humans possess. Through words, we share our thoughts, emotions, and dreams with others across time and distance.",
-  "Education is the foundation of progress. By learning new skills and expanding our knowledge, we prepare ourselves for the challenges of tomorrow.",
-  "Nature teaches us patience and resilience. The trees grow slowly but stand strong for centuries, reminding us that great things take time.",
-  "Technology is a double-edged sword. It can connect us with people halfway around the world, but it can also make us feel more isolated than ever before.",
-  "The ocean covers more than seventy percent of our planet. It is home to millions of species, many of which remain undiscovered in the deep dark waters.",
-  "Music is a universal language that transcends all boundaries. It can move us to tears or make us dance with joy, regardless of where we come from.",
-  "Perseverance is the key to success. No matter how many times we fall, the important thing is to get back up and keep moving toward our goals.",
-  "Traveling allows us to see the world from different perspectives. It challenges our assumptions and helps us grow into more open-minded individuals.",
-  "Healthy habits are essential for a long and happy life. Eating well and staying active provide the energy we need to pursue our passions every day.",
-  "The stars in the night sky have inspired dreamers for millennia. They remind us of the vastness of the universe and our place within its infinite beauty.",
-  "A single act of kindness can change someone's entire day. It ripples outward, creating a wave of positivity that touches the lives of many others.",
-  "Curiosity is the engine of discovery. By asking questions and seeking answers, we uncover the secrets of the world around us and within ourselves.",
-  "Time is our most precious resource. Once it is gone, we can never get it back, so we must make the most of every moment we are given.",
-];
+const passagesData = {
+  'English': [
+    "The sun rises in the east and sets in the west. Every morning brings a new beginning, full of possibilities and opportunities waiting to be discovered.",
+    "Reading is a gateway to the world of knowledge. It opens doors to new ideas, cultures, and experiences that we might never encounter in our daily lives.",
+    "Language is the most powerful tool humans possess. Through words, we share our thoughts, emotions, and dreams with others across time and distance.",
+    "Education is the foundation of progress. By learning new skills and expanding our knowledge, we prepare ourselves for the challenges of tomorrow."
+  ],
+  'Python': [
+    "def greet(name):\n    return f'Hello, {name}!'\n\n# Explain how this function uses f-strings to format the greeting.",
+    "numbers = [1, 2, 3, 4, 5]\nsquares = [n**2 for n in numbers]\n\n# Describe how this list comprehension works to create a new list of squares.",
+    "import requests\nresponse = requests.get('https://api.github.com')\n\n# Explain the process of making an HTTP GET request using the requests library."
+  ],
+  'Java': [
+    "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello World\");\n    }\n}\n\n# Explain the structure of a basic Java class and the main method."
+  ]
+};
+
+function getFallbackPassages() {
+  const subject = getCurrentSubject();
+  return passagesData[subject] || passagesData['English'];
+}
 
 /* ── State ────────────────────────────────────────────────────── */
 let isRecording = false;
@@ -149,8 +192,7 @@ export async function newPassage() {
   recordedWords = [];
   
   const statusEl = document.getElementById('micStatus');
-  const originalStatus = statusEl.textContent;
-  statusEl.textContent = "✨ Generating dynamic passage...";
+  statusEl.textContent = "✨ Generating dynamic content...";
   
   let p;
   try {
@@ -160,13 +202,14 @@ export async function newPassage() {
   }
   
   if (!p) {
-    statusEl.textContent = "⚠️ AI generation failed. Please check your API keys or try again.";
-    statusEl.style.color = '#EF4444';
-    return;
+    const fallbacks = getFallbackPassages();
+    p = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    statusEl.textContent = "ℹ️ Using library passage (AI failed/offline).";
+  } else {
+    setStatus('Click to Start Recording', '');
   }
   
   loadPassage(p);
-  setStatus('Click to Start Recording', '');
 }
 
 function loadPassage(text) {
@@ -194,21 +237,31 @@ export async function submitPractice() {
     finalTranscript = "I didn't read anything clearly.";
   }
 
-  // Set loading state
-  setStatus('🤖 AI is evaluating your reading...', '#6366F1');
+  const subject = getCurrentSubject();
+  const isCoding = subject !== 'English';
 
-  let accuracy, fluency, pronunciation, speed;
+  // Set loading state
+  setStatus(`🤖 AI is evaluating your ${isCoding ? 'explanation' : 'reading'}...`, '#6366F1');
+
+  let v1, v2, v3, v4;
 
   if (GEMINI_API_KEY && GEMINI_API_KEY.length > 10) {
-    // REAL EVALUATION VIA GEMINI API
     try {
-      const prompt = `You are an expert English language tutor. Evaluate the user's reading performance.
+      const prompt = isCoding ? 
+        `You are a Senior ${subject} Developer. Evaluate the user's verbal explanation of this code snippet.
+Code Snippet: "${originalPassage}"
+User's Explanation: "${finalTranscript}"
+
+Evaluate Logic, Clarity, Keywords usage, and Complexity understanding out of 100.
+Respond ONLY with a valid JSON object:
+{ "v1": 0, "v2": 0, "v3": 0, "v4": 0 }` :
+        `You are an expert English language tutor. Evaluate the user's reading performance.
 Original Passage: "${originalPassage}"
 User's Spoken Transcript: "${finalTranscript}"
 
 Evaluate accuracy, fluency, pronunciation, and speed out of 100.
-Respond ONLY with a valid JSON object. No markdown formatting, no backticks, just the JSON.
-{ "accuracy": 0, "fluency": 0, "pronunciation": 0, "speed": 0 }`;
+Respond ONLY with a valid JSON object:
+{ "v1": 0, "v2": 0, "v3": 0, "v4": 0 }`;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
@@ -225,31 +278,31 @@ Respond ONLY with a valid JSON object. No markdown formatting, no backticks, jus
       textResponse = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
       
       const evaluation = JSON.parse(textResponse);
-      accuracy = evaluation.accuracy || 0;
-      fluency = evaluation.fluency || 0;
-      pronunciation = evaluation.pronunciation || 0;
-      speed = evaluation.speed || 0;
+      v1 = evaluation.v1 || 0;
+      v2 = evaluation.v2 || 0;
+      v3 = evaluation.v3 || 0;
+      v4 = evaluation.v4 || 0;
 
     } catch (error) {
       console.error("Gemini API Error:", error);
       setStatus('⚠️ AI Evaluation failed. Using simulation.', '#EF4444');
       // Fallback
-      accuracy = 70; fluency = 70; pronunciation = 70; speed = 70;
+      v1 = 70; v2 = 70; v3 = 70; v4 = 70;
     }
   } else {
     // SIMULATED EVALUATION (Fallback)
     const correct = document.querySelectorAll('#passageText .word.correct').length;
-    accuracy       = Math.min(100, Math.round((correct / Math.max(total, 1)) * 100));
-    fluency        = Math.min(100, Math.round(accuracy * 0.85 + Math.random() * 15));
-    pronunciation  = Math.min(100, Math.round(accuracy * 0.9  + Math.random() * 10));
-    speed          = Math.min(100, Math.round(50 + Math.random() * 40));
+    v1 = Math.min(100, Math.round((correct / Math.max(total, 1)) * 100));
+    v2 = Math.min(100, Math.round(v1 * 0.85 + Math.random() * 15));
+    v3 = Math.min(100, Math.round(v1 * 0.9  + Math.random() * 10));
+    v4 = Math.min(100, Math.round(50 + Math.random() * 40));
   }
 
-  const overall = Math.round(accuracy * 0.35 + fluency * 0.25 + pronunciation * 0.25 + speed * 0.15);
+  const overall = Math.round(v1 * 0.35 + v2 * 0.25 + v3 * 0.25 + v4 * 0.15);
 
   animateRing(overall);
-  updateMetrics([accuracy, fluency, pronunciation, speed]);
-  updateTip(speed, fluency, pronunciation, accuracy);
+  updateMetrics([v1, v2, v3, v4]);
+  updateTip(v4, v2, v3, v1);
   addSessionEntry(overall);
 
   setStatus(
@@ -259,6 +312,21 @@ Respond ONLY with a valid JSON object. No markdown formatting, no backticks, jus
 
   saveResult(overall, 'practice');
   addXP(Math.round(overall * 1.5)); // Up to 150 XP per session
+
+  /* Learning Loop: Save missed words to Flashcards */
+  const missedWords = Array.from(allWords)
+    .filter(w => w.classList.contains('wrong') || (!w.classList.contains('correct') && !w.classList.contains('highlight')))
+    .map(w => w.textContent.replace(/[^a-zA-Z]/g, '').toLowerCase())
+    .filter(w => w.length > 2); // Avoid saving tiny words
+
+  if (missedWords.length > 0) {
+    const uniqueMissed = [...new Set(missedWords)];
+    uniqueMissed.forEach(word => {
+      saveWord(word, "Pronunciation review required (from Practice)");
+    });
+    console.log(`[VaaniAI] Saved ${uniqueMissed.length} words to Flashcards.`);
+  }
+
   recordedWords = [];   // reset for next round
   finalTranscript = ''; // reset transcript
 }

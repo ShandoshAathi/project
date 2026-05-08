@@ -43,8 +43,9 @@ export async function initAuth() {
   const splash = document.getElementById('splash');
   if (!splash) return;
 
+  const isSplashHidden = sessionStorage.getItem('vaani_splash_shown') === 'true';
   let authChecked = false;
-  let timerFinished = false;
+  let timerFinished = isSplashHidden; // Skip timer if splash is already hidden
 
   // Function to actually hide splash and proceed
   const proceed = () => {
@@ -84,13 +85,15 @@ export async function initAuth() {
     }
   })();
 
-  // 2. Branded splash timer (min wait 2s)
-  setTimeout(() => {
-    timerFinished = true;
-    proceed();
-  }, 2000);
+  // 2. Branded splash timer (min wait 1s)
+  if (!isSplashHidden) {
+    setTimeout(() => {
+      timerFinished = true;
+      proceed();
+    }, 1000);
+  }
 
-  // 3. Safety Fail-safe: Force dismiss after 6 seconds if still stuck
+  // 3. Safety Fail-safe: Force dismiss after 4 seconds if still stuck
   setTimeout(() => {
     if (splash.classList.contains('active')) {
       console.warn("Auth check timed out in auth.js. Forcing proceed.");
@@ -98,7 +101,7 @@ export async function initAuth() {
       timerFinished = true;
       proceed();
     }
-  }, 6000);
+  }, 4000);
 }
 
 /** Show the login page (auth-page needs flex, not block) */

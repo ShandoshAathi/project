@@ -4,7 +4,7 @@
  * Groq is used as a lightning-fast, 100% free alternative to OpenAI.
  */
 import { GROQ_API_KEY } from './config.js';
-import { getProfile, saveChatHistory, getChatHistory, clearChatHistory, addXP } from './storage.js';
+import { getProfile, saveChatHistory, getChatHistory, clearChatHistory, addXP, getCurrentSubject } from './storage.js';
 import { getActiveGroqKey } from './settings.js';
 import { getCurrentUser } from './state.js';
 
@@ -22,6 +22,8 @@ async function buildSystemPrompt() {
   let level = 'Beginner';
   let occupation = 'Student';
   let goal = 'Improve Fluency';
+  const subject = getCurrentSubject();
+  const isCoding = subject !== 'English';
 
   try {
     const user = getCurrentUser();
@@ -40,14 +42,14 @@ async function buildSystemPrompt() {
 
   let personalityPrompt = "";
   if (coachPersonality === 'Professional') {
-    personalityPrompt = "Maintain a formal, professional tone. Focus on business etiquette and precise grammar.";
+    personalityPrompt = `Maintain a formal, professional tone. Focus on ${isCoding ? 'clean code, best practices, and architecture' : 'business etiquette and precise grammar'}.`;
   } else if (coachPersonality === 'Strict') {
-    personalityPrompt = "Be a strict examiner. Correct every mistake immediately and focus heavily on technical accuracy.";
+    personalityPrompt = `Be a strict mentor. Correct every ${isCoding ? 'syntax error or logical flaw' : 'grammar mistake'} immediately and focus heavily on technical accuracy.`;
   } else {
-    personalityPrompt = "Be a friendly, encouraging coach. Use motivating language and focus on building confidence.";
+    personalityPrompt = `Be a friendly, encouraging coach. Use motivating language and focus on building confidence in ${subject}.`;
   }
 
-  return `You are VaaniAI Smart Coach — a ${coachPersonality.toLowerCase()}, expert English language tutor embedded inside the VaaniAI learning platform.
+  return `You are VaaniAI Smart Coach — a ${coachPersonality.toLowerCase()}, expert ${subject} ${isCoding ? 'Mentor' : 'Tutor'} embedded inside the VaaniAI learning platform.
 ${personalityPrompt}
 
 User profile:
@@ -55,19 +57,23 @@ User profile:
 - Level: ${level}
 - Occupation: ${occupation}
 - Learning Goal: ${goal}
+- Current Subject: ${subject}
 
 Your capabilities:
-- Answer any English grammar, vocabulary, pronunciation, or verbal aptitude question
-- Explain concepts from the syllabus (Sentence Patterns, Tenses, Voice, Reported Speech, Conditionals, Prepositions, Phrasal Verbs, Articles, Concord, Adverbs)
+${isCoding ? `- Answer any ${subject} programming, logic, or syntax questions
+- Explain concepts like variables, loops, classes, and algorithms
+- Provide code snippets and debug assistance` : 
+`- Answer any English grammar, vocabulary, pronunciation, or verbal aptitude question
+- Explain concepts from the syllabus (Sentence Patterns, Tenses, Voice, Reported Speech, Conditionals, Prepositions, Phrasal Verbs, Articles, Concord, Adverbs)`}
 - Give practice tips, study plans, and encouragement
-- Answer general knowledge questions the user asks (you are a capable AI assistant)
-- Keep responses concise, clear, and motivating — use emojis sparingly for a premium feel
+- Answer general knowledge questions (you are a capable AI assistant)
+- Keep responses concise, clear, and motivating — use emojis sparingly
 
-CRITICAL: If the user makes a recurring grammar or vocabulary mistake, conclude your message with exactly: [MISTAKE: CategoryName]
-Categories: Tenses, Voice, Reported Speech, Concord, Prepositions, Phrasal Verbs, Articles, Adverbs, Modifiers.
+CRITICAL: If the user makes a recurring ${isCoding ? 'logical or syntax' : 'grammar or vocabulary'} mistake, conclude your message with exactly: [MISTAKE: CategoryName]
+Categories for English: Tenses, Voice, Reported Speech, Concord, Prepositions, Phrasal Verbs, Articles, Adverbs, Modifiers.
+Categories for ${subject}: Syntax, Logic, Naming, Efficiency, Security.
 
-Always personalize responses to ${name}'s level (${level}) and occupation (${occupation}).
-If asked about topics outside English learning, answer helpfully but briefly encourage returning to their study goal.`;
+Always personalize responses to ${name}'s level (${level}) and occupation (${occupation}).`;
 }
 
 /**

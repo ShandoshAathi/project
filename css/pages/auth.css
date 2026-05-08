@@ -36,29 +36,40 @@
 }
 
 .splash-logo {
-  width: 80px; height: 80px;
-  border-radius: 20px;
+  width: 100px; height: 100px;
+  border-radius: 24px;
   background: linear-gradient(135deg, var(--primary), var(--accent));
   display: flex; align-items: center; justify-content: center;
-  font-size: 2.5rem; font-weight: 800; color: #fff;
-  box-shadow: 0 10px 30px rgba(14, 165, 233, 0.4);
-  margin-bottom: 0.5rem;
+  font-size: 3rem; font-weight: 900; color: #fff;
+  box-shadow: 0 20px 40px rgba(14, 165, 233, 0.4);
+  margin-bottom: 1.5rem;
   position: relative;
+  animation: float 3s ease-in-out infinite;
 }
 .splash-logo::after {
-  content: ''; position: absolute; inset: -4px;
-  border-radius: 22px;
-  border: 2px solid rgba(14, 165, 233, 0.2);
-  animation: spin 3s linear infinite;
+  content: ''; position: absolute; inset: -8px;
+  border-radius: 30px;
+  border: 2px solid rgba(14, 165, 233, 0.3);
+  animation: orbit 4s linear infinite;
 }
-@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes orbit {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
 
 .splash-title {
-  font-size: 2.5rem; font-weight: 800;
-  letter-spacing: -0.04em; color: var(--text);
+  font-size: 3rem; font-weight: 900;
+  letter-spacing: -0.05em; color: var(--text);
+  margin-bottom: 0.25rem;
 }
 .splash-subtitle {
-  color: var(--text2); font-size: 1.1rem;
+  color: var(--text2); font-size: 1.2rem;
+  font-weight: 500; opacity: 0.8;
 }
 
 /* ── Login Page ───────────────────────────────────────────────── */
@@ -112,18 +123,32 @@
 .social-auth-grid {
   display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
 }
-.btn-google, .btn-github {
+.btn-google {
+  display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+  width: 100%; padding: 0.85rem;
+  background: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: var(--radius-sm);
+  color: #3c4043; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+.btn-google:hover {
+  background: #f8f9fa;
+  border-color: #d2e3fc;
+  box-shadow: 0 1px 3px 1px rgba(60, 64, 67, 0.15), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+  transform: translateY(-1px);
+}
+.btn-github {
   display: flex; align-items: center; justify-content: center; gap: 0.5rem;
   width: 100%; padding: 0.85rem;
-  background: var(--ui-bg);
-  border: 1px solid var(--ui-border);
+  background: #24292e;
+  border: 1px solid #24292e;
   border-radius: var(--radius-sm);
-  color: var(--text); font-size: 0.9rem; font-weight: 600;
+  color: white; font-size: 0.9rem; font-weight: 600;
   cursor: pointer; transition: all 0.2s;
 }
-.btn-google:hover, .btn-github:hover { background: var(--ui-bg-hover); transform: translateY(-1px); }
-.btn-github { background: #24292e; color: white; border-color: #24292e; }
-.btn-github:hover { background: #1b1f23; }
+.btn-github:hover { background: #1b1f23; transform: translateY(-1px); }
 .google-icon { width: 18px; height: 18px; }
 
 .auth-divider {

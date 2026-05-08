@@ -12,7 +12,17 @@ const KEYS = {
   CHAT:    'vaaniChatHistory',
   XP:      'vaaniXP',
   MISTAKES: 'vaaniMistakes',
+  SUBJECT:  'vaaniCurrentSubject',
 };
+
+/** Get/Set current subject */
+export function getCurrentSubject() {
+  return localStorage.getItem(KEYS.SUBJECT) || 'English';
+}
+
+export function saveCurrentSubject(subject) {
+  localStorage.setItem(KEYS.SUBJECT, subject);
+}
 
 /** Save a practice / quiz score */
 export async function saveResult(score, activityType = 'practice') {
@@ -146,7 +156,31 @@ export function addXP(amount) {
   const currentXP = getXP();
   const newXP = currentXP + amount;
   localStorage.setItem(KEYS.XP, newXP.toString());
+  
+  // Visual feedback
+  showXPToast(amount);
   return newXP;
+}
+
+function showXPToast(amount) {
+  let container = document.getElementById('xp-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'xp-toast-container';
+    container.className = 'xp-toast-container';
+    document.body.appendChild(container);
+  }
+  
+  const toast = document.createElement('div');
+  toast.className = 'xp-toast animate-in-up';
+  toast.innerHTML = `<span class="xp-star">⭐</span> +${amount} XP`;
+  
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    setTimeout(() => toast.remove(), 500);
+  }, 2500);
 }
 
 export function getXP() {

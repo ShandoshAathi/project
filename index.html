@@ -32,7 +32,7 @@
       <div class="splash-logo">V</div>
       <div class="splash-title">VaaniAI</div>
       <div class="splash-subtitle">Your AI Language Tutor</div>
-      <button id="skip-splash" class="btn-text" style="display:none; margin-top: 2rem; color: rgba(255,255,255,0.5);" onclick="window.dismissSplash()">
+      <button id="skip-splash" class="btn-skip-splash" onclick="window.dismissSplash()">
         Skip Splash Screen
       </button>
     </div>
@@ -43,6 +43,13 @@
     (function() {
       const splash = document.getElementById('splash');
       if (!splash) return;
+
+      // Skip splash if already shown in this session
+      if (sessionStorage.getItem('vaani_splash_shown')) {
+        splash.style.display = 'none';
+        splash.classList.remove('active');
+        return;
+      }
       
       // Auto-show skip button after 3s
       setTimeout(() => {
@@ -52,20 +59,24 @@
       
       window.dismissSplash = function() {
         splash.style.opacity = '0';
-        splash.style.transition = 'opacity 0.5s ease-out';
+        splash.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
         
         setTimeout(() => {
           splash.style.setProperty('display', 'none', 'important');
           splash.style.zIndex = '-1';
           splash.classList.remove('active');
-        }, 500);
+          // Mark as shown once dismissed
+          sessionStorage.setItem('vaani_splash_shown', 'true');
+        }, 400);
       };
       
-      // Safety fail-safe dismissal after 7s
+      // Safety fail-safe dismissal after 5s
       setTimeout(() => {
-        console.warn("Splash fail-safe triggered.");
-        window.dismissSplash();
-      }, 7000);
+        if (splash.classList.contains('active')) {
+          console.warn("Splash fail-safe triggered.");
+          window.dismissSplash();
+        }
+      }, 5000);
     })();
   </script>
 
@@ -80,8 +91,8 @@
       </div>
 
       <div id="onboarding-step-1">
-        <div class="social-auth-grid hidden mb-6" id="extract-section">
-          <button class="btn-primary" onclick="extractProviderDetails()" id="btn-extract">
+        <div id="extract-section" class="hidden mb-6">
+          <button class="btn-primary auth-btn btn-extract" onclick="extractProviderDetails()" id="btn-extract">
             ✨ Extract details from <span id="provider-name">Provider</span>
           </button>
         </div>
@@ -171,43 +182,122 @@
 
   <!-- Main -->
   <main class="main">
-    <div class="page-header">
-      <h2 class="page-title" id="pageTitle">Dashboard</h2>
-    </div>
-
-    <!-- Dashboard Page -->
     <div class="page active" id="page-dashboard">
+      <header class="dashboard-hero">
+        <div class="hero-content">
+          <div class="dashboard-header">
+            <h1>Welcome back to <span class="text-primary dynamic-subject-name">English</span>!</h1>
+            <p>Pick your focus area and let's crush your goals today.</p>
+          </div>
+          
+          <div class="hero-stats-bar">
+            <div class="hero-stat-card">
+              <span class="stat-icon">🎯</span>
+              <div class="stat-details">
+                <span class="stat-label">Daily Goal</span>
+                <span class="stat-value">85% Complete</span>
+              </div>
+            </div>
+            <div class="hero-stat-card">
+              <span class="stat-icon">🏆</span>
+              <div class="stat-details">
+                <span class="stat-label">Next Rank</span>
+                <span class="stat-value">Master II</span>
+              </div>
+            </div>
+            <div class="hero-stat-card">
+              <span class="stat-icon">✨</span>
+              <div class="stat-details">
+                <span class="stat-label">Total XP</span>
+                <span class="stat-value">12,450 XP</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="section-header mb-6">
+        <h3 class="section-title">Continue Your Learning Path</h3>
+        <p class="section-subtitle">Pick up right where you left off or explore a new domain.</p>
+      </div>
+
+      <div class="subject-path-grid mb-10">
+          <div class="subject-card" data-subject="english" onclick="switchSubject('english')">
+            <div class="card-banner"></div>
+            <div class="subject-card-info">
+              <h4>English Master</h4>
+              <p>Fluency & Communication</p>
+            </div>
+            <button class="path-btn">Resume Path →</button>
+          </div>
+
+          <div class="subject-card" data-subject="python" onclick="switchSubject('python')">
+            <div class="card-banner"></div>
+            <div class="subject-card-info">
+              <h4>Python Mentor</h4>
+              <p>Logic & Data Science</p>
+            </div>
+            <button class="path-btn">Resume Path →</button>
+          </div>
+
+          <div class="subject-card" data-subject="java" onclick="switchSubject('java')">
+            <div class="card-banner"></div>
+            <div class="subject-card-info">
+              <h4>Java Expert</h4>
+              <p>Objects & Architecture</p>
+            </div>
+            <button class="path-btn">Resume Path →</button>
+          </div>
+
+          <div class="subject-card" data-subject="cpp" onclick="switchSubject('cpp')">
+            <div class="card-banner"></div>
+            <div class="subject-card-info">
+              <h4>C++ Master</h4>
+              <p>Performance & Graphics</p>
+            </div>
+            <button class="path-btn">Resume Path →</button>
+          </div>
+      </div>
+
       <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon grad-purple">📖</div>
-          <div class="stat-info">
-            <p class="stat-label">Lessons Done</p>
-            <h3 class="stat-value" id="stat-lessons">0</h3>
-            <p class="stat-change positive">Updated now</p>
+        <div class="stat-card lessons">
+          <div class="stat-info-overlay">
+            <div class="stat-icon grad-purple">📖</div>
+            <div class="stat-info">
+              <p class="stat-label">Lessons Done</p>
+              <h3 class="stat-value" id="stat-lessons">0</h3>
+              <p class="stat-change positive">Updated now</p>
+            </div>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon grad-blue">🎯</div>
-          <div class="stat-info">
-            <p class="stat-label">Accuracy</p>
-            <h3 class="stat-value" id="stat-accuracy">0%</h3>
-            <p class="stat-change positive">Updated now</p>
+        <div class="stat-card accuracy">
+          <div class="stat-info-overlay">
+            <div class="stat-icon grad-blue">🎯</div>
+            <div class="stat-info">
+              <p class="stat-label">Accuracy</p>
+              <h3 class="stat-value" id="stat-accuracy">0%</h3>
+              <p class="stat-change positive">Updated now</p>
+            </div>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon grad-amber">⏱️</div>
-          <div class="stat-info">
-            <p class="stat-label">Time Spent</p>
-            <h3 class="stat-value" id="stat-time">0h</h3>
-            <p class="stat-change positive">Updated now</p>
+        <div class="stat-card time">
+          <div class="stat-info-overlay">
+            <div class="stat-icon grad-amber">⏱️</div>
+            <div class="stat-info">
+              <p class="stat-label">Time Spent</p>
+              <h3 class="stat-value" id="stat-time">0h</h3>
+              <p class="stat-change positive">Updated now</p>
+            </div>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon grad-indigo">✨</div>
-          <div class="stat-info">
-            <p class="stat-label">Current Level</p>
-            <h3 class="stat-value" id="stat-level">Lvl 1</h3>
-            <p class="stat-change positive" id="stat-xp">0 XP Total</p>
+        <div class="stat-card level">
+          <div class="stat-info-overlay">
+            <div class="stat-icon grad-indigo">✨</div>
+            <div class="stat-info">
+              <p class="stat-label">Current Level</p>
+              <h3 class="stat-value" id="stat-level">Lvl 1</h3>
+              <p class="stat-change positive" id="stat-xp">0 XP Total</p>
+            </div>
           </div>
         </div>
       </div>
@@ -313,6 +403,23 @@
               <span class="diff-label" id="challenge-type">Flash-Chat</span>
             </div>
             <button class="btn-primary btn-sm w-full mt-4" id="btn-start-challenge" onclick="startDailyChallenge()">Start Mission</button>
+          </div>
+        </div>
+
+        <!-- AI Coach Dashboard Card -->
+        <div class="card ai-coach-dashboard-card">
+          <div class="coach-card-overlay"></div>
+          <div class="coach-card-content">
+            <div class="coach-header">
+              <div class="coach-avatar dashboard-avatar"></div>
+              <div class="coach-header-info">
+                <h3 class="card-title dashboard-title">AI Smart Coach</h3>
+                <p class="section-subtitle">Your personalized learning mentor</p>
+              </div>
+            </div>
+            <div class="coach-banner-img"></div>
+            <p class="coach-tip">"You're doing great! Ready for a quick practice session to solidify your progress?"</p>
+            <button class="btn-primary w-full mt-4" onclick="toggleChatbot()">Chat with AI Coach →</button>
           </div>
         </div>
       </div>
@@ -598,6 +705,13 @@
               <div class="q-dot" onclick="goToQ(9)">10</div>
             </div>
           </div>
+
+          <div class="card quiz-history-card">
+            <h3>Score History</h3>
+            <div id="quiz-history-list" class="quiz-history-list">
+              <p class="empty-state-sm">No history yet</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -665,7 +779,7 @@
               <label>Theme</label>
               <p>Toggle between Light and Dark mode</p>
             </div>
-            <select id="setting-theme" onchange="applySettings()">
+            <select id="setting-theme" onchange="applySettings()" title="Select application theme">
               <option value="light">Light Mode</option>
               <option value="dark">Dark Mode</option>
             </select>
@@ -675,7 +789,7 @@
               <label>Font Size</label>
               <p>Adjust the text size across the application</p>
             </div>
-            <select id="setting-font-size" onchange="applySettings()">
+            <select id="setting-font-size" onchange="applySettings()" title="Select application font size">
               <option value="small">Small</option>
               <option value="medium" selected>Medium</option>
               <option value="large">Large</option>
@@ -691,7 +805,7 @@
               <p>Enable text-to-speech for AI responses</p>
             </div>
             <label class="switch">
-              <input type="checkbox" id="setting-ai-voice" onchange="applySettings()">
+              <input type="checkbox" id="setting-ai-voice" onchange="applySettings()" title="Toggle AI Voice Output">
               <span class="slider round"></span>
             </label>
           </div>
@@ -700,7 +814,7 @@
               <label>Default Personality</label>
               <p>How should the AI respond to you?</p>
             </div>
-            <select id="setting-ai-personality" onchange="applySettings()">
+            <select id="setting-ai-personality" onchange="applySettings()" title="Select AI coach personality">
               <option value="Friendly">😊 Friendly</option>
               <option value="Professional">💼 Professional</option>
               <option value="Strict">🎓 Strict</option>
@@ -759,7 +873,7 @@
 
 
 <!-- ── Login Page ───────────────────────────────────────────────── -->
-<div id="page-login" class="page auth-page">
+<div id="page-login" class="page auth-page hidden">
   <div class="auth-card">
     <div class="auth-header">
       <div class="auth-logo">V</div>
@@ -951,13 +1065,13 @@
 <!-- Floating AI Smart Coach Window -->
 <div class="card ai-coach-card floating-coach" id="ai-coach-card">
   <!-- Header -->
-  <div class="coach-header">
+  <div class="coach-header floating-header">
     <div class="coach-avatar-wrap">
       <div class="coach-avatar-pulse"></div>
-      <div class="coach-avatar">✨</div>
+      <div class="coach-avatar floating-avatar"></div>
     </div>
     <div class="coach-header-info">
-      <h3 class="card-title">AI Smart Coach</h3>
+      <h3 class="card-title floating-title">AI Smart Coach</h3>
       <div class="coach-ai-badges">
         <span class="coach-status-dot" title="AI Online"></span>
         <button class="btn-icon-xs" id="coach-tts-toggle" onclick="toggleCoachVoice()" title="Toggle Voice Output">🔊</button>
@@ -1057,14 +1171,16 @@
     const upBtn   = document.getElementById('scroll-up-btn');
     const downBtn = document.getElementById('scroll-down-btn');
 
-    window.updateScrollBtns = function() {
-      const scrolled  = window.scrollY;
-      const totalHeight = document.documentElement.scrollHeight;
-      const viewportHeight = window.innerHeight;
-      const maxScroll = totalHeight - viewportHeight;
+      window.updateScrollBtns = function() {
+        if (!upBtn || !downBtn) return;
 
-      // Hide scroll buttons if an overlay (Login, Onboarding, Splash) is active
-      const isOverlayActive = document.querySelector('.auth-page.active, .splash-screen.active');
+        const scrolled  = window.scrollY;
+        const totalHeight = document.documentElement.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        const maxScroll = totalHeight - viewportHeight;
+
+        // Hide scroll buttons if an overlay (Login, Onboarding, Splash) is active
+        const isOverlayActive = document.querySelector('.auth-page.active, .splash-screen.active, .quiz-overlay:not(.hidden)');
       
       // Only show buttons if the page content actually exceeds the viewport AND no overlay is active
       if (maxScroll <= 20 || isOverlayActive) {
@@ -1074,16 +1190,23 @@
       }
 
       // Show "up" only when scrolled down a bit
-      upBtn.classList.toggle('visible', scrolled > 100);
+      upBtn.classList.toggle('visible', scrolled > 150);
       // Show "down" only when not at the bottom
-      downBtn.classList.toggle('visible', scrolled < maxScroll - 50);
+      downBtn.classList.toggle('visible', scrolled < maxScroll - 100);
     };
 
     window.addEventListener('scroll', window.updateScrollBtns, { passive: true });
     window.addEventListener('resize', window.updateScrollBtns);
     
+    // MutationObserver to catch dynamic content changes (like AI responses or page swaps)
+    const observer = new MutationObserver(() => {
+      window.updateScrollBtns();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
     // Initial check
-    setTimeout(window.updateScrollBtns, 800);
+    setTimeout(window.updateScrollBtns, 500);
+    setTimeout(window.updateScrollBtns, 1500);
   })();
 </script>
 

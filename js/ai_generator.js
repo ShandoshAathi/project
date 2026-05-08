@@ -1,29 +1,31 @@
 import { GROQ_API_KEY } from './config.js';
-import { getProfile } from './storage.js';
+import { getProfile, getCurrentSubject } from './storage.js';
 import { getCurrentUser } from './state.js';
 import { getActiveGroqKey } from './settings.js';
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 export async function generatePracticePassage() {
-  const { level, occupation } = await getUserContext();
+  const { level, occupation, subject } = await getUserContext();
   const seed = Date.now().toString(36) + Math.random().toString(36).substring(2);
   let lengthInstruction = "";
+  // ... (rest of length logic) ...
   if (level === "Beginner") {
-    lengthInstruction = "The passage should be short, simple, and easy to read, exactly 1-2 sentences. Use basic vocabulary.";
+    lengthInstruction = "The content should be short, simple, and easy to read, exactly 1-2 sentences. Use basic vocabulary.";
   } else if (level === "Intermediate") {
-    lengthInstruction = "The passage should be moderately challenging, exactly 2-3 sentences.";
+    lengthInstruction = "The content should be moderately challenging, exactly 2-3 sentences.";
   } else {
-    lengthInstruction = "The passage should be complex and detailed, exactly 3-4 sentences forming a rich paragraph with advanced vocabulary.";
+    lengthInstruction = "The content should be complex and detailed, exactly 3-4 sentences forming a rich paragraph with advanced vocabulary.";
   }
 
-  const prompt = `Generate a highly unique and creative reading practice passage in English for a ${level} level learner who is a ${occupation}. 
+  const isCoding = subject !== 'English';
+  const prompt = `Generate a highly unique and creative ${isCoding ? 'coding practice snippet or explanation' : 'reading practice passage'} in ${subject} for a ${level} level learner who is a ${occupation}. 
     Reference ID: ${seed}
     ${lengthInstruction}
-    Include verbal aptitude elements from the Module (e.g., specific sentence patterns, active/passive voice) appropriate for their level to make it professionally relevant.
+    ${isCoding ? 'For coding, provide a code snippet and a brief explanation. Ensure it is syntactically correct.' : 'Include verbal aptitude elements from the Module appropriate for their level.'}
     Use scenarios related to their background as a ${occupation}.
-    CRITICAL: DO NOT use generic topics like 'The sun rises'. Choose something niche, modern, or unexpected.
-    Return ONLY the plain text of the passage, nothing else. No markdown, no quotes.`;
+    CRITICAL: DO NOT use generic topics. Choose something niche, modern, or unexpected.
+    Return ONLY the plain text, nothing else. No markdown, no quotes.`;
 
   try {
     const text = await callGroq(prompt);
@@ -38,21 +40,23 @@ export async function generatePracticePassage() {
  * Generate quiz questions based on topic and user level
  */
 export async function generateQuizQuestions(topic = "Verbal Aptitude (Module)") {
-  const { level, occupation } = await getUserContext();
+  const { level, occupation, subject } = await getUserContext();
   const seed = Date.now().toString(36) + Math.random().toString(36).substring(2);
+  const isCoding = subject !== 'English';
+  
   let difficultyInstruction = "";
   if (level === "Beginner") {
-    difficultyInstruction = "The questions should be relatively easy, focusing on foundational grammar rules from the syllabus. Avoid overly tricky distractors.";
+    difficultyInstruction = `The questions should be relatively easy, focusing on foundational ${isCoding ? 'syntax and logic' : 'grammar rules'}. Avoid overly tricky distractors.`;
   } else if (level === "Intermediate") {
-    difficultyInstruction = "The questions should be moderately challenging, requiring a good understanding of the syllabus grammar and typical vocabulary.";
+    difficultyInstruction = `The questions should be moderately challenging, requiring a good understanding of ${isCoding ? 'core concepts and libraries' : 'the syllabus grammar'}.`;
   } else {
-    difficultyInstruction = "The questions should be highly advanced and tricky, testing nuanced grammar from the syllabus, complex sentence structures, and advanced professional vocabulary.";
+    difficultyInstruction = `The questions should be highly advanced and tricky, testing nuanced ${isCoding ? 'performance, architecture, and edge cases' : 'grammar and professional vocabulary'}.`;
   }
 
-  const prompt = `Generate exactly 10 unique, high-variety multiple-choice questions about '${topic}' in English for a ${level} learner who is a ${occupation}. 
+  const prompt = `Generate exactly 10 unique, high-variety multiple-choice questions about '${isCoding ? subject + ' programming' : topic}' for a ${level} learner who is a ${occupation}. 
     Reference ID: ${seed}
     ${difficultyInstruction}
-    Focus strictly on topics from their COMPLETED Syllabus Module: Sentence Patterns, Verb Tenses, Voice, Reported Speech, Concord, Prepositions, Phrasal Verbs, Conditionals, Adverbs, Articles, or Dangling Modifiers.
+    ${!isCoding ? 'Focus strictly on topics from their COMPLETED Syllabus Module: Sentence Patterns, Verb Tenses, Voice, Reported Speech, Concord, Prepositions, Phrasal Verbs, Conditionals, Adverbs, Articles, or Dangling Modifiers.' : ''}
     Use diverse question types: vocabulary, comprehension, grammar, and situational scenarios.
     CRITICAL: Avoid standard textbook examples. Be imaginative and challenging.
     Return the response as a JSON array of exactly 10 objects.
@@ -192,10 +196,12 @@ async function callGroq(prompt) {
 
 async function getUserContext() {
   const user = getCurrentUser();
-  if (!user) return { level: "Beginner", occupation: "Student" };
+  const subject = getCurrentSubject();
+  
+  if (!user) return { level: "Beginner", occupation: "Student", subject };
 
   const profile = await getProfile(user.id);
-  if (!profile) return { level: "Beginner", occupation: "Student" };
+  if (!profile) return { level: "Beginner", occupation: "Student", subject };
 
   const goal = profile.learning_goal || "";
   const occupation = profile.occupation || "Student";
@@ -205,5 +211,5 @@ async function getUserContext() {
   else if (goal === "Pass an Exam (IELTS/TOEFL)" || goal === "Improve Fluency") level = "Intermediate";
   else if (goal === "Daily Conversation") level = "Beginner";
   
-  return { level, occupation };
+  return { level, occupation, subject };
 }

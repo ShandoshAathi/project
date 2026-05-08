@@ -35,13 +35,21 @@ export function extractProviderDetails() {
   const user = getCurrentUser();
   if (!user) return;
 
-  const fullName = user.user_metadata?.full_name || user.user_metadata?.name || '';
+  const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.name || '';
   if (fullName) {
-    document.getElementById('onboard-name').value = fullName;
+    const nameInput = document.getElementById('onboard-name');
+    if (nameInput) {
+      nameInput.value = fullName;
+      nameInput.classList.add('pulse-success');
+      setTimeout(() => nameInput.classList.remove('pulse-success'), 2000);
+    }
   }
   
-  // Bonus: If it's GitHub, maybe we can fetch more? 
-  // For now, just the name is usually available in metadata.
+  // Also try to guess occupation if available (from metadata)
+  const occupation = user.user_metadata?.occupation || '';
+  if (occupation) {
+    document.getElementById('onboard-occupation').value = occupation;
+  }
 }
 
 /** Save and continue to dashboard */
@@ -81,3 +89,7 @@ export async function saveOnboarding() {
     btn.innerHTML = originalText;
   }
 }
+
+// Global hook
+window.extractProviderDetails = extractProviderDetails;
+window.saveOnboarding = saveOnboarding;
