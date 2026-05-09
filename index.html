@@ -31,7 +31,7 @@
     <div class="splash-content">
       <div class="splash-logo">V</div>
       <div class="splash-title">VaaniAI</div>
-      <div class="splash-subtitle">Your AI Language Tutor</div>
+      <div class="splash-subtitle">Your AI Learning Tutor</div>
       <button id="skip-splash" class="btn-skip-splash" onclick="window.dismissSplash()">
         Skip Splash Screen
       </button>
@@ -431,13 +431,8 @@
       <div class="syllabus-header">
         <p class="subtitle">Your personalized learning roadmap</p>
       </div>
-      <div class="syllabus-grid">
-        <div class="unit-card completed"><div class="unit-badge">✓</div><div class="unit-num">Module 1</div><h3>Foundations of Reading</h3><p>Basic phonics, letter sounds, and simple words</p><div class="unit-progress"><div class="unit-bar w-100"></div></div><span class="unit-status done">Completed</span></div>
-        <div class="unit-card completed"><div class="unit-badge">✓</div><div class="unit-num">Module 2</div><h3>Sentence Formation</h3><p>Building simple and compound sentences</p><div class="unit-progress"><div class="unit-bar w-100"></div></div><span class="unit-status done">Completed</span></div>
-        <div class="unit-card active-unit"><div class="unit-badge current">●</div><div class="unit-num">Module 3</div><h3>Reading Fluency (Mod I)</h3><p>Speed reading, rhythm and intonation patterns</p><div class="unit-progress"><div class="unit-bar w-65"></div></div><span class="unit-status progress">65% Done</span></div>
-        <div class="unit-card"><div class="unit-badge">📖</div><div class="unit-num">Module 4</div><h3>Verbal Aptitude (Module)</h3><p>Sentence patterns, voice, tenses and grammar mastery</p><div class="unit-progress"><div class="unit-bar w-0"></div></div><span class="unit-status progress">0% Done</span></div>
-        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Module 5</div><h3>Vernacular Integration</h3><p>Tamil-English bilingual reading exercises</p><div class="unit-progress"><div class="unit-bar w-0"></div></div><span class="unit-status locked-s">Locked</span></div>
-        <div class="unit-card locked"><div class="unit-badge">🔒</div><div class="unit-num">Module 6</div><h3>Mastery Assessment</h3><p>Final evaluation and certification</p><div class="unit-progress"><div class="unit-bar w-0"></div></div><span class="unit-status locked-s">Locked</span></div>
+      <div class="syllabus-grid" id="syllabus-grid">
+        <!-- Dynamic Modules Injected Here -->
       </div>
     </div>
 
@@ -874,7 +869,7 @@
 
 <!-- ── Login Page ───────────────────────────────────────────────── -->
 <div id="page-login" class="page auth-page hidden">
-  <div class="auth-card">
+  <div class="auth-card animate-in">
     <div class="auth-header">
       <div class="auth-logo">V</div>
       <h2>Welcome Back</h2>
@@ -918,7 +913,7 @@
         </div>
         <button class="btn-primary auth-btn" id="email-action-btn" onclick="loginWithEmail()">Log In</button>
         <div class="auth-footer-note">
-          <span id="email-auth-hint" class="auth-hint-small">Don't have an account?</span> 
+          <span id="email-auth-hint" class="auth-hint-small">Don't have an account?</span>
           <button type="button" class="btn-outline w-full" id="email-auth-toggle" onclick="toggleEmailMode()">Create an Account</button>
         </div>
       </div>
@@ -961,7 +956,6 @@
         <button class="btn-text" onclick="switchAuthType('phone')">Change Phone Number</button>
       </div>
     </div>
-  </div>
   </div>
 </div>
 

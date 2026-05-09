@@ -105,7 +105,134 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.auth-header { margin-bottom: 2rem; }
+/* ── Full Background Layout ─────────────────────────────────────── */
+.login-full-bg {
+  background: url('../../assets/img/auth_banner.png') center/cover no-repeat !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.login-full-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1;
+}
+
+.auth-card-glass-centered {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 32px;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-card-glass-centered h2 {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.auth-card-glass-centered p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+}
+
+.auth-card-glass-centered .input-group label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.auth-card-glass-centered .input-group input {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.auth-card-glass-centered .input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.auth-card-glass-centered .auth-divider span {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.auth-card-glass-centered .auth-divider::before,
+.auth-card-glass-centered .auth-divider::after {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.auth-card-glass-centered .toggle-btn {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.auth-card-glass-centered .toggle-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.auth-card-glass-centered .btn-google {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.auth-card-glass-centered .btn-github {
+  background: rgba(36, 41, 46, 0.8);
+}
+
+/* ── Split-Screen Layout (Legacy) ───────────────────────────────── */
+
+.auth-form-wrapper {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .auth-split-right {
+    display: none;
+  }
+  .auth-split-left {
+    padding: 2rem;
+  }
+}
+
+.auth-split-left .auth-header {
+  text-align: left;
+}
+.auth-split-left .auth-logo {
+  margin: 0 0 1.5rem 0;
+}
+.auth-split-left .auth-divider {
+  justify-content: center;
+  margin: 2rem 0;
+}
+.auth-split-left .auth-footer-note {
+  text-align: left;
+  margin-top: 2rem;
+}
+.auth-split-left .auth-footer-note span {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.auth-header { margin-bottom: 2.5rem; }
 .auth-logo {
   width: 50px; height: 50px; margin: 0 auto 1rem;
   border-radius: 14px;

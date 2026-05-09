@@ -81,10 +81,12 @@ export async function generateQuizQuestions(topic = "Verbal Aptitude (Module)") 
  * Generate a unique daily challenge scenario
  */
 export async function generateDailyChallenge() {
-  const { level, occupation } = await getUserContext();
-  const prompt = `Generate a unique, interactive language learning challenge for a ${level} level learner who is a ${occupation}.
+  const { level, occupation, subject } = await getUserContext();
+  const isCoding = subject !== 'English';
+  
+  const prompt = `Generate a unique, interactive learning challenge for a ${level} level learner who is a ${occupation} studying ${subject}.
     The challenge should be a 'Flash-Chat' mission.
-    Example scenarios: ordering a coffee with a specific constraint, responding to a job interview question, or explaining a technical concept to a child.
+    ${isCoding ? `Example scenarios: debugging a snippet, explaining a ${subject} concept, or optimizing a small function.` : `Example scenarios: ordering a coffee with a specific constraint, responding to a job interview question, or explaining a technical concept to a child.`}
     Return the response as a JSON object with:
     - "title": A catchy name for the mission
     - "scenario": A detailed description of the situation
@@ -97,9 +99,9 @@ export async function generateDailyChallenge() {
   } catch (err) {
     console.error("Challenge Generation Failed:", err);
     return {
-      title: "The Elevator Pitch",
-      scenario: "You just bumped into a potential investor in an elevator. You have 30 seconds to explain your product.",
-      task: "What do you say to grab their attention?"
+      title: isCoding ? `The ${subject} Bug` : "The Elevator Pitch",
+      scenario: isCoding ? `A critical bug was found in your ${subject} code.` : "You just bumped into a potential investor in an elevator. You have 30 seconds to explain your product.",
+      task: isCoding ? `Explain how you would debug this situation.` : "What do you say to grab their attention?"
     };
   }
 }
@@ -108,13 +110,18 @@ export async function generateDailyChallenge() {
  * Generate a Roleplay Scenario
  */
 export async function generateRoleplayScenario() {
-  const { level, occupation } = await getUserContext();
-  const prompt = `Generate a real-world English roleplay scenario for a ${level} level learner who is a ${occupation}.
+  const { level, occupation, subject } = await getUserContext();
+  const isCoding = subject !== 'English';
+  
+  const prompt = `Generate a real-world ${isCoding ? subject + ' technical' : 'English'} roleplay scenario for a ${level} level learner who is a ${occupation}.
     The scenario should involve a conversation with an AI character.
-    Examples: 
+    ${isCoding ? `Examples: 
+    - Code review with a senior dev
+    - Discussing a feature with a project manager
+    - Explaining a bug to a non-technical client` : `Examples: 
     - At a doctor's appointment (Beginner)
     - Negotiating a contract (Advanced)
-    - Handling a customer complaint (Intermediate)
+    - Handling a customer complaint (Intermediate)`}
     Return the response as a JSON object with:
     - "scenario": A brief description of the setting
     - "ai_character": Who the AI is acting as
@@ -128,10 +135,10 @@ export async function generateRoleplayScenario() {
   } catch (err) {
     console.error("Roleplay Generation Failed:", err);
     return {
-      scenario: "Checking into a hotel",
-      ai_character: "Hotel Receptionist",
-      goal: "Check into your room and ask about breakfast times",
-      first_message: "Welcome to the Grand View Hotel! How can I help you today?"
+      scenario: isCoding ? "Code Review" : "Checking into a hotel",
+      ai_character: isCoding ? "Senior Developer" : "Hotel Receptionist",
+      goal: isCoding ? `Explain your ${subject} design choice` : "Check into your room and ask about breakfast times",
+      first_message: isCoding ? "I've looked at your PR. Can you explain why you chose this approach?" : "Welcome to the Grand View Hotel! How can I help you today?"
     };
   }
 }

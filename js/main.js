@@ -104,7 +104,7 @@ window.switchSubject = (subject) => {
   
   // Update active class in subject cards
   document.querySelectorAll('.subject-card').forEach(card => {
-    card.classList.toggle('active', card.querySelector('h4').textContent.includes(subject));
+    card.classList.toggle('active', card.dataset.subject === subject);
   });
 };
 
@@ -120,7 +120,7 @@ function formatSubjectName(subject) {
 }
 
 export function refreshSubjectUI() {
-  const subject = getCurrentSubject();
+  const subject = getCurrentSubject() || 'english';
   const formattedSubject = formatSubjectName(subject);
   
   const titleEls = document.querySelectorAll('.dynamic-subject-name');
@@ -133,6 +133,13 @@ export function refreshSubjectUI() {
   // Update Syllabus header
   const sylHeader = document.querySelector('#page-syllabus h2');
   if (sylHeader) sylHeader.textContent = `${formattedSubject} Curriculum`;
+
+  // Update Hero Background
+  const hero = document.querySelector('.dashboard-hero');
+  if (hero) {
+    const bannerPath = `assets/img/${subject.toLowerCase()}_banner.png`;
+    hero.style.backgroundImage = `url('${bannerPath}')`;
+  }
 }
 
 /* ── Page-change hook ─────────────────────────────────────────── */
@@ -714,9 +721,19 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshPracticeUI();
   
   // Set initial active state in subject cards
-  const subject = getCurrentSubject();
+  const currentSub = getCurrentSubject() || 'english';
   document.querySelectorAll('.subject-card').forEach(card => {
-    card.classList.toggle('active', card.querySelector('h4').textContent.includes(subject));
+    card.classList.toggle('active', card.dataset.subject === currentSub);
+    
+    // Hover preview for hero background
+    card.addEventListener('mouseenter', () => {
+      const s = card.dataset.subject;
+      const hero = document.querySelector('.dashboard-hero');
+      if (hero) hero.style.backgroundImage = `url('assets/img/${s}_banner.png')`;
+    });
+    card.addEventListener('mouseleave', () => {
+      refreshSubjectUI(); // Restore active subject's background
+    });
   });
 });
 
