@@ -7,13 +7,13 @@ import { startQuiz, initiateQuiz, nextQuestion, prevQuestion, goToQ, selectOptio
 import { toggleMic, newPassage, submitPractice, startPractice, initiatePractice, refreshPracticeUI } from './practice.js';
 import { loadChapter, prevChapter, nextChapter, refreshSyllabusUI } from './study.js';
 import { editProfile, closeProfileModal, saveProfileEdit } from './profile.js';
-import { getResults, getProfile, saveResult, addXP, getXP, getLevel, getXPProgress, getChatHistory, getTopMistakes, getCurrentSubject, saveCurrentSubject } from './storage.js';
+import { getResults, getProfile, saveResult, addXP, getXP, getLevel, getXPProgress, getChatHistory, getTopMistakes, getCurrentSubject, saveCurrentSubject, saveCustomSubject, getCustomSubjects, deleteCustomSubject } from './storage.js';
 import { getFlashcards, getDueWords, updateSRS, saveWord } from './flashcards.js';
 import { initAuth, loginWithGoogle, loginWithGithub, switchAuthType, loginWithEmail, signUpWithEmail, toggleEmailMode, sendOTP, verifyOTP, resetPhoneAuth, logout, updatePhonePlaceholder } from './auth.js';
 import { getCurrentUser } from './state.js';
 
 import { extractProviderDetails, saveOnboarding } from './onboarding.js';
-import { generateDailyChallenge, evaluateChallengeResponse, generateRoleplayScenario } from './ai_generator.js';
+import { generateDailyChallenge, evaluateChallengeResponse, generateRoleplayScenario, generateCustomSyllabus } from './ai_generator.js';
 
 import { sendChatMessage, resetChatHistory, setCoachPersonality, getChatHistoryLength } from './ai_chatbot.js';
 import { initSpeechToText, startListening, stopListening, speak, toggleTTS, isTTSEnabled } from './voice_engine.js';
@@ -99,13 +99,101 @@ window.switchSubject = (subject) => {
   refreshSubjectUI();
   refreshSyllabusUI();
   refreshPracticeUI();
-  resetCoachChat(); // Clear chat to re-initialize with new subject persona
-  addXP(10); // Small reward for exploring
-  
+  resetCoachChat();
+  addXP(10);
+  loadChapter(0); // Reset to first chapter of new subject
+
   // Update active class in subject cards
   document.querySelectorAll('.subject-card').forEach(card => {
     card.classList.toggle('active', card.dataset.subject === subject);
   });
+};
+
+/* ── Custom Path Generation ────────────────────────────────────── */
+window.openCustomPathModal = () => {
+  const modal = document.getElementById('custom-path-overlay');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('active');
+  }
+};
+
+window.closeCustomPathModal = () => {
+  const modal = document.getElementById('custom-path-overlay');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('active');
+  }
+};
+
+window.generateCustomPath = async () => {
+  const titleInput = document.getElementById('custom-path-title').value.trim();
+  const fileInput = document.getElementById('custom-path-file').files[0];
+  const linkInput = document.getElementById('custom-path-link').value.trim();
+
+  if (!titleInput) {
+    alert("Please provide at least a Topic or Book Title.");
+    return;
+  }
+
+  const formEl = document.getElementById('custom-path-form');
+  const loadingEl = document.getElementById('custom-path-loading');
+  
+  formEl.classList.add('hidden');
+  loadingEl.classList.remove('hidden');
+
+  try {
+    // Generate the syllabus using AI
+    const customData = await generateCustomSyllabus(titleInput);
+    
+    // Save to local storage
+    const subjectKey = titleInput;
+    saveCustomSubject(subjectKey, customData);
+    
+    // Add new card to the UI dynamically
+    const grid = document.querySelector('.subject-path-grid');
+    const newCardHTML = `
+      <div class="subject-card" data-subject="${subjectKey}" onclick="switchSubject('${subjectKey}')">
+        <div class="card-banner" style="background: linear-gradient(135deg, var(--primary), var(--accent))"></div>
+        <div class="subject-card-info">
+          <h4>${subjectKey}</h4>
+          <p>Custom Learning Path</p>
+        </div>
+        <button class="path-btn">Resume Path →</button>
+      </div>
+    `;
+    
+    // Insert before the 'Create Custom Path' card
+    const createCard = document.querySelector('.create-custom-card');
+    if (grid && createCard) {
+      createCard.insertAdjacentHTML('beforebegin', newCardHTML);
+    }
+    
+    closeCustomPathModal();
+    window.switchSubject(subjectKey);
+    navigate('syllabus');
+    addXP(100); // Reward for creating a path
+    
+  } catch (err) {
+    alert("Failed to generate path: " + err.message);
+    formEl.classList.remove('hidden');
+    loadingEl.classList.add('hidden');
+  }
+};
+
+window.deleteCustomPath = (event, subjectKey) => {
+  event.stopPropagation(); // Prevent card from being clicked
+  
+  if (confirm(`Are you sure you want to permanently delete the custom path for "${subjectKey}"?`)) {
+    deleteCustomSubject(subjectKey);
+    
+    // If the deleted path was the active one, switch to default English
+    if (getCurrentSubject() === subjectKey) {
+      window.switchSubject('English');
+    } else {
+      refreshDashboard(); // Just refresh the dashboard to remove the card
+    }
+  }
 };
 
 function formatSubjectName(subject) {
@@ -137,8 +225,15 @@ export function refreshSubjectUI() {
   // Update Hero Background
   const hero = document.querySelector('.dashboard-hero');
   if (hero) {
-    const bannerPath = `assets/img/${subject.toLowerCase()}_banner.png`;
-    hero.style.backgroundImage = `url('${bannerPath}')`;
+    const customSubjects = getCustomSubjects();
+    if (customSubjects && customSubjects[subject]) {
+      // Generate a dynamic, premium background based on the custom topic
+      const prompt = encodeURIComponent(`aesthetic abstract background representing ${subject}, 3d render, glowing, premium tech, dark mode`);
+      hero.style.backgroundImage = `url('https://image.pollinations.ai/prompt/${prompt}?width=1200&height=400&nologo=true')`;
+    } else {
+      const bannerPath = `assets/img/${subject.toLowerCase()}_banner.png`;
+      hero.style.backgroundImage = `url('${bannerPath}')`;
+    }
   }
 }
 
@@ -295,6 +390,60 @@ export async function refreshDashboard() {
 
   // Load Daily Challenge
   loadTodayChallenge();
+  
+  // Load Custom Subjects into Dashboard
+  loadCustomSubjectsToDashboard();
+}
+
+function loadCustomSubjectsToDashboard() {
+  const customSubjects = getCustomSubjects();
+  const keys = Object.keys(customSubjects);
+  
+  if (keys.length === 0) return;
+  
+  const grid = document.querySelector('.subject-path-grid');
+  const createCard = document.querySelector('.create-custom-card');
+  
+  if (!grid || !createCard) return;
+  
+  // Remove existing custom cards to avoid duplicates on refresh
+  document.querySelectorAll('.subject-card.custom-injected').forEach(c => c.remove());
+  
+  const currentSub = getCurrentSubject() || 'english';
+  
+  keys.forEach(subjectKey => {
+    const isActive = subjectKey === currentSub ? 'active' : '';
+    const promptCard = encodeURIComponent(`aesthetic abstract background representing ${subjectKey}, 3d render, glowing, premium tech, dark mode`);
+    const cardBgUrl = `https://image.pollinations.ai/prompt/${promptCard}?width=400&height=200&nologo=true`;
+    
+    const newCardHTML = `
+      <div class="subject-card custom-injected ${isActive}" data-subject="${subjectKey}" onclick="switchSubject('${subjectKey}')">
+        <div class="card-banner" style="background: url('${cardBgUrl}') center/cover no-repeat; box-shadow: inset 0 0 40px rgba(0,0,0,0.5);"></div>
+        <button class="delete-path-btn" onclick="deleteCustomPath(event, '${subjectKey}')" title="Delete Path">✕</button>
+        <div class="subject-card-info">
+          <h4>${subjectKey}</h4>
+          <p>Custom Learning Path</p>
+        </div>
+        <button class="path-btn">Resume Path →</button>
+      </div>
+    `;
+    createCard.insertAdjacentHTML('beforebegin', newCardHTML);
+  });
+  
+  // Attach hover listeners to the newly injected cards
+  document.querySelectorAll('.subject-card.custom-injected').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      const s = card.dataset.subject;
+      const hero = document.querySelector('.dashboard-hero');
+      if (hero) {
+        const promptHero = encodeURIComponent(`aesthetic abstract background representing ${s}, 3d render, glowing, premium tech, dark mode`);
+        hero.style.backgroundImage = `url('https://image.pollinations.ai/prompt/${promptHero}?width=1200&height=400&nologo=true')`;
+      }
+    });
+    card.addEventListener('mouseleave', () => {
+      refreshSubjectUI(); // Restore active subject's background
+    });
+  });
 }
 
 /* ── Daily Challenge Logic ────────────────────────────────────── */
@@ -714,6 +863,9 @@ document.addEventListener('DOMContentLoaded', () => {
       history.forEach(m => appendChatBubble(feed, m.content, m.role === 'assistant' ? 'coach' : 'user'));
     }
   }
+
+  // Load Custom Subjects into Dashboard on initial load
+  loadCustomSubjectsToDashboard();
 
   // Refresh Subject UI (Syllabus, Dashboard Headings)
   refreshSubjectUI();

@@ -34,7 +34,8 @@ export function navigate(page) {
 
   /* Show target page */
   document.getElementById('page-' + page)?.classList.add('active');
-  document.getElementById('pageTitle').textContent = titles[page] || page;
+  const pt = document.getElementById('pageTitle');
+  if (pt) pt.textContent = titles[page] || page;
 
   /* Set attribute for CSS hooks */
   document.querySelector('.app')?.setAttribute('data-active-page', page);

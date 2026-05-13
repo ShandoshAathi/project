@@ -18,7 +18,7 @@ export async function generatePracticePassage() {
     lengthInstruction = "The content should be complex and detailed, exactly 3-4 sentences forming a rich paragraph with advanced vocabulary.";
   }
 
-  const isCoding = subject !== 'English';
+  const isCoding = ['Python', 'Java', 'C++'].includes(subject) || subject.toLowerCase().includes('program') || subject.toLowerCase().includes('code');
   const prompt = `Generate a highly unique and creative ${isCoding ? 'coding practice snippet or explanation' : 'reading practice passage'} in ${subject} for a ${level} level learner who is a ${occupation}. 
     Reference ID: ${seed}
     ${lengthInstruction}
@@ -42,7 +42,7 @@ export async function generatePracticePassage() {
 export async function generateQuizQuestions(topic = "Verbal Aptitude (Module)") {
   const { level, occupation, subject } = await getUserContext();
   const seed = Date.now().toString(36) + Math.random().toString(36).substring(2);
-  const isCoding = subject !== 'English';
+  const isCoding = ['Python', 'Java', 'C++'].includes(subject) || subject.toLowerCase().includes('program') || subject.toLowerCase().includes('code');
   
   let difficultyInstruction = "";
   if (level === "Beginner") {
@@ -82,7 +82,7 @@ export async function generateQuizQuestions(topic = "Verbal Aptitude (Module)") 
  */
 export async function generateDailyChallenge() {
   const { level, occupation, subject } = await getUserContext();
-  const isCoding = subject !== 'English';
+  const isCoding = ['Python', 'Java', 'C++'].includes(subject) || subject.toLowerCase().includes('program') || subject.toLowerCase().includes('code');
   
   const prompt = `Generate a unique, interactive learning challenge for a ${level} level learner who is a ${occupation} studying ${subject}.
     The challenge should be a 'Flash-Chat' mission.
@@ -111,7 +111,7 @@ export async function generateDailyChallenge() {
  */
 export async function generateRoleplayScenario() {
   const { level, occupation, subject } = await getUserContext();
-  const isCoding = subject !== 'English';
+  const isCoding = ['Python', 'Java', 'C++'].includes(subject) || subject.toLowerCase().includes('program') || subject.toLowerCase().includes('code');
   
   const prompt = `Generate a real-world ${isCoding ? subject + ' technical' : 'English'} roleplay scenario for a ${level} level learner who is a ${occupation}.
     The scenario should involve a conversation with an AI character.
@@ -163,6 +163,72 @@ export async function evaluateChallengeResponse(task, userResponse) {
   } catch (err) {
     console.error("Challenge Evaluation Failed:", err);
     return { score: 70, feedback: "Great effort! Try to be more concise.", suggestion: "I'm working on a revolutionary AI tool." };
+  }
+}
+
+/**
+ * Generate a complete syllabus and modules for a custom topic
+ */
+export async function generateCustomSyllabus(topicName) {
+  const prompt = `Generate a comprehensive, professional-grade learning syllabus for the topic: "${topicName}".
+    Return ONLY a raw JSON object with no markdown formatting. The JSON must match this structure exactly:
+    {
+      "modules": [
+        { "num": "Module 1", "title": "Module Title", "desc": "Brief 1-sentence description", "status": "In Progress", "progress": 20, "icon": "●", "class": "active-unit" },
+        { "num": "Module 2", "title": "Module Title", "desc": "Brief 1-sentence description", "status": "0% Done", "progress": 0, "icon": "📖", "class": "" },
+        { "num": "Module 3", "title": "Module Title", "desc": "Brief 1-sentence description", "status": "Locked", "progress": 0, "icon": "🔒", "class": "locked" },
+        { "num": "Module 4", "title": "Module Title", "desc": "Brief 1-sentence description", "status": "Locked", "progress": 0, "icon": "🔒", "class": "locked" }
+      ],
+      "chapters": [
+        { "title": "Chapter 1: Title", "body": "<p>Rich HTML content here with <h4> subheadings, <ul> lists, and <pre><code> blocks if applicable.</p>" },
+        { "title": "Chapter 2: Title", "body": "<p>Rich HTML content here...</p>" },
+        { "title": "Chapter 3: Title", "body": "<p>Rich HTML content here...</p>" },
+        { "title": "Chapter 4: Title", "body": "<p>Rich HTML content here...</p>" },
+        { "title": "Chapter 5: Title", "body": "<p>Rich HTML content here...</p>" }
+      ]
+    }
+    Requirements:
+    1. Provide exactly 4 or 5 modules.
+    2. Provide exactly 8 to 10 chapters.
+    3. The chapter 'body' MUST be formatted in clean, rich HTML (use <p>, <h4>, <ul>, <li>, <strong>, <em>, and <pre><code> for code if it's a programming topic).
+    4. Ensure the content is accurate and highly educational.`;
+
+  try {
+    // Increase max_tokens since this is a large generation
+    const userKey = getActiveGroqKey();
+    const apiKey = userKey || GROQ_API_KEY;
+
+    if (!apiKey || apiKey.includes('PASTE_YOUR_KEY')) {
+      throw new Error("Missing Groq API Key. Please set it in Settings.");
+    }
+
+    const response = await fetch(GROQ_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 3000
+      })
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.error?.message || "Groq API Request Failed");
+    }
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content || "";
+    if (!text) throw new Error("Groq returned empty response");
+    
+    return JSON.parse(text.replace(/```json|```/g, '').trim());
+  } catch (err) {
+    console.error("Custom Syllabus Generation Failed:", err);
+    throw err;
   }
 }
 

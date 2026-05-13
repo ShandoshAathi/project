@@ -13,6 +13,7 @@ const KEYS = {
   XP:      'vaaniXP',
   MISTAKES: 'vaaniMistakes',
   SUBJECT:  'vaaniCurrentSubject',
+  CUSTOM_SUBJECTS: 'vaaniCustomSubjects'
 };
 
 /** Get/Set current subject */
@@ -22,6 +23,25 @@ export function getCurrentSubject() {
 
 export function saveCurrentSubject(subject) {
   localStorage.setItem(KEYS.SUBJECT, subject);
+}
+
+export function getCustomSubjects() {
+  const stored = localStorage.getItem(KEYS.CUSTOM_SUBJECTS);
+  return stored ? JSON.parse(stored) : {};
+}
+
+export function saveCustomSubject(subjectKey, data) {
+  const customSubjects = getCustomSubjects();
+  customSubjects[subjectKey] = data;
+  localStorage.setItem(KEYS.CUSTOM_SUBJECTS, JSON.stringify(customSubjects));
+}
+
+export function deleteCustomSubject(subjectKey) {
+  const customSubjects = getCustomSubjects();
+  if (customSubjects[subjectKey]) {
+    delete customSubjects[subjectKey];
+    localStorage.setItem(KEYS.CUSTOM_SUBJECTS, JSON.stringify(customSubjects));
+  }
 }
 
 /** Save a practice / quiz score */
