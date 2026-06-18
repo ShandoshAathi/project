@@ -8,12 +8,13 @@
   .achievements-grid  { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* ── Mobile ────────────────────────────────────────────────────── */
+/* ── Mobile Landscape / Small Tablet ────────────────────────────── */
 @media (max-width: 900px) {
   .topnav { padding: 0 1rem; gap: .5rem; }
-  .nav { gap: 0; overflow-x: auto; }
+  .nav { gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
   .nav-item span:not(.nav-icon) { display: none; }
-  .nav-item { padding: .5rem .6rem; }
+  .nav-item { padding: .5rem .6rem; white-space: nowrap; }
   .brand-name { display: none; }
   .topnav-right { margin-left: auto; }
 
@@ -24,4 +25,20 @@
   .quiz-layout,
   .profile-layout { grid-template-columns: 1fr; }
   .results-detail-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Mobile Portrait ────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .page { padding: 1rem 0.5rem; }
+  .page-header { padding: 1.5rem 1rem 0.5rem; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .dashboard-grid, .stats-grid, .syllabus-grid, .achievements-grid, .course-cards { 
+    grid-template-columns: 1fr !important; 
+  }
+  .dashboard-grid .card, .dashboard-grid .ai-coach-card { grid-column: span 1 !important; }
+  
+  .nav-item { padding: 0.5rem; }
+  .nav-icon { margin-right: 0; }
+  
+  /* Make sure flex layouts stack on mobile if they are side-by-side */
+  .auth-card { padding: 2rem 1.5rem; }
 }

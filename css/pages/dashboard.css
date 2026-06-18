@@ -44,13 +44,20 @@
   min-height: 320px;
 }
 
-.card-banner {
+.card-banner-wrap {
   width: 100%;
   height: 140px;
   border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+
+.card-banner {
+  width: 100%;
+  height: 100%;
   background-size: cover;
   background-position: center;
-  margin-bottom: 0.5rem;
   transition: transform 0.5s ease;
 }
 
@@ -231,7 +238,18 @@
   align-items: center;
   justify-content: center;
   border: 1px solid var(--glass-border);
-  transition: background-image 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
+  animation: heroFadeIn 0.8s ease-out;
+}
+
+.dashboard-hero[data-subject="english"] { background-image: url('../../assets/img/english_banner.png'); }
+.dashboard-hero[data-subject="python"] { background-image: url('../../assets/img/python_banner.png'); }
+.dashboard-hero[data-subject="java"] { background-image: url('../../assets/img/java_banner.png'); }
+.dashboard-hero[data-subject="cpp"] { background-image: url('../../assets/img/cpp_banner.png'); }
+
+@keyframes heroFadeIn {
+  from { opacity: 0.6; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .dashboard-hero::before {
@@ -711,7 +729,11 @@
   border-radius: 50%;
   background: conic-gradient(from 0deg, var(--primary), var(--accent), var(--primary));
   animation: coachSpin 3s linear infinite;
-  opacity: 0.6;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.coach-avatar-pulse.active {
+  opacity: 1;
 }
 @keyframes coachSpin {
   to { transform: rotate(360deg); }
@@ -1091,11 +1113,22 @@
   .dashboard-grid .ai-coach-card { grid-column: span 2; }
   .quick-prompts { gap: 0.4rem; }
   .quick-btn { font-size: 0.68rem; padding: 0.3rem 0.6rem; }
+  .ai-coach-card { flex-direction: column; text-align: center; }
+  .ai-coach-card .coach-avatar { margin-bottom: 1rem; }
 }
 @media (max-width: 600px) {
-  .dashboard-grid .ai-coach-card { grid-column: span 1; }
-  .coach-chat-panel.chat-open { max-height: 380px; }
+  .dashboard-grid .ai-coach-card { grid-column: span 1 !important; }
+  .coach-chat-panel.chat-open { max-height: 380px; width: 90vw !important; right: 5vw; bottom: 80px; }
   .coach-chat-feed { height: 260px; }
+  
+  .dashboard-hero { padding: 2rem 1.5rem; text-align: center; }
+  .hero-content h1 { font-size: 2rem; }
+  .hero-content p { font-size: 1rem; }
+  
+  .ai-fab-icon { width: 50px; height: 50px; bottom: 20px; right: 20px; font-size: 1.5rem; }
+  
+  .course-cards { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+  .subject-card { min-height: auto; }
 }
 
 /* ── Level Progress Card ───────────────────────────────────────── */
@@ -1178,4 +1211,59 @@
   font-weight: 700;
   font-size: 0.9rem;
   color: var(--text1);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CHALLENGE MODAL RESPONSIVE FIXES
+   ═══════════════════════════════════════════════════════════════ */
+.challenge-modal-content {
+  max-width: 650px !important;
+  width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 2.5rem !important;
+}
+
+.challenge-modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+.challenge-modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.challenge-modal-content::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 4px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  background: var(--ui-bg-hover);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text2);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.modal-close:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  transform: scale(1.1);
+}
+
+.challenge-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1.5rem;
+  width: 100%;
 }
