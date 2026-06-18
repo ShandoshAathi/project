@@ -3,7 +3,8 @@
  * Dual-AI Smart Coach Chatbot & syllabus generator using Groq (Llama 3).
  */
 
-import { GROQ_API_KEY } from '../../js/config.js'; // Keep importing from the original config to avoid breaking keys
+// Read API key from local .env file instead of hardcoded config
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 import { getProfile, getCurrentSubject, trackMistake } from './storage.js';
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
