@@ -35,8 +35,34 @@ export default function Dashboard() {
   const [dailyChallenge, setDailyChallenge] = useState(null);
   const [challengeResponse, setChallengeResponse] = useState('');
   const [challengeLoading, setChallengeLoading] = useState(false);
-  const [challengeResult, setChallengeResult] = useState(null); // { score, feedback, suggestion }
   const [isListening, setIsListening] = useState(false);
+
+  const levelRef = React.useRef(null);
+  const weeklyRef = React.useRef(null);
+  const skillsRef = React.useRef(null);
+
+  const [levelVisible, setLevelVisible] = useState(false);
+  const [weeklyVisible, setWeeklyVisible] = useState(false);
+  const [skillsVisible, setSkillsVisible] = useState(false);
+
+  useEffect(() => {
+    const observerOpts = { threshold: 0.15 }; // Trigger when 15% visible
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (entry.target === levelRef.current) setLevelVisible(true);
+          if (entry.target === weeklyRef.current) setWeeklyVisible(true);
+          if (entry.target === skillsRef.current) setSkillsVisible(true);
+        }
+      });
+    }, observerOpts);
+
+    if (levelRef.current) observer.observe(levelRef.current);
+    if (weeklyRef.current) observer.observe(weeklyRef.current);
+    if (skillsRef.current) observer.observe(skillsRef.current);
+
+    return () => observer.disconnect();
+  }, []);
 
   // Stats Simulation values
   const [dashboardStats, setDashboardStats] = useState({
@@ -299,13 +325,13 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="card mt-6 level-progress-card">
+      <div className="card mt-6 level-progress-card" ref={levelRef}>
         <div className="level-header">
           <span>Level Progress</span>
           <span id="level-percentage">{Math.round(xpProgress)}%</span>
         </div>
         <div className="progress-bar-container">
-          <div className="progress-bar-fill" style={{ width: `${xpProgress}%` }}></div>
+          <div className="progress-bar-fill" style={{ width: levelVisible ? `${xpProgress}%` : '0%', transition: 'width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)' }}></div>
         </div>
       </div>
 
@@ -333,38 +359,44 @@ export default function Dashboard() {
 
       <div className="dashboard-grid mt-6">
         {/* Weekly Chart */}
-        <div className="card">
+        <div className="card" ref={weeklyRef}>
           <h3 className="card-title">Weekly Progress</h3>
           <div className="bar-chart">
-            <div className="bar-group"><div className="bar h-60" style={{ height: '60%' }}></div><span>Mon</span></div>
-            <div className="bar-group"><div className="bar h-80" style={{ height: '80%' }}></div><span>Tue</span></div>
-            <div className="bar-group"><div className="bar h-45" style={{ height: '45%' }}></div><span>Wed</span></div>
-            <div className="bar-group"><div className="bar h-90" style={{ height: '90%' }}></div><span>Thu</span></div>
-            <div className="bar-group"><div className="bar h-70" style={{ height: '70%' }}></div><span>Fri</span></div>
-            <div className="bar-group"><div className="bar h-55" style={{ height: '55%' }}></div><span>Sat</span></div>
-            <div className="bar-group"><div className="bar active-bar h-85" style={{ height: '85%' }}></div><span>Sun</span></div>
+            {[
+              { day: 'Mon', h: 60 }, { day: 'Tue', h: 80 }, { day: 'Wed', h: 45 },
+              { day: 'Thu', h: 90 }, { day: 'Fri', h: 70 }, { day: 'Sat', h: 55 },
+              { day: 'Sun', h: 85, active: true }
+            ].map((b, i) => (
+              <div className="bar-group" key={b.day}>
+                <div className={`bar ${b.active ? 'active-bar' : ''}`} style={{ 
+                  height: weeklyVisible ? `${b.h}%` : '0%', 
+                  transition: `height 1s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 0.1}s` 
+                }}></div>
+                <span>{b.day}</span>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Skill Levels */}
-        <div className="card">
+        <div className="card" ref={skillsRef}>
           <h3 className="card-title">Skill Levels</h3>
           <div className="skill-list" id="skill-list">
             <div className="skill-item">
               <div className="skill-header"><span>Reading</span><span>{dashboardStats.accuracy}%</span></div>
-              <div className="skill-bar"><div className="skill-fill grad-purple-90" style={{ width: `${dashboardStats.accuracy}%` }}></div></div>
+              <div className="skill-bar"><div className="skill-fill grad-purple-90" style={{ width: skillsVisible ? `${dashboardStats.accuracy}%` : '0%', transition: 'width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s' }}></div></div>
             </div>
             <div className="skill-item">
               <div className="skill-header"><span>Pronunciation</span><span>{dashboardStats.accuracy - 5}%</span></div>
-              <div className="skill-bar"><div className="skill-fill grad-blue-90" style={{ width: `${Math.max(0, dashboardStats.accuracy - 5)}%` }}></div></div>
+              <div className="skill-bar"><div className="skill-fill grad-blue-90" style={{ width: skillsVisible ? `${Math.max(0, dashboardStats.accuracy - 5)}%` : '0%', transition: 'width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s' }}></div></div>
             </div>
             <div className="skill-item">
               <div className="skill-header"><span>Comprehension</span><span>{dashboardStats.accuracy + 2}%</span></div>
-              <div className="skill-bar"><div className="skill-fill grad-green-90" style={{ width: `${Math.min(100, dashboardStats.accuracy + 2)}%` }}></div></div>
+              <div className="skill-bar"><div className="skill-fill grad-green-90" style={{ width: skillsVisible ? `${Math.min(100, dashboardStats.accuracy + 2)}%` : '0%', transition: 'width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s' }}></div></div>
             </div>
             <div className="skill-item">
               <div className="skill-header"><span>Fluency</span><span>{Math.max(40, dashboardStats.accuracy - 10)}%</span></div>
-              <div className="skill-bar"><div className="skill-fill grad-amber-90" style={{ width: `${Math.max(40, dashboardStats.accuracy - 10)}%` }}></div></div>
+              <div className="skill-bar"><div className="skill-fill grad-amber-90" style={{ width: skillsVisible ? `${Math.max(40, dashboardStats.accuracy - 10)}%` : '0%', transition: 'width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s' }}></div></div>
             </div>
           </div>
         </div>

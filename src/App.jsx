@@ -21,6 +21,9 @@ import Syllabus from './pages/Syllabus.jsx';
 import Results from './pages/Results.jsx';
 import Profile from './pages/Profile.jsx';
 import Settings from './pages/Settings.jsx';
+import Leaderboard from './pages/Leaderboard.jsx';
+import Analytics from './pages/Analytics.jsx';
+import StudyRooms from './pages/StudyRooms.jsx';
 
 export default function App() {
   const { activePage, setActivePage, currentUser } = useApp();
@@ -58,6 +61,12 @@ export default function App() {
         return <Profile />;
       case 'settings':
         return <Settings />;
+      case 'leaderboard':
+        return <Leaderboard />;
+      case 'analytics':
+        return <Analytics />;
+      case 'rooms':
+        return <StudyRooms />;
       default:
         return <Dashboard />;
     }

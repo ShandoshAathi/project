@@ -146,6 +146,16 @@ export default function AICoachDrawer() {
     handleSendMessage(promptText);
   };
 
+  const getAvatarProps = () => {
+    switch (coachPersonality) {
+      case 'Professional': return { emoji: '💼', color1: '#1e3a8a', color2: '#3b82f6' };
+      case 'Strict': return { emoji: '🎓', color1: '#7f1d1d', color2: '#ef4444' };
+      case 'Friendly': 
+      default: return { emoji: '😊', color1: 'var(--primary)', color2: 'var(--accent)' };
+    }
+  };
+  const avatarProps = getAvatarProps();
+
   return (
     <>
       {/* Floating Action Button */}
@@ -173,8 +183,10 @@ export default function AICoachDrawer() {
         {/* Header */}
         <div className="coach-header floating-header">
           <div className="coach-avatar-wrap">
-            <div className={`coach-avatar-pulse ${loading ? 'active' : ''}`}></div>
-            <div className="coach-avatar floating-avatar"></div>
+            <div className={`coach-avatar-pulse ${loading ? 'active' : ''}`} style={{ background: `conic-gradient(from 0deg, ${avatarProps.color1}, ${avatarProps.color2}, ${avatarProps.color1})` }}></div>
+            <div className="coach-avatar floating-avatar" style={{ background: `linear-gradient(135deg, ${avatarProps.color1}, ${avatarProps.color2})`, color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+              {avatarProps.emoji}
+            </div>
           </div>
           <div className="coach-header-info">
             <h3 className="card-title floating-title">AI Smart Coach</h3>

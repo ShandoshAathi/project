@@ -4,6 +4,7 @@
  */
 
 import { supabase } from './supabase.js';
+import { encryptProfileData, decryptProfileData } from './crypto.js';
 
 const KEYS = {
   NAME:    'vaaniName',
@@ -102,7 +103,15 @@ export async function getProfile(userId) {
         .eq('id', userId)
         .single();
       
-      if (!error && data) return data;
+      if (!error && data) {
+        if (data.encrypted_data) {
+          const decrypted = decryptProfileData(data.encrypted_data);
+          if (decrypted) {
+            return { id: data.id, ...decrypted };
+          }
+        }
+        return data;
+      }
       if (error && error.code === 'PGRST205') {
         console.warn("Supabase 'profiles' table missing. Using local storage.");
       }
@@ -112,16 +121,32 @@ export async function getProfile(userId) {
   }
   // Fallback for simulation or missing table
   const stored = localStorage.getItem('vaaniai_simulated_profile');
-  return stored ? JSON.parse(stored) : null;
+  if (stored) {
+    if (stored.startsWith('{')) {
+      return JSON.parse(stored);
+    } else {
+      return decryptProfileData(stored) || null;
+    }
+  }
+  return null;
 }
 
 /** Save user profile to DB */
 export async function saveProfile(currentUser, profileData) {
+  const payloadToEncrypt = { ...profileData };
+  delete payloadToEncrypt.id;
+  
+  const encryptedString = encryptProfileData(payloadToEncrypt);
+
   if (supabase && currentUser && !currentUser.id.startsWith('sim-')) {
     try {
+      const dbPayload = { 
+        id: currentUser.id, 
+        encrypted_data: encryptedString 
+      };
       const { error } = await supabase
         .from('profiles')
-        .upsert({ id: currentUser.id, ...profileData });
+        .upsert(dbPayload);
       
       if (!error) return;
       
@@ -136,7 +161,7 @@ export async function saveProfile(currentUser, profileData) {
   }
   
   // Save locally for simulation or fallback
-  localStorage.setItem('vaaniai_simulated_profile', JSON.stringify(profileData));
+  localStorage.setItem('vaaniai_simulated_profile', encryptedString || JSON.stringify(profileData));
   if (currentUser) {
     saveName(profileData.full_name);
   }

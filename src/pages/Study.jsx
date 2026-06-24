@@ -7,6 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext.jsx';
 import { getChapters } from '../services/studyData.js';
+import DOMPurify from 'dompurify';
 
 export default function Study() {
   const { currentSubject, customSubjects, setActivePage } = useApp();
@@ -113,7 +114,7 @@ export default function Study() {
           <div 
             className="content-body" 
             id="chapterBody"
-            dangerouslySetInnerHTML={{ __html: currentChapter.body }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(currentChapter.body) }}
           />
           
           <div className="content-actions">

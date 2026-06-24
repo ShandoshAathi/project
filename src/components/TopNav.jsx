@@ -17,6 +17,9 @@ export default function TopNav() {
     { id: 'study', label: 'Study', icon: '📖' },
     { id: 'syllabus', label: 'Syllabus', icon: '📚' },
     { id: 'results', label: 'Results', icon: '📊' },
+    { id: 'leaderboard', label: 'Rank', icon: '🏆' },
+    { id: 'analytics', label: 'Analytics', icon: '📈' },
+    { id: 'rooms', label: 'Social', icon: '🌍' },
     { id: 'profile', label: 'Profile', icon: '👤' }
   ];
 

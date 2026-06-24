@@ -25,6 +25,9 @@ import '../css/pages/quiz.css';
 import '../css/pages/profile.css';
 import '../css/pages/settings.css';
 import '../css/pages/flashcards.css';
+import '../css/pages/leaderboard.css';
+import '../css/pages/analytics.css';
+import '../css/pages/study-rooms.css';
 
 // System Utilities & Responsive Glides
 import '../css/responsive.css';

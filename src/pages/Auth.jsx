@@ -20,8 +20,10 @@ export default function Auth() {
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
 
-  // Loadings
+  // Loadings and Feedback
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   const checkOnboarding = (user) => {
     const profile = localStorage.getItem('vaaniai_simulated_profile');
@@ -65,10 +67,18 @@ export default function Auth() {
   };
 
   const handleEmailAction = async () => {
+    setErrorMsg('');
+    setSuccessMsg('');
     if (!email || !password) {
-      alert("Please fill in all fields.");
+      setErrorMsg("Please fill in all fields.");
       return;
     }
+
+    if (isSignUp && password.length < 8) {
+      setErrorMsg("Password must be at least 8 characters long.");
+      return;
+    }
+
     setLoading(true);
 
     if (isSignUp) {
@@ -76,8 +86,8 @@ export default function Auth() {
       if (supabase) {
         const { error } = await supabase.auth.signUp({ email, password });
         setLoading(false);
-        if (error) return alert("Signup failed: " + error.message);
-        alert("Signup successful! Please check your email to verify your account, then log in.");
+        if (error) return setErrorMsg("Signup failed: " + error.message);
+        setSuccessMsg("Signup successful! Please check your email to verify your account, then log in.");
       } else {
         setTimeout(() => {
           const user = { id: 'sim-email-1', email, full_name: 'Email Learner' };
@@ -91,7 +101,7 @@ export default function Auth() {
       if (supabase) {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         setLoading(false);
-        if (error) return alert("Login failed: " + error.message);
+        if (error) return setErrorMsg("Login failed: " + error.message);
         setCurrentUser(data.user);
         checkOnboarding(data.user);
       } else {
@@ -107,9 +117,11 @@ export default function Auth() {
   };
 
   const handleSendOTP = async () => {
+    setErrorMsg('');
+    setSuccessMsg('');
     const cleanPhone = phone.trim().replace(/\s/g, '');
     if (!cleanPhone || cleanPhone.length < 5) {
-      alert('Please enter a valid phone number.');
+      setErrorMsg('Please enter a valid phone number.');
       return;
     }
 
@@ -120,7 +132,7 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithOtp({ phone: fullPhone });
       setLoading(false);
       if (error) {
-        alert("Error sending code: " + error.message);
+        setErrorMsg("Error sending code: " + error.message);
         return;
       }
     } else {
@@ -132,8 +144,10 @@ export default function Auth() {
   };
 
   const handleVerifyOTP = async () => {
+    setErrorMsg('');
+    setSuccessMsg('');
     if (!otp || otp.length < 6) {
-      alert("Please enter the 6-digit verification code.");
+      setErrorMsg("Please enter the 6-digit verification code.");
       return;
     }
 
@@ -148,7 +162,7 @@ export default function Auth() {
       });
       setLoading(false);
       if (error) {
-        alert('Invalid code: ' + error.message);
+        setErrorMsg('Invalid code: ' + error.message);
         return;
       }
       setCurrentUser(data.user);
@@ -163,7 +177,7 @@ export default function Auth() {
         localStorage.setItem('vaaniai_simulated_profile', JSON.stringify({ full_name: 'Mobile Learner', learning_goal: 'Daily Conversation' }));
         checkOnboarding(user);
       } else {
-        alert("Invalid code. For simulation, use '123456'.");
+        setErrorMsg("Invalid code. For simulation, use '123456'.");
       }
     }
   };
@@ -196,6 +210,9 @@ export default function Auth() {
           </div>
 
           <div className="auth-divider"><span>OR</span></div>
+
+          {errorMsg && <div className="auth-error" style={{color: '#ff4d4f', marginBottom: '1rem', textAlign: 'center', fontSize: '0.9rem'}}>{errorMsg}</div>}
+          {successMsg && <div className="auth-success" style={{color: '#52c41a', marginBottom: '1rem', textAlign: 'center', fontSize: '0.9rem'}}>{successMsg}</div>}
 
           {/* Toggle Type */}
           <div className="auth-type-toggle">

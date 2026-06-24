@@ -1,0 +1,88 @@
+/* ── ANALYTICS ────────────────────────────────────────────── */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-container {
+  flex-grow: 1;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.report-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.report-icon {
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 12px rgba(0, 102, 255, 0.3));
+}
+
+.report-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.report-section {
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  transition: all 0.3s ease;
+}
+
+.report-section:hover {
+  transform: translateX(4px);
+}
+
+.report-section.positive {
+  border-left: 4px solid var(--success);
+}
+
+.report-section.focus {
+  border-left: 4px solid var(--warn);
+}
+
+.report-section.action {
+  border-left: 4px solid var(--primary);
+  background: rgba(0, 102, 255, 0.05);
+}
+
+.report-section h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.report-section p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text2);
+}
