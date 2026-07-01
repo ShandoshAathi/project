@@ -54,8 +54,11 @@ export function AppProvider({ children }) {
     fontSize: 'medium',
     aiVoice: true,
     aiPersonality: 'Friendly',
+    aiProvider: 'groq',
     groqKey: '',
+    groqModel: 'llama-3.1-8b-instant',
     geminiKey: '',
+    geminiModel: 'gemini-1.5-flash',
     openaiKey: ''
   });
 

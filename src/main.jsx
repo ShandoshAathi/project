@@ -23,6 +23,7 @@ import '../css/pages/practice.css';
 import '../css/pages/results.css';
 import '../css/pages/quiz.css';
 import '../css/pages/profile.css';
+import '../css/pages/writing.css';
 import '../css/pages/settings.css';
 import '../css/pages/flashcards.css';
 import '../css/pages/leaderboard.css';

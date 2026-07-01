@@ -4,22 +4,46 @@
  */
 
 // Read API key from local .env file instead of hardcoded config
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+const DEFAULT_GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
+const DEFAULT_GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
 import { getProfile, getCurrentSubject, trackMistake } from './storage.js';
 
-const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+function getAIConfig() {
+  let provider = 'groq';
+  let groqKey = '';
+  let groqModel = 'llama-3.1-8b-instant';
+  let geminiKey = '';
+  let geminiModel = 'gemini-1.5-flash';
 
-function getActiveGroqKey() {
   const saved = localStorage.getItem('vaaniai_settings');
   if (saved) {
     try {
       const settings = JSON.parse(saved);
-      if (settings.groqKey && settings.groqKey.length > 5) {
-        return settings.groqKey;
-      }
+      if (settings.aiProvider) provider = settings.aiProvider;
+      if (settings.groqKey) groqKey = settings.groqKey;
+      if (settings.groqModel) groqModel = settings.groqModel;
+      if (settings.geminiKey) geminiKey = settings.geminiKey;
+      if (settings.geminiModel) geminiModel = settings.geminiModel;
     } catch (_) {}
   }
-  return null;
+
+  if (provider === 'gemini') {
+    return {
+      url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+      apiKey: geminiKey || DEFAULT_GEMINI_KEY,
+      model: geminiModel,
+      provider: 'Google Gemini'
+    };
+  }
+
+  // Default to Groq
+  return {
+    url: 'https://api.groq.com/openai/v1/chat/completions',
+    apiKey: groqKey || DEFAULT_GROQ_KEY,
+    model: groqModel,
+    provider: 'Groq'
+  };
 }
 
 async function getUserContext(currentUser) {
@@ -40,15 +64,14 @@ async function getUserContext(currentUser) {
   return { level, occupation, subject };
 }
 
-async function callGroq(prompt, model = 'llama-3.1-8b-instant', isJson = false) {
-  const userKey = getActiveGroqKey();
-  const apiKey = userKey || GROQ_API_KEY;
+async function callAI(prompt, isJson = false) {
+  const { url, apiKey, model, provider } = getAIConfig();
 
   if (!apiKey || apiKey.includes('PASTE_YOUR_KEY')) {
-    throw new Error("Missing Groq API Key. Please set it in Settings.");
+    throw new Error(`Missing ${provider} API Key. Please set it in Settings.`);
   }
 
-  const response = await fetch(GROQ_URL, {
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -65,12 +88,12 @@ async function callGroq(prompt, model = 'llama-3.1-8b-instant', isJson = false) 
 
   if (!response.ok) {
     const errData = await response.json();
-    throw new Error(errData.error?.message || "Groq API Request Failed");
+    throw new Error(errData.error?.message || `${provider} API Request Failed`);
   }
 
   const data = await response.json();
   const text = data.choices?.[0]?.message?.content || "";
-  if (!text) throw new Error("Groq returned empty response");
+  if (!text) throw new Error(`${provider} returned empty response`);
   return text;
 }
 
@@ -141,7 +164,7 @@ Always personalize responses to ${name}'s level (${level}) and occupation (${occ
 }
 
 /**
- * Main chat function — Groq only
+ * Main chat function
  */
 export async function sendChatMessage(currentUser, chatHistory, userMessage, imageData = null, coachPersonality = 'Friendly') {
   const updatedHistory = [...chatHistory, { role: 'user', content: userMessage, imageData }];
@@ -158,9 +181,9 @@ export async function sendChatMessage(currentUser, chatHistory, userMessage, ima
     };
   } else {
     try {
-      const apiKey = getActiveGroqKey() || GROQ_API_KEY;
+      const { url, apiKey, model, provider } = getAIConfig();
       if (!apiKey || apiKey.includes('PASTE_YOUR_KEY')) {
-        throw new Error('Missing Groq API Key. Please set it in Settings.');
+        throw new Error(`Missing ${provider} API Key. Please set it in Settings.`);
       }
 
       const groqMessages = [
@@ -168,14 +191,14 @@ export async function sendChatMessage(currentUser, chatHistory, userMessage, ima
         ...recentHistory.map(m => ({ role: m.role, content: m.content }))
       ];
 
-      const res = await fetch(GROQ_URL, {
+      const res = await fetch(url, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
+          model: model,
           messages: groqMessages,
           temperature: 0.7,
           max_tokens: 600
@@ -184,16 +207,16 @@ export async function sendChatMessage(currentUser, chatHistory, userMessage, ima
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error?.message || 'Groq API Failed');
+        throw new Error(err.error?.message || `${provider} API Failed`);
       }
 
       const data = await res.json();
       const text = data.choices?.[0]?.message?.content || '';
-      if (!text) throw new Error('Groq returned empty response');
+      if (!text) throw new Error(`${provider} returned empty response`);
       
-      result = { text, source: 'Groq (Llama 3)' };
+      result = { text, source: provider };
     } catch (err) {
-      console.error('[VaaniAI Chat] Groq failed:', err);
+      console.error('[VaaniAI Chat] API failed:', err);
       result = {
         text: "I'm having trouble connecting to the AI right now. Please verify your free API keys in settings or config.js! 🔧",
         source: 'Error'
@@ -243,7 +266,7 @@ export async function generatePracticePassage(currentUser, fileContext = "") {
     Return ONLY the plain text, nothing else. No markdown, no quotes.`;
 
   try {
-    const text = await callGroq(prompt);
+    const text = await callAI(prompt);
     return text.trim();
   } catch (err) {
     console.error("Passage Generation Failed:", err);
@@ -283,7 +306,7 @@ export async function generateQuizQuestions(currentUser, topic = "Verbal Aptitud
     CRITICAL: Output MUST be strictly valid JSON. Do not use literal newlines inside strings. Use \\n if needed.`;
 
   try {
-    const responseText = await callGroq(prompt, 'llama-3.1-8b-instant', true);
+    const responseText = await callAI(prompt, true);
     const parsed = parseLLMJSON(responseText);
     return parsed.questions || parsed;
   } catch (err) {
@@ -311,7 +334,7 @@ export async function generateDailyChallenge(currentUser, subjectOverride = null
     CRITICAL: Output MUST be strictly valid JSON. Do not use literal newlines inside strings. Use \\n if needed.`;
 
   try {
-    const responseText = await callGroq(prompt, 'llama-3.1-8b-instant', true);
+    const responseText = await callAI(prompt, true);
     return parseLLMJSON(responseText);
   } catch (err) {
     console.error("Challenge Generation Failed:", err);
@@ -348,7 +371,7 @@ export async function generateRoleplayScenario(currentUser, fileContext = "") {
     CRITICAL: Output MUST be strictly valid JSON. Do not use literal newlines inside strings. Use \\n if needed.`;
 
   try {
-    const responseText = await callGroq(prompt, 'llama-3.1-8b-instant', true);
+    const responseText = await callAI(prompt, true);
     return parseLLMJSON(responseText);
   } catch (err) {
     console.error("Roleplay Generation Failed:", err);
@@ -376,7 +399,7 @@ export async function evaluateChallengeResponse(task, userResponse) {
     CRITICAL: Output MUST be strictly valid JSON. Do not use literal newlines inside strings. Use \\n if needed.`;
 
   try {
-    const responseText = await callGroq(prompt, 'llama-3.1-8b-instant', true);
+    const responseText = await callAI(prompt, true);
     return parseLLMJSON(responseText);
   } catch (err) {
     console.error("Challenge Evaluation Failed:", err);
@@ -414,21 +437,20 @@ export async function generateCustomSyllabus(topicName, fileContext = "") {
     5. CRITICAL: Output MUST be strictly valid JSON. Do not use literal newlines inside strings. Use \\n if needed.`;
 
   try {
-    const userKey = getActiveGroqKey();
-    const apiKey = userKey || GROQ_API_KEY;
+    const { url, apiKey, model, provider } = getAIConfig();
 
     if (!apiKey || apiKey.includes('PASTE_YOUR_KEY')) {
-      throw new Error("Missing Groq API Key. Please set it in Settings.");
+      throw new Error(`Missing ${provider} API Key. Please set it in Settings.`);
     }
 
-    const response = await fetch(GROQ_URL, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: model,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
         max_tokens: 3000,
@@ -438,7 +460,7 @@ export async function generateCustomSyllabus(topicName, fileContext = "") {
 
     if (!response.ok) {
       const errData = await response.json();
-      throw new Error(errData.error?.message || "Groq API Request Failed");
+      throw new Error(errData.error?.message || `${provider} API Request Failed`);
     }
 
     const data = await response.json();
@@ -448,6 +470,42 @@ export async function generateCustomSyllabus(topicName, fileContext = "") {
     return parseLLMJSON(text);
   } catch (err) {
     console.error("Custom Syllabus Generation Failed:", err);
+    throw err;
+  }
+}
+
+/**
+ * Grade user's writing based on grammar, vocabulary, and relevance.
+ */
+export async function gradeWriting(topic, text, currentUser) {
+  const context = await getUserContext(currentUser);
+  
+  const prompt = `You are a strict but encouraging AI writing tutor. Evaluate the following text written by a ${context.level} level learner about the topic: "${topic}".
+
+User's Text:
+"""
+${text}
+"""
+
+Return ONLY a valid JSON object with the following structure:
+{
+  "score": 85, // integer out of 100
+  "grammar_corrections": [
+    { "original": "I goes", "correction": "I go", "explanation": "Use 'go' for first-person singular." }
+  ],
+  "vocabulary_suggestions": [
+    { "original": "good", "better": "excellent", "explanation": "A stronger adjective." }
+  ],
+  "general_feedback": "A concise paragraph highlighting strengths and areas for improvement."
+}
+
+Do not include any markdown formatting, only the raw JSON.`;
+
+  try {
+    const responseText = await callAI(prompt, true);
+    return parseLLMJSON(responseText);
+  } catch (err) {
+    console.error("Writing Grading Failed:", err);
     throw err;
   }
 }

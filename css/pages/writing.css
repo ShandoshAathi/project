@@ -1,0 +1,132 @@
+.writing-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.writing-editor {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 160px);
+}
+
+.writing-textarea {
+  flex: 1;
+  width: 100%;
+  background: var(--ui-bg);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem;
+  font-size: 1.1rem;
+  color: var(--text);
+  resize: none;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.writing-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--ui-bg-hover);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.writing-feedback-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: calc(100vh - 160px);
+  overflow-y: auto;
+}
+
+.score-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid var(--primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: var(--shadow-glow);
+}
+
+.score-circle .score-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.score-circle .score-label {
+  font-size: 0.8rem;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.correction-item {
+  background: var(--ui-bg);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--danger);
+}
+
+.vocab-item {
+  background: var(--ui-bg);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--primary);
+}
+
+.correction-original {
+  text-decoration: line-through;
+  color: var(--text3);
+  margin-right: 0.5rem;
+}
+
+.correction-fixed {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.vocab-original {
+  color: var(--text2);
+  margin-right: 0.5rem;
+}
+
+.vocab-better {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.writing-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.word-count {
+  color: var(--text2);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Mobile responsive */
+@media (max-width: 900px) {
+  .writing-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .writing-editor, .writing-feedback-panel {
+    height: auto;
+    min-height: 400px;
+  }
+}

@@ -12,6 +12,7 @@ export default function TopNav() {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
     { id: 'practice', label: 'Practice', icon: '🎙️' },
+    { id: 'writing', label: 'Writing', icon: '✍️' },
     { id: 'quiz', label: 'Quiz', icon: '🧠' },
     { id: 'flashcards', label: 'Flashcards', icon: '🗂️' },
     { id: 'study', label: 'Study', icon: '📖' },

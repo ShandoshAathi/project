@@ -59,7 +59,7 @@
   border: 1px solid var(--ui-border);
 }
 .nav-item {
-  display: flex; align-items: center; gap: .5rem;
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
   padding: .4rem .9rem;
   border-radius: 99px;
   color: var(--text2);
@@ -70,7 +70,6 @@
   white-space: nowrap;
   position: relative;
   z-index: 2;
-  height: 34px;
   overflow: hidden;
 }
 
@@ -101,8 +100,16 @@
   visibility: visible !important;
   max-width: 200px !important;
   color: var(--primary) !important;
-  background: var(--primary-glow);
+  background: var(--primary-glow) !important;
+  border: none !important;
+  box-shadow: none !important;
   padding: .4rem .9rem !important;
+}
+
+[data-theme="dark"] .nav-item.active {
+  color: #ffd700 !important;
+  background: rgba(255, 215, 0, 0.1) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 215, 0, 0.6), 0 0 10px rgba(255, 215, 0, 0.2) !important;
 }
 
 .nav-glider {

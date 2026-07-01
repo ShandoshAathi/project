@@ -56,36 +56,39 @@
 
 /* ── Dark Mode (OLED Premium) ── */
 [data-theme="dark"] {
-  --bg:         #09090b; /* Zinc 950 - Near OLED Black */
-  --bg2:        rgba(9, 9, 11, 0.85);
-  --bg3:        rgba(24, 24, 27, 0.7);
+  /* Slate 900 - Rich Midnight Blue/Grey */
+  --bg:         #0f172a; 
+  --bg2:        rgba(15, 23, 42, 0.85);
+  --bg3:        rgba(30, 41, 59, 0.7);
 
   /* Richer glass effect with bright frosty border */
-  --glass:      rgba(24, 24, 27, 0.5);
-  --glass-hover:rgba(39, 39, 42, 0.7);
-  --glass-solid:rgba(9, 9, 11, 1);
-  --glass-border:rgba(255, 255, 255, 0.1);
-  --glass-glow: rgba(0, 102, 255, 0.15);
+  --glass:      rgba(30, 41, 59, 0.5);
+  --glass-hover:rgba(51, 65, 85, 0.7);
+  --glass-solid:rgba(15, 23, 42, 1);
+  --glass-border:rgba(255, 255, 255, 0.12);
+  --glass-glow: rgba(56, 189, 248, 0.15);
 
-  /* Brighter primary/accent for max contrast */
-  --primary:    #3385ff; 
-  --primary2:   #66a3ff;
-  --accent:     #b066ff;
-  --accent2:    #c48aff;
+  /* Vibrant Sky Blue for high contrast on dark slate */
+  --primary:    #38bdf8; 
+  --primary2:   #7dd3fc;
+  /* Soft Indigo for accent */
+  --accent:     #818cf8;
+  --accent2:    #a5b4fc;
 
-  --text:       #f8fafc;
-  --text2:      #a1a1aa;
-  --text3:      #52525b;
+  /* Improved text contrast */
+  --text:       #f8fafc; /* Slate 50 */
+  --text2:      #cbd5e1; /* Slate 300 (Brighter than previous text2) */
+  --text3:      #94a3b8; /* Slate 400 (Much brighter than previous text3) */
 
-  --card:       rgba(24, 24, 27, 0.6);
-  --border:     rgba(255, 255, 255, 0.08);
-  --ui-bg:      rgba(255, 255, 255, 0.04);
-  --ui-bg-hover:rgba(255, 255, 255, 0.08);
-  --ui-border:  rgba(255, 255, 255, 0.12);
+  --card:       rgba(30, 41, 59, 0.6); /* Slate 800 */
+  --border:     rgba(255, 255, 255, 0.1);
+  --ui-bg:      rgba(255, 255, 255, 0.06);
+  --ui-bg-hover:rgba(255, 255, 255, 0.1);
+  --ui-border:  rgba(255, 255, 255, 0.15);
 
-  --shadow:     0 24px 60px rgba(0, 0, 0, 0.6);
-  --shadow-sm:  0 10px 24px rgba(0, 0, 0, 0.4);
-  --shadow-glow:0 0 40px rgba(51, 133, 255, 0.15);
+  --shadow:     0 24px 60px rgba(0, 0, 0, 0.4);
+  --shadow-sm:  0 10px 24px rgba(0, 0, 0, 0.3);
+  --shadow-glow:0 0 40px rgba(56, 189, 248, 0.15);
 }
 
 /* ── Font Sizes ── */

@@ -24,6 +24,7 @@ import Settings from '@/pages/Settings.jsx';
 import Leaderboard from '@/pages/Leaderboard.jsx';
 import Analytics from '@/pages/Analytics.jsx';
 import StudyRooms from '@/pages/StudyRooms.jsx';
+import WritingGrader from '@/pages/WritingGrader.jsx';
 
 export default function App() {
   const { activePage, setActivePage, currentUser } = useApp();
@@ -67,6 +68,8 @@ export default function App() {
         return <Analytics />;
       case 'rooms':
         return <StudyRooms />;
+      case 'writing':
+        return <WritingGrader />;
       default:
         return <Dashboard />;
     }

@@ -116,8 +116,51 @@ export default function Settings() {
           
           <div className="setting-item">
             <div className="setting-info">
+              <label>AI Provider</label>
+              <p>Choose your AI engine (both offer free tiers)</p>
+            </div>
+            <select 
+              id="setting-ai-provider" 
+              value={settings.aiProvider || 'groq'} 
+              onChange={(e) => handleSettingChange('aiProvider', e.target.value)}
+              title="Select AI Provider"
+            >
+              <option value="groq">Groq (Lightning Fast)</option>
+              <option value="gemini">Google Gemini (Massive Context)</option>
+            </select>
+          </div>
+
+          <div className="setting-item">
+            <div className="setting-info">
+              <label>AI Model</label>
+              <p>Select which specific model to use</p>
+            </div>
+            {settings.aiProvider === 'gemini' ? (
+              <select 
+                id="setting-gemini-model" 
+                value={settings.geminiModel || 'gemini-1.5-flash'} 
+                onChange={(e) => handleSettingChange('geminiModel', e.target.value)}
+              >
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Free Tier)</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Free Tier Limited)</option>
+              </select>
+            ) : (
+              <select 
+                id="setting-groq-model" 
+                value={settings.groqModel || 'llama-3.1-8b-instant'} 
+                onChange={(e) => handleSettingChange('groqModel', e.target.value)}
+              >
+                <option value="llama-3.1-8b-instant">Llama 3.1 8B (Fast)</option>
+                <option value="llama-3.3-70b-versatile">Llama 3.3 70B (Smart)</option>
+                <option value="mixtral-8x7b-32768">Mixtral 8x7B (Balanced)</option>
+              </select>
+            )}
+          </div>
+          
+          <div className="setting-item" style={{ opacity: settings.aiProvider === 'groq' ? 1 : 0.4 }}>
+            <div className="setting-info">
               <label>Groq API Key</label>
-              <p>Used for the AI Chatbot and Exercises</p>
+              <p>Required for Groq models</p>
             </div>
             <div className="input-with-toggle">
               <input 
@@ -137,10 +180,10 @@ export default function Settings() {
             </div>
           </div>
           
-          <div className="setting-item">
+          <div className="setting-item" style={{ opacity: settings.aiProvider === 'gemini' ? 1 : 0.4 }}>
             <div className="setting-info">
               <label>Gemini API Key</label>
-              <p>Backup Google AI engine</p>
+              <p>Required for Google models</p>
             </div>
             <div className="input-with-toggle">
               <input 
