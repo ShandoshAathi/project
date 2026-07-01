@@ -86,7 +86,8 @@ export default function Practice() {
 
     let passage = null;
     try {
-      passage = await generatePracticePassage(currentUser);
+      const contextText = customSubjects[currentSubject]?.contextText || '';
+      passage = await generatePracticePassage(currentUser, contextText);
     } catch (e) {
       console.error("AI Passage generation failed, using library fallbacks:", e);
     }
@@ -346,7 +347,8 @@ Respond ONLY with a valid JSON object:
   const launchRoleplay = async () => {
     setGeneratingRoleplay(true);
     try {
-      const mission = await generateRoleplayScenario(currentUser);
+      const contextText = customSubjects[currentSubject]?.contextText || '';
+      const mission = await generateRoleplayScenario(currentUser, contextText);
       setRoleplay({
         scenario: mission.scenario,
         ai_character: mission.ai_character,
@@ -363,6 +365,7 @@ Respond ONLY with a valid JSON object:
       setIsChatOpen(true);
     } catch (err) {
       console.error("Failed to generate roleplay scenario:", err);
+      const isCoding = ['Python', 'Java', 'C++'].includes(currentSubject) || currentSubject.toLowerCase().includes('program') || currentSubject.toLowerCase().includes('code');
       // Fallback
       setRoleplay({
         scenario: isCoding ? "Code Architecture Review" : "At a Coffee Shop",

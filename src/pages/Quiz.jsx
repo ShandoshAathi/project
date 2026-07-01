@@ -36,7 +36,8 @@ export default function Quiz() {
     let dynamicQs = null;
     try {
       const topic = currentSubject === 'English' ? 'Verbal Aptitude (Module)' : `${currentSubject} Programming`;
-      dynamicQs = await generateQuizQuestions(currentUser, topic);
+      const contextText = customSubjects[currentSubject]?.contextText || '';
+      dynamicQs = await generateQuizQuestions(currentUser, topic, contextText);
     } catch (err) {
       console.error("AI quiz generation error:", err);
     }

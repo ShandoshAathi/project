@@ -4,26 +4,26 @@
  */
 
 import React, { useState } from 'react';
-import { useApp } from './context/AppContext.jsx';
-import Splash from './components/Splash.jsx';
-import Onboarding from './components/Onboarding.jsx';
-import TopNav from './components/TopNav.jsx';
-import AICoachDrawer from './components/AICoachDrawer.jsx';
+import { useApp } from '@/context/AppContext.jsx';
+import Splash from '@/components/Splash.jsx';
+import Onboarding from '@/components/Onboarding.jsx';
+import TopNav from '@/components/TopNav.jsx';
+import AICoachDrawer from '@/components/AICoachDrawer.jsx';
 
 // Pages
-import Auth from './pages/Auth.jsx';
-import Dashboard from './pages/Dashboard.jsx';
-import Practice from './pages/Practice.jsx';
-import Quiz from './pages/Quiz.jsx';
-import Flashcards from './pages/Flashcards.jsx';
-import Study from './pages/Study.jsx';
-import Syllabus from './pages/Syllabus.jsx';
-import Results from './pages/Results.jsx';
-import Profile from './pages/Profile.jsx';
-import Settings from './pages/Settings.jsx';
-import Leaderboard from './pages/Leaderboard.jsx';
-import Analytics from './pages/Analytics.jsx';
-import StudyRooms from './pages/StudyRooms.jsx';
+import Auth from '@/pages/Auth.jsx';
+import Dashboard from '@/pages/Dashboard.jsx';
+import Practice from '@/pages/Practice.jsx';
+import Quiz from '@/pages/Quiz.jsx';
+import Flashcards from '@/pages/Flashcards.jsx';
+import Study from '@/pages/Study.jsx';
+import Syllabus from '@/pages/Syllabus.jsx';
+import Results from '@/pages/Results.jsx';
+import Profile from '@/pages/Profile.jsx';
+import Settings from '@/pages/Settings.jsx';
+import Leaderboard from '@/pages/Leaderboard.jsx';
+import Analytics from '@/pages/Analytics.jsx';
+import StudyRooms from '@/pages/StudyRooms.jsx';
 
 export default function App() {
   const { activePage, setActivePage, currentUser } = useApp();

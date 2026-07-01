@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext.jsx';
 import { generateDailyChallenge, evaluateChallengeResponse, generateCustomSyllabus } from '../services/ai.js';
 import { initSpeechToText, startListening, stopListening } from '../services/voice.js';
+import { extractTextFromPDF, fetchTextFromURL } from '../services/fileParser.js';
 
 export default function Dashboard() {
   const { 
@@ -28,6 +29,8 @@ export default function Dashboard() {
   // Modals & Challenge state
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customTitle, setCustomTitle] = useState('');
+  const [customFile, setCustomFile] = useState(null);
+  const [customLink, setCustomLink] = useState('');
   const [generatingCustom, setGeneratingCustom] = useState(false);
   const [customStatus, setCustomStatus] = useState('Analyzing Document...');
 
@@ -75,7 +78,8 @@ export default function Dashboard() {
     // Generate simulated daily mission text
     const fetchChallenge = async () => {
       try {
-        const challenge = await generateDailyChallenge(currentUser);
+        const contextText = customSubjects[currentSubject]?.contextText || '';
+        const challenge = await generateDailyChallenge(currentUser, currentSubject, contextText);
         setDailyChallenge(challenge);
       } catch (err) {
         console.error("Daily challenge generation failed:", err);
@@ -155,23 +159,45 @@ export default function Dashboard() {
   };
 
   const handleGenerateCustomPath = async () => {
-    if (!customTitle.trim()) return alert("Please enter a topic title.");
+    if (!customTitle.trim()) {
+      console.warn("Title empty, alerting user.");
+      return alert("Please enter a topic title.");
+    }
     setGeneratingCustom(true);
-    setCustomStatus("Reading prompt contexts...");
+    setCustomStatus("Initializing...");
 
     try {
+      let extractedContext = "";
+      
+      if (customFile) {
+        setCustomStatus("Reading PDF (extracting text)...");
+        extractedContext = await extractTextFromPDF(customFile);
+      } else if (customLink) {
+        setCustomStatus("Fetching content from link...");
+        extractedContext = await fetchTextFromURL(customLink);
+      }
+      
+      console.warn("Starting generateCustomSyllabus API call...");
       setCustomStatus("AI is designing your modules...");
-      const syllabus = await generateCustomSyllabus(customTitle);
+      const syllabus = await generateCustomSyllabus(customTitle, extractedContext);
+      console.warn("API call succeeded!", { syllabusLength: syllabus?.chapters?.length });
       
       setCustomStatus("Finalizing course structure...");
-      addCustomSubject(customTitle, syllabus);
+      addCustomSubject(customTitle, syllabus, extractedContext);
 
       setShowCustomModal(false);
       setCustomTitle('');
+      setCustomFile(null);
+      setCustomLink('');
       switchSubject(customTitle);
+      
+      // Auto-navigate to study page so the user sees the generated syllabus immediately
+      setActivePage('study');
+      console.warn("Successfully generated and navigated to study page!");
     } catch (err) {
+      console.warn("API call FAILED with error:", err.message);
       console.error(err);
-      alert("Failed to generate custom syllabus. Please try again.");
+      alert("Failed to generate custom syllabus. Error: " + err.message + "\nPlease take a screenshot of this error.");
     } finally {
       setGeneratingCustom(false);
     }
@@ -479,7 +505,7 @@ export default function Dashboard() {
 
       {/* Custom Syllabus Creation Modal */}
       {showCustomModal && (
-        <div id="custom-path-overlay" className="auth-page" style={{ display: 'flex' }}>
+        <div id="custom-path-overlay" className="auth-page active" style={{ display: 'flex' }}>
           <div className="auth-card animate-in custom-path-modal">
             <div className="auth-header">
               <div className="auth-logo">✨</div>
@@ -488,7 +514,7 @@ export default function Dashboard() {
             </div>
 
             {!generatingCustom ? (
-              <div id="custom-path-form">
+              <form id="custom-path-form" onSubmit={(e) => { e.preventDefault(); handleGenerateCustomPath(); }}>
                 <div className="input-group">
                   <label htmlFor="custom-path-title">Topic or Book Title <span className="text-danger">*</span></label>
                   <input 
@@ -503,19 +529,31 @@ export default function Dashboard() {
                 
                 <div className="input-group mt-4">
                   <label htmlFor="custom-path-file">Upload Book / PDF (Optional)</label>
-                  <input type="file" id="custom-path-file" accept=".pdf,.epub,.txt,.docx" className="file-input" />
+                  <input 
+                    type="file" 
+                    id="custom-path-file" 
+                    accept=".pdf" 
+                    className="file-input" 
+                    onChange={(e) => setCustomFile(e.target.files[0])}
+                  />
                 </div>
 
                 <div className="input-group mt-4">
-                  <label htmlFor="custom-path-link">Google Drive Link (Optional)</label>
-                  <input type="url" id="custom-path-link" placeholder="https://drive.google.com/..." />
+                  <label htmlFor="custom-path-link">Web Link (Optional)</label>
+                  <input 
+                    type="url" 
+                    id="custom-path-link" 
+                    placeholder="https://example.com/article" 
+                    value={customLink}
+                    onChange={(e) => setCustomLink(e.target.value)}
+                  />
                 </div>
 
                 <div className="modal-actions mt-6 custom-path-actions">
-                  <button className="btn-outline w-full" onClick={() => setShowCustomModal(false)}>Cancel</button>
-                  <button className="btn-primary w-full" onClick={handleGenerateCustomPath}>Generate Path</button>
+                  <button type="button" className="btn-outline w-full" onClick={() => setShowCustomModal(false)}>Cancel</button>
+                  <button type="submit" className="btn-primary w-full">Generate Path</button>
                 </div>
-              </div>
+              </form>
             ) : (
               <div id="custom-path-loading" className="text-center py-6">
                 <div className="spinner mb-4 custom-path-spinner"></div>

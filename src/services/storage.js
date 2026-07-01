@@ -30,9 +30,9 @@ export function getCustomSubjects() {
   return stored ? JSON.parse(stored) : {};
 }
 
-export function saveCustomSubject(subjectKey, data) {
+export function saveCustomSubject(subjectKey, data, contextText = '') {
   const customSubjects = getCustomSubjects();
-  customSubjects[subjectKey] = data;
+  customSubjects[subjectKey] = { ...data, contextText };
   localStorage.setItem(KEYS.CUSTOM_SUBJECTS, JSON.stringify(customSubjects));
 }
 

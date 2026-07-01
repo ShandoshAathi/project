@@ -188,8 +188,8 @@ export function AppProvider({ children }) {
     setStoredSubject(subject);
   };
 
-  const addCustomSubject = (subjectKey, data) => {
-    setStoredCustomSubject(subjectKey, data);
+  const addCustomSubject = (subjectKey, data, contextText = '') => {
+    setStoredCustomSubject(subjectKey, data, contextText);
     setCustomSubjects(getStoredCustomSubjects());
   };
 

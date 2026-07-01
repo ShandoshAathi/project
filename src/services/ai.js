@@ -40,7 +40,7 @@ async function getUserContext(currentUser) {
   return { level, occupation, subject };
 }
 
-async function callGroq(prompt, model = 'llama-3.3-70b-versatile') {
+async function callGroq(prompt, model = 'llama-3.1-8b-instant', isJson = false) {
   const userKey = getActiveGroqKey();
   const apiKey = userKey || GROQ_API_KEY;
 
@@ -58,7 +58,8 @@ async function callGroq(prompt, model = 'llama-3.3-70b-versatile') {
       model: model,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.8,
-      max_tokens: 1500
+      max_tokens: 1500,
+      ...(isJson ? { response_format: { type: "json_object" } } : {})
     })
   });
 
@@ -71,6 +72,11 @@ async function callGroq(prompt, model = 'llama-3.3-70b-versatile') {
   const text = data.choices?.[0]?.message?.content || "";
   if (!text) throw new Error("Groq returned empty response");
   return text;
+}
+
+function parseLLMJSON(text) {
+  const cleanedText = text.replace(/```json|```/g, '').replace(/[\u0000-\u001F]+/g, " ").trim();
+  return JSON.parse(cleanedText);
 }
 
 /**
@@ -169,7 +175,7 @@ export async function sendChatMessage(currentUser, chatHistory, userMessage, ima
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
+          model: 'llama-3.1-8b-instant',
           messages: groqMessages,
           temperature: 0.7,
           max_tokens: 600
@@ -213,7 +219,7 @@ export async function sendChatMessage(currentUser, chatHistory, userMessage, ima
 /**
  * Generate practice passages
  */
-export async function generatePracticePassage(currentUser) {
+export async function generatePracticePassage(currentUser, fileContext = "") {
   const { level, occupation, subject } = await getUserContext(currentUser);
   const seed = Date.now().toString(36) + Math.random().toString(36).substring(2);
   let lengthInstruction = "";
@@ -230,6 +236,7 @@ export async function generatePracticePassage(currentUser) {
   const prompt = `Generate a highly unique and creative ${isCoding ? 'coding practice snippet or explanation' : 'reading practice passage'} in ${subject} for a ${level} level learner who is a ${occupation}. 
     Reference ID: ${seed}
     ${lengthInstruction}
+    ${fileContext ? `CRITICAL: The content MUST be based strictly on this source material:\n---\n${fileContext.slice(0, 5000)}\n---\n` : ''}
     ${isCoding ? 'For coding, provide a code snippet and a brief explanation. Ensure it is syntactically correct.' : 'Include verbal aptitude elements from the Module appropriate for their level.'}
     Use scenarios related to their background as a ${occupation}.
     CRITICAL: DO NOT use generic topics. Choose something niche, modern, or unexpected.
@@ -247,7 +254,7 @@ export async function generatePracticePassage(currentUser) {
 /**
  * Generate quiz questions based on topic and user level
  */
-export async function generateQuizQuestions(currentUser, topic = "Verbal Aptitude (Module)") {
+export async function generateQuizQuestions(currentUser, topic = "Verbal Aptitude (Module)", fileContext = "") {
   const { level, occupation, subject } = await getUserContext(currentUser);
   const seed = Date.now().toString(36) + Math.random().toString(36).substring(2);
   const isCoding = ['Python', 'Java', 'C++'].includes(subject) || subject.toLowerCase().includes('program') || subject.toLowerCase().includes('code');
@@ -264,20 +271,21 @@ export async function generateQuizQuestions(currentUser, topic = "Verbal Aptitud
   const prompt = `Generate exactly 10 unique, high-variety multiple-choice questions about '${isCoding ? subject + ' programming' : topic}' for a ${level} learner who is a ${occupation}. 
     Reference ID: ${seed}
     ${difficultyInstruction}
-    ${!isCoding ? 'Focus strictly on topics from their COMPLETED Syllabus Module: Sentence Patterns, Verb Tenses, Voice, Reported Speech, Concord, Prepositions, Phrasal Verbs, Conditionals, Adverbs, Articles, or Dangling Modifiers.' : ''}
+    ${!isCoding && !fileContext ? 'Focus strictly on topics from their COMPLETED Syllabus Module: Sentence Patterns, Verb Tenses, Voice, Reported Speech, Concord, Prepositions, Phrasal Verbs, Conditionals, Adverbs, Articles, or Dangling Modifiers.' : ''}
+    ${fileContext ? `CRITICAL: Base your questions ENTIRELY on the following source material:\n---\n${fileContext.slice(0, 5000)}\n---\n` : ''}
     Use diverse question types: vocabulary, comprehension, grammar, and situational scenarios.
     CRITICAL: Avoid standard textbook examples. Be imaginative and challenging.
-    Return the response as a JSON array of exactly 10 objects.
+    Return the response as a JSON object containing a single key "questions" which is an array of exactly 10 objects.
     Each object MUST have:
     - "q": The question text
     - "opts": An array of exactly 4 options
     - "ans": The 0-based index of the correct option
-    Return ONLY the raw JSON array, no markdown blocks.`;
+    CRITICAL: Output MUST be strictly valid JSON. Do not use literal newlines inside strings. Use \\n if needed.`;
 
   try {
-    const responseText = await callGroq(prompt);
-    const jsonStr = responseText.replace(/```json|```/g, '').trim();
-    return JSON.parse(jsonStr);
+    const responseText = await callGroq(prompt, 'llama-3.1-8b-instant', true);
+    const parsed = parseLLMJSON(responseText);
+    return parsed.questions || parsed;
   } catch (err) {
     console.error("Quiz Generation Failed:", err);
     return null;
@@ -287,22 +295,24 @@ export async function generateQuizQuestions(currentUser, topic = "Verbal Aptitud
 /**
  * Generate a unique daily challenge scenario
  */
-export async function generateDailyChallenge(currentUser) {
-  const { level, occupation, subject } = await getUserContext(currentUser);
+export async function generateDailyChallenge(currentUser, subjectOverride = null, fileContext = "") {
+  const { level, occupation, subject: defaultSubject } = await getUserContext(currentUser);
+  const subject = subjectOverride || defaultSubject;
   const isCoding = ['Python', 'Java', 'C++'].includes(subject) || subject.toLowerCase().includes('program') || subject.toLowerCase().includes('code');
   
   const prompt = `Generate a unique, interactive learning challenge for a ${level} level learner who is a ${occupation} studying ${subject}.
     The challenge should be a 'Flash-Chat' mission.
+    ${fileContext ? `CRITICAL: Base the scenario and task strictly on the following source material:\n---\n${fileContext.slice(0, 5000)}\n---\n` : ''}
     ${isCoding ? `Example scenarios: debugging a snippet, explaining a ${subject} concept, or optimizing a small function.` : `Example scenarios: ordering a coffee with a specific constraint, responding to a job interview question, or explaining a technical concept to a child.`}
     Return the response as a JSON object with:
     - "title": A catchy name for the mission
     - "scenario": A detailed description of the situation
     - "task": The specific question or prompt the user must respond to
-    Return ONLY the raw JSON, no markdown.`;
+    CRITICAL: Output MUST be strictly valid JSON. Do not use literal newlines inside strings. Use \\n if needed.`;
 
   try {
-    const responseText = await callGroq(prompt);
-    return JSON.parse(responseText.replace(/```json|```/g, '').trim());
+    const responseText = await callGroq(prompt, 'llama-3.1-8b-instant', true);
+    return parseLLMJSON(responseText);
   } catch (err) {
     console.error("Challenge Generation Failed:", err);
     return {
@@ -316,12 +326,13 @@ export async function generateDailyChallenge(currentUser) {
 /**
  * Generate a Roleplay Scenario
  */
-export async function generateRoleplayScenario(currentUser) {
+export async function generateRoleplayScenario(currentUser, fileContext = "") {
   const { level, occupation, subject } = await getUserContext(currentUser);
   const isCoding = ['Python', 'Java', 'C++'].includes(subject) || subject.toLowerCase().includes('program') || subject.toLowerCase().includes('code');
   
   const prompt = `Generate a real-world ${isCoding ? subject + ' technical' : 'English'} roleplay scenario for a ${level} level learner who is a ${occupation}.
     The scenario should involve a conversation with an AI character.
+    ${fileContext ? `CRITICAL: The roleplay MUST be based heavily on the themes and content of this source material:\n---\n${fileContext.slice(0, 5000)}\n---\n` : ''}
     ${isCoding ? `Examples: 
     - Code review with a senior dev
     - Discussing a feature with a project manager
@@ -334,11 +345,11 @@ export async function generateRoleplayScenario(currentUser) {
     - "ai_character": Who the AI is acting as
     - "goal": What the user needs to achieve
     - "first_message": The AI's opening line to start the roleplay
-    Return ONLY the raw JSON, no markdown blocks.`;
+    CRITICAL: Output MUST be strictly valid JSON. Do not use literal newlines inside strings. Use \\n if needed.`;
 
   try {
-    const responseText = await callGroq(prompt);
-    return JSON.parse(responseText.replace(/```json|```/g, '').trim());
+    const responseText = await callGroq(prompt, 'llama-3.1-8b-instant', true);
+    return parseLLMJSON(responseText);
   } catch (err) {
     console.error("Roleplay Generation Failed:", err);
     return {
@@ -362,11 +373,11 @@ export async function evaluateChallengeResponse(task, userResponse) {
     - "score": A number from 0 to 100
     - "feedback": Constructive feedback on grammar, tone, and effectiveness
     - "suggestion": One specific sentence they could have used instead
-    Return ONLY the raw JSON, no markdown.`;
+    CRITICAL: Output MUST be strictly valid JSON. Do not use literal newlines inside strings. Use \\n if needed.`;
 
   try {
-    const responseText = await callGroq(prompt, 'llama-3.1-8b-instant');
-    return JSON.parse(responseText.replace(/```json|```/g, '').trim());
+    const responseText = await callGroq(prompt, 'llama-3.1-8b-instant', true);
+    return parseLLMJSON(responseText);
   } catch (err) {
     console.error("Challenge Evaluation Failed:", err);
     return { score: 70, feedback: "Great effort! Try to be more concise.", suggestion: "I'm working on a revolutionary AI tool." };
@@ -376,8 +387,9 @@ export async function evaluateChallengeResponse(task, userResponse) {
 /**
  * Generate a complete syllabus and modules for a custom topic
  */
-export async function generateCustomSyllabus(topicName) {
+export async function generateCustomSyllabus(topicName, fileContext = "") {
   const prompt = `Generate a comprehensive, professional-grade learning syllabus for the topic: "${topicName}".
+    ${fileContext ? `CRITICAL: You MUST base the entire syllabus explicitly on the following source material provided by the user. Do not hallucinate external chapters if they are not covered in the text.\n---\n${fileContext}\n---\n` : ''}
     Return ONLY a raw JSON object with no markdown formatting. The JSON must match this structure exactly:
     {
       "modules": [
@@ -398,7 +410,8 @@ export async function generateCustomSyllabus(topicName) {
     1. Provide exactly 4 or 5 modules.
     2. Provide exactly 8 to 10 chapters.
     3. The chapter 'body' MUST be formatted in clean, rich HTML (use <p>, <h4>, <ul>, <li>, <strong>, <em>, and <pre><code> for code if it's a programming topic).
-    4. Ensure the content is accurate and highly educational.`;
+    4. Ensure the content is accurate and highly educational.
+    5. CRITICAL: Output MUST be strictly valid JSON. Do not use literal newlines inside strings. Use \\n if needed.`;
 
   try {
     const userKey = getActiveGroqKey();
@@ -415,10 +428,11 @@ export async function generateCustomSyllabus(topicName) {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'llama-3.1-8b-instant',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
-        max_tokens: 3000
+        max_tokens: 3000,
+        response_format: { type: "json_object" }
       })
     });
 
@@ -431,7 +445,7 @@ export async function generateCustomSyllabus(topicName) {
     const text = data.choices?.[0]?.message?.content || "";
     if (!text) throw new Error("Groq returned empty response");
     
-    return JSON.parse(text.replace(/```json|```/g, '').trim());
+    return parseLLMJSON(text);
   } catch (err) {
     console.error("Custom Syllabus Generation Failed:", err);
     throw err;
